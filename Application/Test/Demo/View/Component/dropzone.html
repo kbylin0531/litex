@@ -1,0 +1,24 @@
+<extend file="../Base/sticky_header_layout" />
+<block name="wrapper">
+    <section class="panel">
+        <header class="panel-heading">
+            Dropzone File Upload
+                    <span class="tools pull-right">
+                        <a class="fa fa-chevron-down" href="javascript:;"></a>
+                        <a class="fa fa-times" href="javascript:;"></a>
+                     </span>
+        </header>
+        <div class="panel-body">
+            <form action="__PUBLIC__/js/dropzone/upload.php" class="dropzone" id="my-awesome-dropzone"></form>
+        </div>
+    </section>
+</block>
+<block name="script">
+    <script src="__PUBLIC__/js/dropzone/dropzone.js"></script>
+</block>
+
+<block name="style">
+    <link href="__PUBLIC__/js/dropzone/css/dropzone.css" rel="stylesheet"/>
+</block>
+
+

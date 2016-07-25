@@ -1,0 +1,45 @@
+<extend file="../Base/sticky_header_layout" />
+<block name="style">
+    <link href="__PUBLIC__/js/fullcalendar/bootstrap-fullcalendar.css" rel="stylesheet" />
+</block>
+<block name="wrapper">
+<!--calendar css-->
+
+        <!-- page start-->
+        <div class="row">
+            <aside class="col-md-3">
+                <h4 class="drg-event-title"> Draggable Events</h4>
+                <div id='external-events'>
+                    <div class='external-event label label-primary'>My Event 1</div>
+                    <div class='external-event label label-success'>My Event 2</div>
+                    <div class='external-event label label-info'>My Event 3</div>
+                    <div class='external-event label label-primary'>My Event 4</div>
+                    <div class='external-event label label-warning'>My Event 5</div>
+                    <div class='external-event label label-danger'>My Event 6</div>
+                    <div class='external-event label label-default'>My Event 7</div>
+                    <div class='external-event label label-primary'>My Event 8</div>
+                    <div class='external-event label label-info'>My Event 9</div>
+                    <div class='external-event label label-success'>My Event 10</div>
+                    <p class="border-top drp-rmv">
+                        <input type='checkbox' id='drop-remove' />
+                        Remove after drop
+                    </p>
+                    <br/>
+                </div>
+            </aside>
+            <aside class="col-md-9">
+                <section class="panel">
+                    <div id="calendar" class="has-toolbar"></div>
+                </section>
+            </aside>
+
+        </div>
+        <!-- page end-->
+</block>
+<block name="script">
+
+    <script src="__PUBLIC__/js/fullcalendar/fullcalendar.min.js"></script>
+    <script src="__PUBLIC__/js/external-dragging-calendar.js"></script>
+
+</block>
+

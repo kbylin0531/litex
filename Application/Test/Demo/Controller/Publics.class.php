@@ -16,12 +16,20 @@ class Publics extends Controller{
         $this->display();
     }
 
+    public function lockScreen(){
+        $this->display();
+    }
+
     public function show404(){
         $this->display('404');
     }
 
     public function show500(){
         $this->display('500');
+    }
+
+    public function boxView(){
+        $this->display();
     }
 
 }

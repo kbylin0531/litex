@@ -1,0 +1,133 @@
+<extend file="../Base/sticky_header_layout" />
+<block name="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    WORLD MAP
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                        <a href="javascript:;" class="fa fa-times"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    <div id="world-vmap" class="vmaps"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    EUROPE
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                        <a href="javascript:;" class="fa fa-times"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    <div id="europe-vmap" class="vmaps"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+            <div class="col-sm-6">
+                <section class="panel">
+                    <header class="panel-heading">
+                        ASIA
+                        <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-down"></a>
+                            <a href="javascript:;" class="fa fa-times"></a>
+                         </span>
+                    </header>
+                    <div class="panel-body">
+                        <div id="asia-vmap" class="vmaps"></div>
+                    </div>
+                </section>
+            </div>
+            <div class="col-sm-6">
+                <section class="panel">
+                    <header class="panel-heading">
+                        Australia
+                        <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-down"></a>
+                            <a href="javascript:;" class="fa fa-times"></a>
+                         </span>
+                    </header>
+                    <div class="panel-body">
+                        <div id="australia-vmap" class="vmaps"></div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+</block>
+<block name="script">
+    <!--Vector Maps-->
+    <script src="__PUBLIC__/js/jvector-map/jqvmap/jquery.vmap.js"></script>
+    <script src="__PUBLIC__/js/jvector-map/jqvmap/maps/jquery.vmap.world.js"></script>
+    <script src="__PUBLIC__/js/jvector-map/jqvmap/data/jquery.vmap.sampledata.js"></script>
+    <script src="__PUBLIC__/js/jvector-map/jqvmap/maps/continents/jquery.vmap.europe.js"></script>
+    <script src="__PUBLIC__/js/jvector-map/jqvmap/maps/continents/jquery.vmap.asia.js"></script>
+    <script src="__PUBLIC__/js/jvector-map/jqvmap/maps/continents/jquery.vmap.australia.js"></script>
+    <script>
+        jQuery('#world-vmap').vectorMap({
+            map: 'world_en',
+            backgroundColor: null,
+            color: '#ffffff',
+            hoverOpacity: 0.7,
+            selectedColor: '#666666',
+            enableZoom: true,
+            borderWidth:1,
+            showTooltip: true,
+            values: sample_data,
+            scaleColors: ['#d3d3d3', '#262626'],
+            normalizeFunction: 'polynomial'
+        });
+        jQuery(document).ready(function() {
+            jQuery('#europe-vmap').vectorMap({
+                map: 'europe_en',
+                backgroundColor: null,
+                color: '#ffffff',
+                borderWidth:1,
+                hoverOpacity: 0.7,
+                selectedColor: '#666666',
+                enableZoom: false,
+                showTooltip: false,
+                values: sample_data,
+                scaleColors: ['#d3d3d3', '#262626'],
+                normalizeFunction: 'polynomial'
+            });
+            jQuery('#asia-vmap').vectorMap({
+                map: 'asia_en',
+                backgroundColor: null,
+                color: '#ffffff',
+                borderWidth:1,
+                hoverOpacity: 0.7,
+                selectedColor: '#666666',
+                enableZoom: false,
+                showTooltip: false,
+                values: sample_data,
+                scaleColors: ['#d3d3d3', '#262626'],
+                normalizeFunction: 'polynomial'
+            });
+            jQuery('#australia-vmap').vectorMap({
+                map: 'australia_en',
+                backgroundColor: null,
+                color: '#ffffff',
+                borderWidth:1,
+                hoverOpacity: 0.7,
+                selectedColor: '#666666',
+                enableZoom: false,
+                showTooltip: false,
+                values: sample_data,
+                scaleColors: ['#d3d3d3', '#262626'],
+                normalizeFunction: 'polynomial'
+            });
+        });
+    </script>
+
+</block>
+

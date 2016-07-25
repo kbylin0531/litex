@@ -106,19 +106,14 @@
 
    searchform_reposition();
 
-   jQuery(window).resize(function(){
-
-      if(jQuery('body').css('position') == 'relative') {
-
-         jQuery('body').removeClass('left-side-collapsed');
-
+   $(window).resize(function(){
+       var thisbody = $("body");
+      if(thisbody.css('position') == 'relative') {
+          thisbody.removeClass('left-side-collapsed');
       } else {
-
-         jQuery('body').css({left: '', marginRight: ''});
+          thisbody.css({left: '', marginRight: ''});
       }
-
       searchform_reposition();
-
    });
 
    function searchform_reposition() {

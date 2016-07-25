@@ -791,6 +791,7 @@ class Think implements ViewInterface{
                 //现在解析规则改为 PATH_BASE.'Application'.'#相对于Application目录的位置#';
                 $templateName .= $this->config['TEMPLATE_SUFFIX'];
             }
+//            \PLite\dump($templateName,dirname($this->template).'/'.$templateName);
             if(strpos($templateName,'/') !== 0){
                 //Relative path
                 $templateName = realpath(dirname($this->template).'/'.$templateName);
@@ -798,8 +799,12 @@ class Think implements ViewInterface{
                 //Absolute path
                 $templateName = PATH_BASE.'/Application'.$templateName;//abs
             }
-            // 获取模板文件内容
-            $parseStr .= file_get_contents($templateName);
+            if(is_file($templateName)){
+                // 获取模板文件内容
+                $parseStr .= file_get_contents($templateName);
+            }else{
+                PLiteException::throwing($templateName,'not found!');
+            }
         }
         return $parseStr;
     }

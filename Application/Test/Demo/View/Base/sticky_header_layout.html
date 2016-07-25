@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="ThemeBucket">
+    <link rel="shortcut icon" href="#" type="image/png">
+
+    <title>Basic Table</title>
+
+    <link href="__PUBLIC__/css/style.css" rel="stylesheet">
+    <link href="__PUBLIC__/css/style-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="__PUBLIC__/js/html5shiv.js"></script>
+    <script src="__PUBLIC__/js/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        /* ------------------------------
+                STICKY HEADER
+        ---------------------------------*/
+        .sticky-header .logo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            z-index: 100;
+            background: #424f63;
+
+        }
+
+        .sticky-header .left-side {
+            /*top: 50px;*/
+        }
+
+        .sticky-header .header-section {
+            position: fixed;
+            top: 0;
+            left: 240px;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .sticky-header .main-content {
+            padding-top: 50px;
+        }
+
+        .sticky-header .menu-right {
+            margin-right: 255px;
+        }
+
+        .sticky-header.left-side-collapsed .header-section {
+            left: 52px;
+        }
+
+        .sticky-header.left-side-collapsed .menu-right {
+            margin-right: 67px;
+        }
+    </style>
+    <block name="style"></block>
+</head>
+
+<body class="sticky-header">
+
+<section>
+    <!-- left side start-->
+    <div class="left-side sticky-left-side">
+        <include file="../Base/Public/sider" />
+    </div>
+    <!-- left side end-->
+
+    <!-- main content start-->
+    <div class="main-content" >
+        <!-- header section start-->
+        <include file="../Base/Public/header" />
+        <!-- header section end-->
+
+        <!-- page heading start-->
+        <div class="page-heading">
+            <block name="heading">
+                <h3>
+                    Basic Table
+                </h3>
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="#">Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="#">Data Table</a>
+                    </li>
+                    <li class="active"> Basic Table </li>
+                </ul>
+            </block>
+        </div>
+        <!-- page heading end-->
+
+        <!--body wrapper start-->
+        <div class="wrapper">
+            <block name="wrapper"></block>
+        </div>
+        <!--body wrapper end-->
+
+        <!--footer section start-->
+        <footer>
+            2014 &copy; AdminEx by <a href="http://www.mycodes.net/" target="_blank">源码之家</a>
+        </footer>
+        <!--footer section end-->
+
+    </div>
+    <!-- main content end-->
+</section>
+
+<!-- Placed js at the end of the document so the pages load faster -->
+<script src="__PUBLIC__/js/jquery-1.10.2.min.js"></script>
+<script src="__PUBLIC__/js/jquery-ui-1.9.2.custom.min.js"></script>
+<script src="__PUBLIC__/js/jquery-migrate-1.2.1.min.js"></script>
+<script src="__PUBLIC__/js/bootstrap.min.js"></script>
+<script src="__PUBLIC__/js/modernizr.min.js"></script>
+<script src="__PUBLIC__/js/jquery.nicescroll.js"></script>
+
+<block name="script"></block>
+
+<!--common scripts for all pages-->
+<script src="__PUBLIC__/js/scripts.js"></script>
+
+</body>
+</html>

@@ -21,7 +21,8 @@ $(document).ready(function() {
      */
     var nCloneTh = document.createElement( 'th' );
     var nCloneTd = document.createElement( 'td' );
-    nCloneTd.innerHTML = '<img src="images/details_open.png">';
+    // nCloneTd.innerHTML = '<img src="images/details_open.png">';
+    nCloneTd.innerHTML = '<i class="fa fa-plus"></i>';
     nCloneTd.className = "center";
 
     $('#hidden-table-info thead tr').each( function () {
@@ -46,18 +47,16 @@ $(document).ready(function() {
      * Note that the indicator for showing which row is open is not controlled by DataTables,
      * rather it is done here
      */
-    $(document).on('click','#hidden-table-info tbody td img',function () {
+    $(document).on('click','#hidden-table-info tbody td i',function () {
         var nTr = $(this).parents('tr')[0];
         if ( oTable.fnIsOpen(nTr) )
         {
             /* This row is already open - close it */
-            this.src = "images/details_open.png";
+            this.setAttribute("class","fa fa-plus");
             oTable.fnClose( nTr );
-        }
-        else
-        {
+        } else {
             /* Open this row */
-            this.src = "images/details_close.png";
+            this.setAttribute("class","fa fa-minus");
             oTable.fnOpen( nTr, fnFormatDetails(oTable, nTr), 'details' );
         }
     } );
