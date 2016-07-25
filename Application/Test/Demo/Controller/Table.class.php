@@ -13,13 +13,19 @@ use PLite\Library\Controller;
 
 class Table extends Controller {
 
-    public function basic(){
-        $this->display();
-    }
     public function dynamic(){
         $this->display();
     }
+
+
+    public function basic(){
+        $this->display();
+    }
     public function responsive(){
+        $this->display();
+    }
+
+    public function editable(){
         $this->display();
     }
 

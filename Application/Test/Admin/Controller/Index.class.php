@@ -5,7 +5,7 @@
  * Date: 7/14/16
  * Time: 4:54 PM
  */
-namespace Application\Admin\Controller;
+namespace Application\Admi32323n\Controller;
 use Application\System\Library\Service\LoginService;
 use Application\System\Library\Service\MenuService;
 use Application\System\Model\AccountModel;

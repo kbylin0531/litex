@@ -175,6 +175,46 @@ hr {
     margin-top: 15px;
 }
 
+/* ------------------------------
+        STICKY HEADER
+---------------------------------*/
+.sticky-header .logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    z-index: 100;
+    background: #424f63;
+
+}
+
+.sticky-header .left-side {
+    /*top: 50px;*/
+}
+
+.sticky-header .header-section {
+    position: fixed;
+    top: 0;
+    left: 240px;
+    width: 100%;
+    z-index: 100;
+}
+
+.sticky-header .main-content {
+    padding-top: 50px;
+}
+
+.sticky-header .menu-right {
+    margin-right: 255px;
+}
+
+.sticky-header.left-side-collapsed .header-section {
+    left: 52px;
+}
+
+.sticky-header.left-side-collapsed .menu-right {
+    margin-right: 67px;
+}
 /*---------------------------------
             LEFT SIDE
 ----------------------------------*/

@@ -13,7 +13,7 @@ return [
     ],
     'DRIVER_CONFIG_LIST' => [
         [
-            'dbname'    => 'soya',//选择的数据库
+            'dbname'    => 'litex',//选择的数据库
             'username'  => 'lin',
             'password'  => 'ASD123zxc',
             'host'      => '127.0.0.1',

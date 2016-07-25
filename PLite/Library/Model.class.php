@@ -120,7 +120,6 @@ class Model {
      * @throws Exception
      */
     public function __construct(){
-        $this->tablename or Exception::throwing('Constant TABLE_NAME require to be string !');
         $this->dao = Dao::getInstance();
         $this->reset([
             'table'     => $this->tablename,
@@ -476,6 +475,13 @@ class Model {
     public function find($keys=null,$getall=false){
         if(null === $keys){
             $result = $this->select(null);
+            if(false === $result){
+                return false;
+            }elseif(!$result){
+                return [];
+            }else{
+                return array_shift($result);
+            }
         }else{
             if(!is_array($keys)){
                 if(!$this->pk) return Exception::throwing('Primary key should be set if parameter is type of int/string !');
@@ -787,8 +793,8 @@ class Model {
 
 
 //------------------------------------------- EXT -----------------------------------------------------------------------------------//
-    public function data(array $info,$comparer=null){
-        $data = $this->fields;
+    public function data(array $info,array $base=null,$comparer=null){
+        $data = $base?$base:$this->fields;
         SEK::merge($data,$info);
         SEK::filter($data,$comparer);
         return $data;

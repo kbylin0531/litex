@@ -1,0 +1,935 @@
+<extend file="../Base/sticky_header_layout" />
+<block name="wrapper">
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Slide Toggle
+                        <span class="tools pull-right">
+                                <a class="fa fa-chevron-down" href="javascript:;"></a>
+                                <a class="fa fa-times" href="javascript:;"></a>
+                             </span>
+                </header>
+                <div class="panel-body">
+                    <div class="slide-toggle">
+                        <div>
+                            <input type="checkbox" class="js-switch" checked/>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="js-switch-blue" checked/>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="js-switch-pink" checked/>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="js-switch-teal" checked/>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="js-switch-red" checked/>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="js-switch-yellow" checked/>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Custom Checkbox & Radio
+                        <span class="tools pull-right">
+                                <a class="fa fa-chevron-down" href="javascript:;"></a>
+                                <a class="fa fa-times" href="javascript:;"></a>
+                             </span>
+                </header>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form class="form-horizontal bucket-form" method="get">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Checkboxes</label>
+
+                                    <div class="col-sm-9 icheck minimal">
+                                        <div class="checkbox single-row">
+                                            <input type="checkbox">
+                                            <label>Checkbox 1</label>
+                                        </div>
+
+                                        <div class="checkbox single-row">
+                                            <label class="disabled"><input type="checkbox" disabled=""
+                                                                           checked=""></label>
+                                            <label>Disabled</label>
+                                        </div>
+
+
+                                        <div class="checkbox checked single-row">
+                                            <label class="disabled"><input type="checkbox" disabled=""
+                                                                           checked=" " id=""></label>
+                                            <label>Checked &amp; Disabled</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form class="form-horizontal bucket-form" method="get">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Radio</label>
+
+                                    <div class="col-sm-9 icheck minimal">
+                                        <div class="radio single-row">
+                                            <input tabindex="3" type="radio" name="demo-radio">
+                                            <label>Checkbox 1</label>
+                                        </div>
+
+                                        <div class="radio single-row">
+                                            <label class="disabled"><input type="radio" disabled=""></label>
+                                            <label>Disabled</label>
+                                        </div>
+
+
+                                        <div class="radio checked single-row">
+                                            <label class=" disabled"><input type="radio" disabled="" checked=""></label>
+                                            <label>Checked &amp; Disabled</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Different Color Custom Checkbox & Radio
+            <span class="tools pull-right">
+                <a class="fa fa-chevron-down" href="javascript:;"></a>
+                <a class="fa fa-times" href="javascript:;"></a>
+             </span>
+                </header>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form class="form-horizontal bucket-form" method="get">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Checkboxes</label>
+
+                                    <div class="col-sm-9 icheck ">
+
+                                        <div class="minimal single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Black Checkbox </label>
+                                            </div>
+                                        </div>
+                                        <div class="minimal-red single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Red Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="minimal-green single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Green Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="minimal-blue single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Blue Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="minimal-yellow single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Yellow Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="minimal-purple single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Purple Checkbox </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form class="form-horizontal bucket-form" method="get">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Checkboxes</label>
+
+                                    <div class="col-sm-9 icheck ">
+
+                                        <div class="square single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Black Checkbox </label>
+                                            </div>
+                                        </div>
+                                        <div class="square-red single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Red Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="square-green single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Green Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="square-blue single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Blue Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="square-yellow single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Yellow Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="square-purple single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Purple Checkbox </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form class="form-horizontal bucket-form" method="get">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Radio</label>
+
+                                    <div class="col-sm-9 icheck ">
+
+                                        <div class="minimal single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Black Radio </label>
+                                            </div>
+                                        </div>
+                                        <div class="minimal-red single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio" checked>
+                                                <label>Red Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="minimal-green single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Green Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="minimal-blue single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Blue Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="minimal-yellow single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Yellow Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="minimal-purple single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Purple Radio </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form class="form-horizontal bucket-form" method="get">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Radio</label>
+
+                                    <div class="col-sm-9 icheck ">
+
+                                        <div class="square single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Black Radio </label>
+                                            </div>
+                                        </div>
+                                        <div class="square-red single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Red Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="square-green single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Green Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="square-blue single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Blue Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="square-yellow single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Yellow Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="square-purple single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Purple Radio </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    flat checkbox & radio
+                        <span class="tools pull-right">
+                            <a class="fa fa-chevron-down" href="javascript:;"></a>
+                            <a class="fa fa-times" href="javascript:;"></a>
+                         </span>
+                </header>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form class="form-horizontal bucket-form" method="get">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Checkbox</label>
+
+                                    <div class="col-sm-9 icheck ">
+
+                                        <div class="flat-grey single-row">
+                                            <div class="radio ">
+                                                <input type="checkbox" checked>
+                                                <label>Black Checkbox </label>
+                                            </div>
+                                        </div>
+                                        <div class="flat-red single-row">
+                                            <div class="radio ">
+                                                <input type="checkbox" checked>
+                                                <label>Red Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="flat-green single-row">
+                                            <div class="radio ">
+                                                <input type="checkbox" checked>
+                                                <label>Green Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="flat-blue single-row">
+                                            <div class="radio ">
+                                                <input type="checkbox" checked>
+                                                <label>Blue Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="flat-yellow single-row">
+                                            <div class="radio ">
+                                                <input type="checkbox" checked>
+                                                <label>Yellow Checkbox </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="flat-purple single-row">
+                                            <div class="radio ">
+                                                <input type="checkbox" checked>
+                                                <label>Purple Checkbox </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form class="form-horizontal bucket-form" method="get">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Radio</label>
+
+                                    <div class="col-sm-9 icheck ">
+
+                                        <div class="flat-grey single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Black Radio </label>
+                                            </div>
+                                        </div>
+                                        <div class="flat-red single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Red Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="flat-green single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Green Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="flat-blue single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Blue Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="flat-yellow single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Yellow Radio </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="flat-purple single-row">
+                                            <div class="radio ">
+                                                <input tabindex="3" type="radio" name="demo-radio">
+                                                <label>Purple Radio </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div> 
+
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Multiple Select
+                              <span class="tools pull-right">
+                                <a class="fa fa-chevron-down" href="javascript:;"></a>
+                                <a class="fa fa-times" href="javascript:;"></a>
+                             </span>
+                </header>
+                <div class="panel-body">
+                    <form action="#" class="form-horizontal ">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Default</label>
+
+                            <div class="col-md-9">
+                                <select multiple="multiple" class="multi-select" id="my_multi_select1"
+                                        name="my_multi_select1[]">
+                                    <option>Dallas Cowboys</option>
+                                    <option>New York Giants</option>
+                                    <option selected>Philadelphia Eagles</option>
+                                    <option selected>Washington Redskins</option>
+                                    <option>Chicago Bears</option>
+                                    <option>Detroit Lions</option>
+                                    <option>Green Bay Packers</option>
+                                    <option>Minnesota Vikings</option>
+                                    <option selected>Atlanta Falcons</option>
+                                    <option>Carolina Panthers</option>
+                                    <option>New Orleans Saints</option>
+                                    <option>Tampa Bay Buccaneers</option>
+                                    <option>Arizona Cardinals</option>
+                                    <option>St. Louis Rams</option>
+                                    <option>San Francisco 49ers</option>
+                                    <option>Seattle Seahawks</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Grouped Options</label>
+
+                            <div class="col-md-9">
+                                <select multiple="multiple" class="multi-select" id="my_multi_select2"
+                                        name="my_multi_select2[]">
+                                    <optgroup label="NFC EAST">
+                                        <option>Dallas Cowboys</option>
+                                        <option>New York Giants</option>
+                                        <option>Philadelphia Eagles</option>
+                                        <option>Washington Redskins</option>
+                                    </optgroup>
+                                    <optgroup label="NFC NORTH">
+                                        <option>Chicago Bears</option>
+                                        <option>Detroit Lions</option>
+                                        <option>Green Bay Packers</option>
+                                        <option>Minnesota Vikings</option>
+                                    </optgroup>
+                                    <optgroup label="NFC SOUTH">
+                                        <option>Atlanta Falcons</option>
+                                        <option>Carolina Panthers</option>
+                                        <option>New Orleans Saints</option>
+                                        <option>Tampa Bay Buccaneers</option>
+                                    </optgroup>
+                                    <optgroup label="NFC WEST">
+                                        <option>Arizona Cardinals</option>
+                                        <option>St. Louis Rams</option>
+                                        <option>San Francisco 49ers</option>
+                                        <option>Seattle Seahawks</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group last">
+                            <label class="control-label col-md-3">Searchable</label>
+
+                            <div class="col-md-9">
+                                <select name="country" class="multi-select" multiple="" id="my_multi_select3">
+                                    <option value="AF">Afghanistan</option>
+                                    <option value="AL">Albania</option>
+                                    <option value="DZ">Algeria</option>
+                                    <option value="AS">American Samoa</option>
+                                    <option value="AD">Andorra</option>
+                                    <option value="TO">Tonga</option>
+                                    <option value="TT">Trinidad and Tobago</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Spinner
+                         <span class="tools pull-right">
+                            <a class="fa fa-chevron-down" href="javascript:;"></a>
+                            <a class="fa fa-times" href="javascript:;"></a>
+                         </span>
+                </header>
+                <div class="panel-body">
+                    <form action="#" class="form-horizontal ">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Spinner 1</label>
+                                    <div class="col-md-4">
+                                        <div id="spinner1">
+                                            <div class="input-group input-small">
+                                                <input type="text" class="spinner-input form-control"
+                                                       maxlength="3" readonly>
+                                                <div class="spinner-buttons input-group-btn btn-group-vertical">
+                                                    <button type="button"
+                                                            class="btn spinner-up btn-xs btn-default">
+                                                        <i class="fa fa-angle-up"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn spinner-down btn-xs btn-default">
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                             <span class="help-block">
+                                                basic example
+                                             </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Spinner 2</label>
+                                    <div class="col-md-4">
+                                        <div id="spinner2">
+                                            <div class="input-group input-small">
+                                                <input type="text" class="spinner-input form-control"
+                                                       maxlength="3" readonly>
+                                                <div class="spinner-buttons input-group-btn btn-group-vertical">
+                                                    <button type="button"
+                                                            class="btn spinner-up btn-xs btn-info">
+                                                        <i class="fa fa-angle-up"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn spinner-down btn-xs btn-info">
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                             <span class="help-block">
+                                                disabled state
+                                             </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Spinner 3</label>
+                                    <div class="col-md-9">
+                                        <div id="spinner3">
+                                            <div class="input-group" style="width:150px;">
+                                                <input type="text" class="spinner-input form-control"
+                                                       maxlength="3" readonly>
+                                                <div class="spinner-buttons input-group-btn">
+                                                    <button type="button" class="btn btn-default spinner-up">
+                                                        <i class="fa fa-angle-up"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default spinner-down">
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                             <span class="help-block">
+                                             with max value: 10
+                                             </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <label class="control-label col-md-3">Spinner 4</label>
+                                    <div class="col-md-9">
+                                        <div id="spinner4">
+                                            <div class="input-group" style="width:150px;">
+                                                <div class="spinner-buttons input-group-btn">
+                                                    <button type="button" class="btn spinner-up btn-primary">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                                <input type="text" class="spinner-input form-control"
+                                                       maxlength="3" readonly>
+                                                <div class="spinner-buttons input-group-btn">
+                                                    <button type="button" class="btn spinner-down btn-warning">
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                             <span class="help-block">
+                                                with step: 5
+                                             </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Advanced File Input
+                          <span class="tools pull-right">
+                            <a class="fa fa-chevron-down" href="javascript:;"></a>
+                            <a class="fa fa-times" href="javascript:;"></a>
+                         </span>
+                </header>
+                <div class="panel-body">
+                    <form action="#" class="form-horizontal ">
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Default</label>
+                            <div class="col-md-4">
+                                <input type="file" class="default"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Without input</label>
+                            <div class="controls col-md-9">
+                                <div class="fileupload fileupload-new" data-provides="fileupload">
+                                                <span class="btn btn-default btn-file">
+                                                <span class="fileupload-new"><i class="fa fa-paper-clip"></i> Select file</span>
+                                                <span class="fileupload-exists"><i class="fa fa-undo"></i> Change</span>
+                                                <input type="file" class="default"/>
+                                                </span>
+                                    <span class="fileupload-preview" style="margin-left:5px;"></span>
+                                    <a href="#" class="close fileupload-exists" data-dismiss="fileupload"
+                                       style="float: none; margin-left:5px;"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group last">
+                            <label class="control-label col-md-3">Image Upload</label>
+                            <div class="col-md-9">
+                                <div class="fileupload fileupload-new" data-provides="fileupload">
+                                    <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+                                        <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text=no+image"
+                                             alt=""/>
+                                    </div>
+                                    <div class="fileupload-preview fileupload-exists thumbnail"
+                                         style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
+                                    <div>
+                                                   <span class="btn btn-default btn-file">
+                                                   <span class="fileupload-new"><i class="fa fa-paper-clip"></i> Select image</span>
+                                                   <span class="fileupload-exists"><i
+                                                           class="fa fa-undo"></i> Change</span>
+                                                   <input type="file" class="default"/>
+                                                   </span>
+                                        <a href="#" class="btn btn-danger fileupload-exists"
+                                           data-dismiss="fileupload"><i class="fa fa-trash"></i> Remove</a>
+                                    </div>
+                                </div>
+                                <br/>
+                                <span class="label label-danger ">NOTE!</span>
+                                             <span>
+                                             Attached image thumbnail is
+                                             supported in Latest Firefox, Chrome, Opera,
+                                             Safari and Internet Explorer 10 only
+                                             </span>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Tags Input
+                        <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-down"></a>
+                            <a href="javascript:;" class="fa fa-times"></a>
+                         </span>
+                </header>
+                <div class="panel-body">
+                    <form action="#" class="form-horizontal">
+                        <div class="form-group">
+                            <label class=" col-md-2 control-label">Default</label>
+                            <div class="col-md-10">
+                                <input id="tags_1" type="text" class="tags"
+                                       value="php,ios,javascript,ruby,android,kindle"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Fixed Width</label>
+                            <div class="col-md-10">
+                                <input id="tags_2" type="text" class="tags" value="tag1,tag2"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Masked inputs
+                         <span class="tools pull-right">
+                            <a class="fa fa-chevron-down" href="javascript:;"></a>
+                            <a class="fa fa-times" href="javascript:;"></a>
+                         </span>
+                </header>
+                <div class="panel-body">
+                    <form action="#" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">ISBN 1</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="999-99-999-9999-9"
+                                       class="form-control">
+                                <span class="help-inline">999-99-999-9999-9</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">ISBN 2</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="999 99 999 9999 9"
+                                       class="form-control">
+                                <span class="help-inline">999 99 999 9999 9</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">ISBN 3</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="999/99/999/9999/9"
+                                       class="form-control">
+                                <span class="help-inline">999/99/999/9999/9</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">IPV4</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="999.999.999.9999"
+                                       class="form-control">
+                                <span class="help-inline">192.168.110.310</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">IPV6</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder=""
+                                       data-mask="9999:9999:9999:9:999:9999:9999:9999" class="form-control">
+                                <span class="help-inline">4deg:1340:6547:2:540:h8je:ve73:98pd</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Tax ID</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="99-9999999" class="form-control">
+                                <span class="help-inline">99-9999999</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Phone</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="(999) 999-9999"
+                                       class="form-control">
+                                <span class="help-inline">(999) 999-9999</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Currency</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="$ 999,999,999.99"
+                                       class="form-control">
+                                <span class="help-inline">$ 999,999,999.99</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Date</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="99/99/9999" class="form-control">
+                                <span class="help-inline">dd/mm/yyyy</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Date 2</label>
+                            <div class="col-sm-10">
+                                <input type="text" placeholder="" data-mask="99-99-9999" class="form-control">
+                                <span class="help-inline">dd-mm-yyyy</span>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+</block>
+<block name="script">
+
+    <!--ios7-->
+    <script src="__PUBLIC__/js/ios-switch/switchery.js"></script>
+    <script src="__PUBLIC__/js/ios-switch/ios-init.js"></script>
+
+    <!--icheck -->
+    <script src="__PUBLIC__/js/iCheck/jquery.icheck.js"></script>
+    <script src="__PUBLIC__/js/icheck-init.js"></script>
+    <!--multi-select-->
+    <script src="__PUBLIC__/js/jquery-multi-select/js/jquery.multi-select.js"></script>
+    <script src="__PUBLIC__/js/jquery-multi-select/js/jquery.quicksearch.js"></script>
+    <script src="__PUBLIC__/js/multi-select-init.js"></script>
+    <!--spinner-->
+    <script src="__PUBLIC__/js/fuelux/js/spinner.min.js"></script>
+    <script src="__PUBLIC__/js/spinner-init.js"></script>
+    <!--file upload-->
+    <script src="__PUBLIC__/js/bootstrap-fileupload.min.js"></script>
+    <!--tags input-->
+    <script src="__PUBLIC__/js/jquery-tags-input/jquery.tagsinput.js"></script>
+    <script src="__PUBLIC__/js/tagsinput-init.js"></script>
+    <!--bootstrap input mask-->
+    <script src="__PUBLIC__/js/bootstrap-inputmask/bootstrap-inputmask.min.js"></script>
+
+</block>
+
+<block name="style">
+
+    <!--ios7-->
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/js/ios-switch/switchery.css"/>
+
+    <!--icheck-->
+    <link href="__PUBLIC__/js/iCheck/skins/minimal/minimal.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/minimal/red.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/minimal/green.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/minimal/blue.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/minimal/yellow.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/minimal/purple.css" rel="stylesheet">
+
+    <link href="__PUBLIC__/js/iCheck/skins/square/square.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/square/red.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/square/green.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/square/blue.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/square/yellow.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/square/purple.css" rel="stylesheet">
+
+    <link href="__PUBLIC__/js/iCheck/skins/flat/grey.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/flat/red.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/flat/green.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/flat/blue.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/flat/yellow.css" rel="stylesheet">
+    <link href="__PUBLIC__/js/iCheck/skins/flat/purple.css" rel="stylesheet">
+
+    <!--multi-select-->
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/js/jquery-multi-select/css/multi-select.css"/>
+
+    <!--file upload-->
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/bootstrap-fileupload.min.css"/>
+
+    <!--tags input-->
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/js/jquery-tags-input/jquery.tagsinput.css"/>
+
+</block>
+
+
+

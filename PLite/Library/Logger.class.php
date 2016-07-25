@@ -38,13 +38,10 @@ class Logger extends Lite{
 
         'LOG_RATE'      => Logger::LOGRATE_DAY,
 
-
-
-
         //Think\Log
         'LOG_TIME_FORMAT'   =>  ' c ',
         'LOG_FILE_SIZE'     =>  2097152,
-        'LOG_PATH'  => PATH_RUNTIME.'Log',
+        'LOG_PATH'  => PATH_RUNTIME.'/Log',
         // 允许记录的日志级别
         'LOG_LEVEL'         =>  true,//'EMERG,ALERT,CRIT,ERR,WARN,NOTIC,INFO,DEBUG,SQL',
     ];
@@ -72,18 +69,18 @@ class Logger extends Lite{
      */
     protected static function fetchLogUID($level=self::LOG_LEVEL_DEBUG,$datetime=null){
         if(isset($datetime)){
-            $path = PATH_RUNTIME."Log/{$level}/{$datetime}.log";
+            $path = PATH_RUNTIME."/Log/{$level}/{$datetime}.log";
         }else{
             $date = date('Y-m-d');
             $rate = self::getConfig('LOG_RATE');
             $rate or $rate = self::LOGRATE_DAY;
             switch($rate){
                 case self::LOGRATE_DAY:
-                    $path = PATH_RUNTIME."Log/{$level}/{$date}.log";
+                    $path = PATH_RUNTIME."/Log/{$level}/{$date}.log";
                     break;
                 case self::LOGRATE_HOUR:
                     $hour = date('H');
-                    $path = PATH_RUNTIME."Log/{$level}/{$date}/{$hour}.log";
+                    $path = PATH_RUNTIME."/Log/{$level}/{$date}/{$hour}.log";
                     break;
                 default:
                     return Exception::throwing("日志频率未定义：'{$rate}'");

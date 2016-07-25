@@ -13,6 +13,9 @@ use PLite\Library\Controller;
 
 class Component extends Controller {
 
+    public function boxView(){
+        $this->display();
+    }
     public function buttons(){
         $this->display();
     }
@@ -26,17 +29,6 @@ class Component extends Controller {
     }
 
     public function chartjs(){
-        $this->display();
-    }
-
-    public function chat(){
-        $this->display();
-    }
-
-    /**
-     * 电话簿
-     */
-    public function directory(){
         $this->display();
     }
 
@@ -56,18 +48,6 @@ class Component extends Controller {
         $this->display();
     }
 
-    public function form_advanced_components(){
-        $this->display();
-    }
-    public function form_layouts(){
-        $this->display();
-    }
-    public function form_validation(){
-        $this->display();
-    }
-    public function form_wizard(){
-        $this->display();
-    }
     public function gallery(){
         $this->display();
     }
@@ -105,16 +85,6 @@ class Component extends Controller {
         $this->display();
     }
 
-    public function mail(){
-        $this->display();
-    }
-
-    public function mail_compose(){
-        $this->display();
-    }
-    public function mail_view(){
-        $this->display();
-    }
 
     public function morris(){
         $this->display();
