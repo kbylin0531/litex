@@ -1,0 +1,163 @@
+<extend file="/Admin/View/Common/admin.html"/>
+
+<block name="content">
+    <div class="block-area">
+        <h3 class="block-title">微信账号列表</h3>
+        <div class="table-responsive overflow">
+            <table id="table" class="table table-bordered table-hover tile">
+            </table>
+        </div>
+    </div>
+
+    <form class="form-horizontal hidden" id="edit" role="form">
+
+        <div class="form-group">
+            <label class="col-md-5 control-label">公众号类型 * </label>
+            <div class="col-md-7">
+                <select class="select" name="type">
+                    <option value="0">普通订阅号</option>
+                    <option value="1">微信认证订阅号</option>
+                    <option value="2">普通服务号</option>
+                    <option value="3">微信认证服务号</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-5 control-label">公众号名称</label>
+            <div class="col-md-7">
+                <input type="text" name="name" class="form-control input-sm">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-5 control-label">原始ID</label>
+            <div class="col-md-7">
+                <input type="text" name="origin_id" class="form-control input-sm">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-5 control-label">微信号</label>
+            <div class="col-md-7">
+                <input type="text" name="wechat" class="form-control input-sm">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-5 control-label">凭证(Token)</label>
+            <div class="col-md-7">
+                <input type="text" name="token" class="form-control input-sm">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-5 control-label">应用ID(AppID)</label>
+            <div class="col-md-7">
+                <input type="text" name="appid" class="form-control input-sm">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-5 control-label">应用密钥(AppSecret)</label>
+            <div class="col-md-7">
+                <input type="text" name="appsecret" class="form-control input-sm">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-5 control-label">EncodingAESKey(安全模式下必填)</label>
+            <div class="col-md-7">
+                <input type="text" name="encodingaeskey" class="form-control input-sm">
+            </div>
+        </div>
+
+
+    </form>
+</block>
+<block name="script">
+    <script>
+        $(function () {
+            var datalist = L.O.toObj('{$datalist}');
+            var dtable = L.P.datatable().create('#table',{
+                'columns':[
+                    {
+                        'title':'ID',
+                        'data':'id',
+                        width:'3%'
+                    },
+                    {
+                        'title':'名称',
+                        'className':'text-center',
+                        'data':'name',
+                        width:'12%'
+                    },
+                    {
+                        'title':'原始ID',
+                        'className':'text-center',
+                        'data':'origin_id',
+                        width:'12%'
+                    },
+                    {
+                        'title':'微信号',
+                        'className':'text-center',
+                        'data':'wechat',
+                        width:'13%'
+                    },
+                    {
+                        'title':'Token',
+                        'className':'text-center',
+                        'data':'token',
+                        width:'10%'
+                    },
+                    {
+                        'title':'类型',
+                        'className':'text-center',
+                        'data':function (row) {
+                            switch (parseInt(row.type)){
+                                case 0: return '普通订阅号';
+                                case 1: return '微信认证订阅号';
+                                case 2: return '普通服务号';
+                                case 3: return '微信认证服务号';
+                                default:return 'Unknown';
+                            }
+                        },
+                        width:'10%'
+                    },
+                    {
+                        'title':'操作',
+                        'data':function(row){
+                            return '<a href="javascript:void(0);" class="edit" data-id="'+row.id+'">修改</a>&nbsp;'+
+                                    '<a href="__MODULE__/Material/index?aid='+row.id+'" class="edit" data-id="'+row.id+'">素材管理</a>&nbsp;'+
+                                    '<a href="__CONTROLLER__/manege?aid='+row.id+'" class="edit" data-id="'+row.id+'">自动回复</a>&nbsp;'+
+                                    '<a href="javascript:void(0);" class="delete" data-id="'+row.id+'">删除</a>&nbsp;';
+                        }
+                    }
+                ]
+            }).load(datalist);
+            var modal = L.P.modal().create("#edit");
+            var editform = $("#edit");
+
+            L.select.init('.select');
+
+            $(".edit").click(function (e) {
+                var row = $(this).parents("tr");
+                var data = dtable.data(row);
+
+                L.P.form(editform,data);
+                modal.title('Edit').onConfirm(function () {
+                    var values = editform.serialize();
+                    $.post("__CONTROLLER__/updateAccount",values,function (data) {
+                        console.log(data);
+                        if(data.type > 0){
+                            $.sticky('Success to update!');
+                            modal.hide();
+                        }else{
+                            $.sticky('Failed to update!');
+                        }
+                    });
+                }).show();
+            });
+
+            $(".delete").click(function () {
+            });
+
+
+        });
+    </script>
+
+</block>

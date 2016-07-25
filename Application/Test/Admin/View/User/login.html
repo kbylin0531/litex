@@ -1,0 +1,127 @@
+<extend file="/Admin/View/Base/common.html" />
+<block name="script">
+    <script>
+        var sur = null;
+        function checkform() {
+            var username = $("#username");
+            var password = $("#password");
+            if (username.val().trim() == '') {
+                sur(1);
+                username.focus();
+                return false;
+            }
+            if (password.val().trim() == '') {
+                sur(2);
+                password.focus();
+                return false;
+            }
+            password.val(L.utils.md5(L.utils.sha1(password.val())));
+        }
+
+        $(function () {
+            var $main = $("#mainBody");
+            var win = $(window);
+            var $body = $("body");
+            var $cloud1 = $("#cloud1");
+            var $cloud2 = $("#cloud2");
+            var offset1 = 450;
+            var offset2 = 0;
+            var offsetbg = 0;
+
+            var mainwidth = $main.width();//outerWidth
+
+            // Cloud Float...
+            setInterval(function flutter() {
+                if (offset1 >= mainwidth) offset1 = -580;
+                if (offset2 >= mainwidth)  offset2 = -580;
+                offset1 += 1.1;
+                offset2 += 1;
+                $cloud1.css("background-position", offset1 + "px 100px");
+                $cloud2.css("background-position", offset2 + "px 460px")
+            }, 70);
+            setInterval(function bg() {
+                if (offsetbg >= mainwidth) offsetbg = -580;
+                offsetbg += 0.9;
+                $body.css("background-position", -offsetbg + "px 0")
+            }, 90);
+
+
+            win.resize(function () {
+                $(".loginbox").css({
+                    'position': 'absolute',
+                    /* 692 - width of form */
+                    'left': ($(window).width() - 692 ) / 2
+                });
+            });
+            win.trigger('resize');
+
+
+            var nametip = $("#nametip");
+            var pwdtip = $("#pwdtip");
+            var logintip = $("#logintip");
+
+            sur = function (txt) {
+                switch (txt) {
+                    case 1:
+                        pwdtip.css('display', 'none');
+                        logintip.css('display', 'none');
+                        nametip.css('display', 'inline-block').text("请输入用户名!");
+                        break;
+                    case 2:
+                        logintip.css('display', 'none');
+                        nametip.css('display', 'none');
+                        pwdtip.css('display', 'inline-block').text("请输入密码!");
+                        break;
+                    default:
+                        pwdtip.css('display', 'none');
+                        nametip.css('display', 'none');
+                        logintip.css('display', 'inline-block').text(decodeURI(txt));
+                }
+            };
+
+            if (location.hash) {
+                sur(location.hash.substring(1))
+            }
+
+        });
+
+    </script>
+</block>
+<block name="style">
+
+    <style>
+        .login_tip {
+            color: #f00;
+            font-size: 12px;
+            margin-left: 10px;
+            display: none;
+        }
+    </style>
+
+</block>
+<block name="body">
+    <body id="login_body" style="background-color:#1c77ac; background-image:url(__PUBLIC__/img/admin/light.png) no-repeat center top; overflow:hidden;">
+    <div id="mainBody">
+        <div id="cloud1" class="cloud"></div>
+        <div id="cloud2" class="cloud"></div>
+    </div>
+    <div class="logintop">
+        <span>欢迎登录后台管理界面平台</span>
+    </div>
+    <div class="loginbody">
+        <span class="systemlogo" style="display:block;"></span>
+        <div class="loginbox">
+            <form name="loginform" method="post" action="__ACTION__" onSubmit="return checkform();">
+                <ul>
+                    <li><input name="username" type="text" id="username" class="loginuser" placeholder="请输入用户名"/>
+                        <br><span class="login_tip" id="nametip"></span></li>
+                    <li><input name="password" type="password" id="password" class="loginpwd" placeholder="请输入密码"/>
+                        <br><span class="login_tip" id="pwdtip"></span></li>
+                    <li><input name="login" type="submit" class="loginbtn" value="登录"/><span class="login_tip" id="logintip"></span></li>
+                </ul>
+            </form>
+        </div>
+    </div>
+    <div class="loginbm">&copy;版权所有</div>
+    </body>
+</block>

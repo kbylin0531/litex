@@ -1,0 +1,85 @@
+<extend file="/Admin/View/Base/common.html" />
+
+<block name="script">
+    <script type="text/javascript" src="__PUBLIC__/js/jquery.idTabs.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/js/select-ui.min.js"></script>
+
+    <script type="text/javascript" src="__PUBLIC__/plugin/fancybox/jquery.mousewheel-3.0.4.pack.js"></script>
+    <!--<script type="text/javascript" src="__PUBLIC__/plugin/fancybox/jquery.fancybox-1.3.4.pack.js"></script>-->
+    <!--<link rel="stylesheet" type="text/css" href="__PUBLIC__/plugin/fancybox/jquery.fancybox-1.3.4.css" />-->
+    <script type="text/javascript">
+        function confirmDel(){
+            return confirm("确定要删除删除该信息吗?");
+        }
+        function CheckAll(form){
+            for (var i=0;i<form.elements.length;i++){
+                var e = form.elements[i];
+                if (e.Name != 'chkAll'&&e.disabled==false) e.checked = form.chkAll.checked;
+            }
+        }
+        $(document).ready(function () {
+
+//            $("a[rel=exgroup]").fancybox({
+//                'transitionIn': 'elastic',
+//                'transitionOut': 'elastic',
+//                'titlePosition': 'over',
+//                'titleFormat': function (title, currentArray, currentIndex, currentOpts) {
+//                    return '<span id="fancybox-title-over">Image ' + (currentIndex + 1) + ' / ' + currentArray.length + (title.length ? ' &nbsp; ' + title : '') + '</span>';
+//                }
+//            });
+
+            $('.tablelist tbody tr:odd').addClass('odd');
+        });
+    </script>
+</block>
+
+<block name="body">
+    <body>
+    <div class="place">
+        <span>位置：</span>
+        <ul class="placeul">
+            <li>32323232</li>
+        </ul>
+    </div>
+    <div class="rightinfo">
+
+        <div class="tools">
+            <ul class="toolbar">
+                <a href="">
+                    <li><span><img src="__PUBLIC__/img/admint/01.png"/></span>添加根栏目</li>
+                </a>
+                <a href="">
+                    <li><span><img src="__PUBLIC__/img/admint/01.png"/></span>添加新的子栏目</li>
+                </a>
+            </ul>
+        </div>
+        <table class="tablelist">
+            <thead>
+            <tr>
+                <th width="100">编号<i class="sort"><img src="__PUBLIC__/img/admin/px.gif"/></i></th>
+                <th>栏目代号</th>
+                <th>栏目名称</th>
+                <th width="100">排序</th>
+                <th width="150">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="data_list" id="vo">
+                <img src='__PUBLIC__/img/admin/bg09.png' border='0' />
+                <img src='__PUBLIC__/img/admin/bg10.png' border='0' />
+                <tr>
+                    <td>{$vo.id}</td>
+                    <td>{$vo.code}</td>
+                    <td>{$vo.title}</td>
+                    <td>{$vo.order}</td>
+                    <td class="operate">
+                        <a href="" class="tablelink">展开</a>&nbsp;|&nbsp;
+                        <a href="" class="tablelink">修改</a>&nbsp;|&nbsp;
+                        <a href="" onClick="return confirmDel();" class="tablelink"> 删除</a></td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    </body>
+</block>

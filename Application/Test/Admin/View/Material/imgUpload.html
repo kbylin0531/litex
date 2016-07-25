@@ -1,0 +1,47 @@
+<extend file="/Admin/View/Common/admin.html"/>
+
+<block name="content">
+    <form action="__ACTION__" enctype="multipart/form-data" method="post">
+
+        <input type="hidden" name="aid" value="{$aid}">
+
+        <div class="block-area" id="input-masking">
+            <h3 class="block-title">Title</h3>
+            <div class="row">
+                <div class="col-md-3 m-b-15">
+                    <input name="title" class="form-control">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 m-b-15">
+                    <textarea name="description" class="form-control"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="block-area">
+            <h3 class="block-title">Image</h3>
+            <input type="file" name="picture" id="picture"/>
+        </div>
+
+        <hr class="whiter m-15"/>
+
+        <div class="block-area">
+            <input type="submit" class="btn btn-alt" value="Submit">
+        </div>
+    </form>
+</block>
+<block name="script">
+    <script>
+        L.fileupload.init({
+            "picture": {
+                style: 1
+            }
+        });
+
+        var error = "{$error}";
+        var info = "{$info}";
+        error && L.alert.danger(error);
+        info  && L.alert.success(info);
+    </script>
+</block>

@@ -1,0 +1,63 @@
+<extend file="/Admin/View/Common/admin.html"/>
+<block name="style">
+    <style>
+        .thumbnail.tile{
+            text-align: center;
+        }
+
+    </style>
+</block>
+
+<block name="content">
+
+    <div class="block-area">
+        <h3 class="block-title">Image List</h3>
+        <div id="image">
+            <div id="list">
+                <div class="row">
+                    <notempty name="image_list">
+                        <volist name="image_list" id="vo">
+                            <div class="col-sm-3 col-md-2">
+                                <div class="thumbnail tile">
+                                    <img src="__PUBLIC__/{$vo.path}" alt="">
+                                    <div class="p-15">
+                                        <h6 >{$vo.media_id}</h6>
+                                        <p>{$vo.title} <br>{$vo.description}</p>
+                                        <p>
+                                            <a href="#" class="btn btn-info btn-alt btn-sm">Edit</a>
+                                            <a href="#" class="btn btn-info btn-sm">Remove</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </volist>
+                    </notempty>
+                    <div class="col-sm-3 col-md-2" style="height: 267px">
+                        <div class="thumbnail tile">
+                            <a href="__CONTROLLER__/imgUpload?aid={$aid}" style="text-align: center">
+                                <i class="fa fa-plus fa-5x"></i>
+                            </a>
+                        </div>
+                        <div class="thumbnail tile">
+                            <a href="javascript:void(0);" id="sync" style="text-align: center">
+                                <i class="fa fa-refresh fa-5x"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="script">
+    <script>
+        L.ready(function () {
+
+
+            $("#sync").click(function () {
+                L.post("__CONTROLLER__/imgSync?aid={$aid}",{});
+            });
+
+        });
+    </script>
+</block>

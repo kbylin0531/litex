@@ -1,0 +1,88 @@
+<aside id="sidebar">
+
+    <!-- Sidbar Widgets -->
+    <div class="side-widgets overflow">
+        <!-- Profile Menu -->
+        <div class="text-center s-widget m-b-25 dropdown" id="profile-menu">
+            <a href="" data-toggle="dropdown">
+                <img class="profile-pic animated" src="{$user_info.profile}" alt="">
+            </a>
+            <ul class="dropdown-menu profile-menu">
+                <li><a href="">My Profile</a> <i class="icon left">&#61903;</i><i class="icon right">&#61815;</i></li>
+                <li><a href="">Messages</a> <i class="icon left">&#61903;</i><i class="icon right">&#61815;</i></li>
+                <li><a href="">Settings</a> <i class="icon left">&#61903;</i><i class="icon right">&#61815;</i></li>
+                <li><a href="">Sign Out</a> <i class="icon left">&#61903;</i><i class="icon right">&#61815;</i></li>
+            </ul>
+            <h4 class="m-0">{$user_info.nickname}</h4>
+            liznhv@outlook.com
+        </div>
+
+        <!-- Calendar -->
+        <div class="s-widget m-b-25">
+            <div id="sidebar-calendar"></div>
+        </div>
+
+        <!-- Feeds -->
+        <div class="s-widget m-b-25">
+            <h2 class="tile-title">
+                News Feeds
+            </h2>
+            <div class="s-widget-body">
+                <div id="news-feed"></div>
+                <notempty name="news_feeds">
+                    {$news_feeds}
+                </notempty>
+            </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="s-widget m-b-25">
+            <notempty name="project_list">
+                <h2 class="tile-title">
+                    Projects on going
+                </h2>
+                <div class="s-widget-body">
+                    <!-- progress-bar-danger  progress-bar-info progress-bar-warning progress-bar-success -->
+                    <volist name="project_list" id="vo">
+                        <div class="side-border">
+                            <small>{$vo.title}</small>
+                            <div class="progress progress-small">
+                                <a href="{$vo.link|default='#'}" data-toggle="tooltip"  class="progress-bar tooltips progress-bar-{$vo.type|default='info'}" style="width: 60%;" data-original-title="{$vo.percent}%">
+                                    <span class="sr-only">{$vo.percent}% Complete</span>
+                                </a>
+                            </div>
+                        </div>
+                    </volist>
+                </div>
+            </notempty>
+
+        </div>
+    </div>
+
+    <!-- Side Menu -->
+    <ul class="list-unstyled side-menu">
+        <notempty name="sidemenu_list">
+            <!--<li class="active">  TO ACTIVE -->
+            <volist name="sidemenu_list" id="vo">
+                <notempty name="vo.children">
+                    <li class="dropdown">
+                        <a class="sa-side-{$vo.icon|default='folder'}" href="{$vo.link|default=''}">
+                            <span class="menu-item">{$vo.title|default='Untitled'}</span>
+                        </a>
+                        <ul class="list-unstyled menu-item">
+                            <volist name="vo.children" id="v">
+                                <li><a href="{$v.link|default='#'}">{$v.title|default='Untitled'}</a></li>
+                            </volist>
+                        </ul>
+                    </li>
+                <else />
+                    <li>
+                        <a class="sa-side-{$vo.icon|default='folder'}" href="{$vo.link|default=''}">
+                            <span class="menu-item">{$vo.title|default='Untitled'}</span>
+                        </a>
+                    </li>
+                </notempty>
+            </volist>
+        </notempty>
+    </ul>
+</aside>

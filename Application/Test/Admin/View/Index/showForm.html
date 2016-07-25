@@ -1,0 +1,47 @@
+<extend file="/Admin/View/Base/common.html" />
+<block name="script">
+    <script type="text/javascript" language="javascript">
+        function trim(str){
+            return str.replace(/^\s*|\s*$/g,"");
+        }
+        function checkFormAction(){
+            sub_catg = trim($("#sub_catg").val());
+            catg_name = trim($("#catg_name").val());
+            if(sub_catg==''){
+                $("#tip").html("*请输入栏目代号");
+                $("#sub_catg").focus();
+                return false;
+            }
+            if(catg_name==''){
+                $("#tip").html("*请输入栏目名称");
+                $("#catg_name").focus();
+                return false;
+            }
+        }
+    </script>
+</block>
+
+<block name="body">
+    <form name="form1" enctype="multipart/form-data" action="" method="post" onSubmit="return checkFormAction();">
+        <input type="hidden" name="action" value="" />
+        <input type="hidden" name="catg_code" value="" />
+        <input type="hidden" name="id" value="" />
+        <div class="formbody">
+            <ul class="forminfo">
+                <li id="tip" class="jserror"></li>
+                <li><label>栏目代号：<b>*</b></label><input name="sub_catg" id="sub_catg" type="text" class="dfinput" value="" /></li>
+                <li><label>栏目代号：<b>*</b></label><input name="sub_catg" id="sub_catg" type="text" class="dfinput" value=""  /></li>
+                <li><label>栏目代号：<b>*</b></label><input name="sub_catg" id="sub_catg" type="text" class="dfinput" value="<" disabled="disabled" /></li>
+
+                <li><label>栏目名称：<b>*</b></label><input name="catg_name" id="catg_name" type="text" class="dfinput" value="" /></li>
+
+                <a href='".$SiteImgCatg.$simage."' rel='exgroup' title='".$catg_name."'><img src='__PUBLIC__/img/admin/bimg.gif' width='20' height='20' title='预览' border='0' /></a>&nbsp;&nbsp;
+                <a href='?action=delimg&id=".$id."'>删除该图</a>
+
+                <li><label>上传图片：</label><input name="simage" type="file" class="dfinput" value="" /><i><font color=red>无图</font></i></li>
+                <li><label>栏目排序：<b>*</b></label><input name="ps" id="ps" type="text" class="dfinput" value="" style="width:60px;" /></li>
+                <li><label>&nbsp;</label><input name="" type="submit" class="btn" value="确认保存"/></li>
+            </ul>
+        </div>
+    </form>
+</block>

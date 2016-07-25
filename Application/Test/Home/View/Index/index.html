@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <articles sql="select * from sy_member;" error="error occur" empty="it is empty" >
+        <if condition="$index % 2 gt 0">
+            Hello {$index}:{$vo.username}!
+        <else />
+            Hello {$vo.username}!
+        </if>
+        <br>
+    </articles>
+</body>
+</html>

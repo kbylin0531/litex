@@ -1,0 +1,66 @@
+<extend file="/Admin/View/Common/admin.html"/>
+<block name="content">
+
+
+    <!-- Jumbotron -->
+    <div class="block-area">
+        <h3 class="block-title">Material management</h3>
+        <div class="jumbotron tile-light">
+            <div class="container">
+                <h1>Image</h1>
+                <br>
+                <p><a class="btn btn-alt btn-lg" href="__CONTROLLER__/imgList?aid={$aid}">List</a>
+                    <a class="btn btn-alt btn-lg" href="__CONTROLLER__/imgUpload?aid={$aid}">Add</a></p>
+            </div>
+        </div>
+
+        <div class="jumbotron tile-light">
+            <div class="container">
+                <h1>News</h1>
+                <br>
+                <p><a class="btn btn-alt btn-lg">Show list</a>
+                    <a class="btn btn-alt btn-lg">Add</a></p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="block-area">
+        <div id="tabs">
+            <div id="pane-container">
+                <div id="news">dsdsds</div>
+                <div id="voice"></div>
+                <div id="video"></div>
+                <div id="text"></div>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="script">
+    <script>
+        L.tooltip.init("#image h6",'This is media id.');
+        L.pane.create([
+            {
+                'id':'news',
+                'title':'news'
+            },
+            {
+                'id':'image',
+                'title':'image'
+            },
+            {
+                'id':'voice',
+                'title':'voice'
+            },
+            {
+                'id':'video',
+                'title':'video'
+            },
+            {
+                'id':'text',
+                'title':'text'
+            }
+        ],'#tabs');
+    </script>
+</block>

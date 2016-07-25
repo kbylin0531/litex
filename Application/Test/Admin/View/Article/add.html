@@ -1,0 +1,71 @@
+<extend file="/Admin/View/Common/admin.html"/>
+<block name="content">
+
+    <form action="__ACTION__" id="form" method="post">
+
+        <div class="block-area" id="input-masking">
+            <h3 class="block-title">Common</h3>
+            <div class="row">
+                <div class="col-md-3 m-b-15">
+                    <label>title</label>
+                    <input name="title" class="form-control">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 m-b-15">
+                    <label>Author</label>
+                    <textarea name="author" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 m-b-15">
+                    <label>Summary</label>
+                    <textarea name="summary" class="form-control"></textarea>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-10 m-b-15">
+                    <label>Content</label>
+                    <p id="wysiwye"></p>
+                    <input type="hidden" name="content" id="form-content" >
+                </div>
+            </div>
+        </div>
+
+        <div class="block-area">
+            <h3 class="block-title">Image</h3>
+            <input type="file" name="picture" id="picture"/>
+        </div>
+
+        <hr class="whiter m-15"/>
+
+        <div class="block-area">
+            <input type="submit" class="btn btn-alt" value="Submit">
+        </div>
+    </form>
+</block>
+<block name="script">
+    <script>
+        L.fileupload.init({
+            "picture": {
+                style: 1
+            }
+        });
+        var wysiwyg = L.wysiwyg.create({},"wysiwye");
+        L.wysiwyg.init(null,{height: 200});
+
+        var error = "{$error}";
+        var info = "{$info}";
+        error && L.alert.danger(error);
+        info  && L.alert.success(info);
+
+
+        var form = $("#form");
+        form.on("submit",function () {
+            $("#form-content").val(L.wysiwyg.getCode(wysiwyg));
+            return true;
+        });
+
+    </script>
+</block>

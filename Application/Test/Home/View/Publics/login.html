@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<!-- saved from url=(0030)http://www.jianshu.com/sign_in -->
+<html><!--<![endif]-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>简书</title>
+    <!--[if lte IE 8]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <link rel="stylesheet" media="all" href="__PUBLIC__/home/css/base.css">
+
+    <link rel="stylesheet" media="all" href="__PUBLIC__/home/css/reading.css">
+    <link rel="stylesheet" media="all" href="__PUBLIC__/home/css/base-read-mode.css">
+    <script type="text/javascript" async="" src="__PUBLIC__/home/css/ga.js"></script>
+    <script src="__PUBLIC__/home/css/hm.js"></script>
+    <script src="__PUBLIC__/home/css/modernizr.js"></script>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if IE 8]>
+    <style>
+        .nav-collapse {
+            overflow: visible
+        }
+
+        .notebooks .one-notebook .icon-notebook {
+            background-image: url(/assets/sprite_for_ie.png)
+        }
+
+        .notebooks .active a .icon-notebook {
+            background-image: url(/assets/sprite_for_ie.png);
+            width: 40px
+        }
+
+        a.create-notebook {
+            font-size: 12px
+        }
+
+        a.share-note, a.edit-notebook, a.delete-note, a.delete-notebook {
+            color: #fff
+        }
+
+        .notes .icon-note {
+            background-image: url(/assets/sprite_for_ie.png)
+        }
+
+        .notes .active .icon-note {
+            background-image: url(/assets/sprite_for_ie.png)
+        }
+
+        .notes {
+            font-size: 20px
+        }
+
+        .notes .title {
+            font-size: 18px
+        }
+
+        .notes .wordage {
+            font-size: 11px
+        }
+
+        .notes .abbreviate {
+            font-size: 12px
+        }
+
+        .notes .time {
+            font-size: 11px
+        }
+
+        .new-note-link .win-text {
+            font-style: normal;
+            font-size: 12px
+        }
+
+        .new-note-link .icon {
+            font-size: 12px
+        }
+
+        .dropdown-menu li, .dropdown-menu li a {
+            font-size: 14px
+        }
+
+        .main textarea {
+            padding: 0 30px 0 0;
+            word-wrap: break-word;
+            overflow-x: hidden
+        }
+
+        .main input {
+            font-size: 28px;
+            font-weight: normal
+        }
+
+        .main .alert .close {
+            top: -2px
+        }
+
+        .output .left-aside .bottom-block .btn-success {
+            background-image: url(/assets/sprite_for_ie.png)
+        }
+
+        .output .messages-list .opened {
+            background-image: url(/assets/sprite_for_ie.png)
+        }
+    </style>
+    <![endif]-->
+    <!--[if lt IE 9]>
+    <style>.nav-collapse {
+        overflow: visible
+    }
+
+    .notebooks .one-notebook .icon-notebook {
+        background-image: url(/assets/sprite_for_ie.png)
+    }
+
+    .notebooks .active a .icon-notebook {
+        background-image: url(/assets/sprite_for_ie.png);
+        width: 40px
+    }
+
+    a.create-notebook {
+        font-size: 12px
+    }
+
+    a.share-note, a.edit-notebook, a.delete-note, a.delete-notebook {
+        color: #fff
+    }
+
+    .notes .icon-note {
+        background-image: url(/assets/sprite_for_ie.png)
+    }
+
+    .notes .active .icon-note {
+        background-image: url(/assets/sprite_for_ie.png)
+    }
+
+    .notes {
+        font-size: 20px
+    }
+
+    .notes .title {
+        font-size: 18px
+    }
+
+    .notes .wordage {
+        font-size: 11px
+    }
+
+    .notes .abbreviate {
+        font-size: 12px
+    }
+
+    .notes .time {
+        font-size: 11px
+    }
+
+    .new-note-link .win-text {
+        font-style: normal;
+        font-size: 12px
+    }
+
+    .new-note-link .icon {
+        font-size: 12px
+    }
+
+    .dropdown-menu li, .dropdown-menu li a {
+        font-size: 14px
+    }
+
+    .main textarea {
+        padding: 0 30px 0 0;
+        word-wrap: break-word;
+        overflow-x: hidden
+    }
+
+    .main input {
+        font-size: 28px;
+        font-weight: normal
+    }
+
+    .main .alert .close {
+        top: -2px
+    }
+
+    .output .left-aside .bottom-block .btn-success {
+        background-image: url(/assets/sprite_for_ie.png)
+    }
+
+    .output .messages-list .opened {
+        background-image: url(/assets/sprite_for_ie.png)
+    }</style><![endif]-->
+
+    <style type="text/css">object, embed {
+        -webkit-animation-duration: .001s;
+        -webkit-animation-name: playerInserted;
+        -ms-animation-duration: .001s;
+        -ms-animation-name: playerInserted;
+        -o-animation-duration: .001s;
+        -o-animation-name: playerInserted;
+        animation-duration: .001s;
+        animation-name: playerInserted;
+    }
+
+    @-webkit-keyframes playerInserted {
+        from {
+            opacity: 0.99;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @-ms-keyframes playerInserted {
+        from {
+            opacity: 0.99;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @-o-keyframes playerInserted {
+        from {
+            opacity: 0.99;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes playerInserted {
+        from {
+            opacity: 0.99;
+        }
+        to {
+            opacity: 1;
+        }
+    }</style>
+</head>
+
+<body class="output no-fluid zh cn linux reader-day-mode reader-font2" data-js-module="" data-locale="zh-CN">
+
+<div class="navbar navbar-jianshu shrink">
+    <div class="dropdown">
+        <a class="dropdown-toggle logo" id="dLabel" role="button" data-toggle="dropdown" data-target="#"
+           href="javascript:void(0)">
+            简
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            <li><a href="http://www.jianshu.com/"><i class="fa fa-home"></i> 首页</a></li>
+            <li><a href="http://www.jianshu.com/collections"><i class="fa fa-th"></i> 专题</a></li>
+            <li><a href="http://www.jianshu.com/user_invitations"><i class="fa fa-money"></i> 发钱啦</a></li>
+        </ul>
+    </div>
+</div>
+<div class="navbar-user">
+    <a class="login" data-signup-link="true" data-toggle="modal" href="http://www.jianshu.com/sign_up">
+        <i class="fa fa-user"></i> 注册
+    </a> <a class="login" data-signin-link="true" data-toggle="modal" href="http://www.jianshu.com/sign_in">
+    <i class="fa fa-sign-in"></i> 登录
+</a> <a class="daytime set-view-mode pull-right" href="javascript:void(0)"><i class="fa fa-moon-o"></i></a>
+</div>
+<div class="navbar navbar-jianshu expanded">
+    <div class="dropdown">
+        <a class="active logo" role="button" data-original-title="个人主页" data-container="div.expanded"
+           href="http://www.jianshu.com/">
+            <b>简</b><i class="fa fa-home"></i><span class="title">首页</span>
+        </a> <a data-toggle="tooltip" data-placement="right" data-original-title="专题" data-container="div.expanded"
+                href="http://www.jianshu.com/collections">
+        <i class="fa fa-th"></i><span class="title">专题</span>
+    </a> <a class="ad-selector" href="http://www.jianshu.com/apps">
+        <i class="fa fa-mobile"></i><span class="title">下载手机应用</span>
+    </a>
+        <div class="ad-container ">
+            <div class="ad-pop">
+                <img class="ad-logo" src="__PUBLIC__/home/img/114-8dae53b3bcea3f06bb139e329d1edab3.png" alt="114">
+                <p class="ad-title">简书</p>
+                <p class="ad-subtitle">交流故事，沟通想法</p>
+                <img class="ad-qrcode" src="__PUBLIC__/home/img/download-app-qrcode-053849fa25f9b44573ef8dd3c118a20f.png"
+                     alt="Download app qrcode">
+                <div>
+                    <a class="ad-link" href="https://itunes.apple.com/cn/app/jian-shu/id888237539?ls=1&amp;mt=8">iOS</a>·
+                    <a class="ad-link" href="http://downloads.jianshu.io/apps/haruki/JianShu-1.11.1.apk">Android</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav-user">
+        <a href="http://www.jianshu.com/sign_in#view-mode-modal" data-toggle="modal"><i class="fa fa-font"></i><span
+                class="title">显示模式</span></a>
+
+    </div>
+</div>
+
+
+<div class="container">
+
+    <div class="login-page">
+        <div class="logo"><img src="__PUBLIC__/home/img/img_logo-25ff4bee2e56411470b83c636a7a0dad.png" alt="Img logo"></div>
+        <h4 class="title">
+      <span>
+        <a class="active" data-pjax="true" href="http://www.jianshu.com/sign_in">登录</a>
+        <b>·</b>
+        <a class="" data-pjax="true" href="http://www.jianshu.com/sign_up">注册</a>
+      </span>
+        </h4>
+        <div id="pjax-container">
+
+            <div class="sign-in">
+                <form class="form-horizontal" data-js-module="sign-in" action="http://www.jianshu.com/sessions"
+                      accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="✓"><input
+                        type="hidden" name="authenticity_token"
+                        value="lck3JlD1d1W8KftONGJHL4QVDKLH4tzeUFFsLYdN3sdvZJ7JDCTcEAmXF1gDDk/43YfLXmXHZHf5KvWocsPHYg==">
+
+                    <p id="signin_errors" class="signin_error hide"></p>
+
+                    <div class="input-prepend mobile-verify foreign hide">
+                        <div class="choose_phone clearfix">
+                            <a class="selector btn dropdown-toggle" data-toggle="dropdown" data-iso-code="CN">
+                                +86<span class="caret"></span>
+                            </a>
+                            <ul class="nation_code dropdown-menu" role="menu">
+                                <li data-calling-code="61" data-iso-code="AU">
+                                    <a tabindex="-1" href="javascript:void(0)">
+                                        <span class="nation_code">+61</span><span class="nation_name">澳大利亚</span>
+                                    </a>
+                                </li>
+                                <li data-calling-code="33" data-iso-code="FR">
+                                    <a tabindex="-1" href="javascript:void(0)">
+                                        <span class="nation_code">+33</span><span class="nation_name">法国</span>
+                                    </a>
+                                </li>
+                                <li data-calling-code="49" data-iso-code="DE">
+                                    <a tabindex="-1" href="javascript:void(0)">
+                                        <span class="nation_code">+49</span><span class="nation_name">德国</span>
+                                    </a>
+                                </li>
+                                <li data-calling-code="852" data-iso-code="HK">
+                                    <a tabindex="-1" href="javascript:void(0)">
+                                        <span class="nation_code">+852</span><span class="nation_name">中国香港</span>
+                                    </a>
+                                </li>
+                                <li class="separate_line"></li>
+                                <li data-calling-code="886" data-iso-code="TW">
+                                    <a tabindex="-1" href="javascript:void(0)">
+                                        <span class="nation_code">+886</span><span class="nation_name">中国台湾</span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <input type="hidden" name="sign_in[country_code]" id="sign_in_country_code" value="CN">
+                            <input type="text" name="sign_in[mobile_number]" id="sign_in_mobile_number" value=""
+                                   class="span2" placeholder="移动电话号码">
+                        </div>
+                    </div>
+
+                    <div class="input-prepend domestic ">
+                        <span class="add-on"><i class="fa fa-user"></i></span>
+                        <input type="text" name="sign_in[name]" id="sign_in_name" value="" class="span2"
+                               placeholder="手机号码/电子邮件">
+                    </div>
+
+                    <div class="input-prepend password ">
+                        <span class="add-on"><i class="fa fa-unlock-alt"></i></span>
+                        <input type="password" name="sign_in[password]" id="sign_in_password" class="span2"
+                               placeholder="密码">
+                    </div>
+
+                    <input type="hidden" name="sign_in[is_foreign]" id="sign_in_is_foreign" value="false">
+
+                    <div class="captcha" data-captcha-type="geetest" data-js-module="captcha">
+                        <input name="captcha[validation][challenge]" autocomplete="off" type="hidden"
+                               value="cc055168940a9ce69f6f5a28f7d927c3">
+                        <input name="captcha[validation][gt]" autocomplete="off" type="hidden"
+                               value="a10ea6a23a441db3d956598988dff3c4">
+                        <input name="captcha[validation][validate]" autocomplete="off" type="hidden">
+                        <input name="captcha[validation][seccode]" autocomplete="off" type="hidden">
+                        <input name="captcha[id]" type="hidden" autocomplete="off"
+                               value="459f166c-6e38-4e98-ba04-5936c936f838">
+                        <div id="geetest-area" class="geetest"></div>
+
+                    </div>
+
+
+                    <button class="ladda-button submit-button" data-color="blue">
+                        <span class="ladda-label">登 录</span>
+                    </button>
+
+                    <div class="control-group text-left">
+                        <div class="icheckbox_minimal checked" style="position: relative;"><input type="checkbox"
+                                                                                                  name="sign_in[remember_me]"
+                                                                                                  id="sign_in_remember_me"
+                                                                                                  value="true"
+                                                                                                  checked="checked"
+                                                                                                  style="position: absolute; opacity: 0;">
+                            <ins class="iCheck-helper"
+                                 style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins>
+                        </div>
+                        记住我
+                        <a href="http://www.jianshu.com/users/password/new">忘记密码</a>
+                    </div>
+
+                    <div><a href="javascript:void(0)" class="switch_sign_in_name">海外手机登录</a></div>
+
+                </form>
+            </div>
+
+        </div>
+        <div class="login-sns">
+            <p>您还可以通过以下方式直接登录</p>
+            <ul class="login-sns">
+                <li class="weibo">
+                    <a href="http://www.jianshu.com/users/auth/weibo"><i class="fa fa-weibo"></i></a>
+                </li>
+                <li class="qq">
+                    <a href="http://www.jianshu.com/users/auth/qq_connect"><i class="fa fa-qq"></i></a>
+                </li>
+                <li class="douban">
+                    <a href="http://www.jianshu.com/users/auth/douban"><i class="fa fa-douban"></i></a>
+                </li>
+                <li class="google">
+                    <a href="http://www.jianshu.com/users/auth/google_oauth2"><i class="fa fa-google-plus"></i></a>
+                </li>
+                <li class="wechat">
+                    <a href="http://www.jianshu.com/users/auth/wechat"><i class="fa fa-wechat"></i></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+<div id="flash" class="hide"></div>
+
+<div id="view-mode-modal" tabindex="-1" class="modal hide read-modal" aria-hidden="false"
+     data-js-module="view-mode-modal">
+    <div class="btn-group change-background" data-toggle="buttons-radio">
+        <a class="btn btn-daytime active" data-mode="day" href="javascript:void(0);">
+            <i class="fa fa-sun-o"></i>
+        </a> <a class="btn btn-nighttime " data-mode="night" href="javascript:void(0);">
+        <i class="fa fa-moon-o"></i>
+    </a></div>
+    <div class="btn-group change-font" data-toggle="buttons-radio">
+        <a class="btn font " data-font="font1" href="javascript:void(0);">宋体</a>
+        <a class="btn font hei active" data-font="font2" href="javascript:void(0);">黑体</a>
+    </div>
+    <div class="btn-group change-locale" data-toggle="buttons-radio">
+        <a class="btn font active" data-locale="zh-CN" href="javascript:void(0);">简</a>
+        <a class="btn font hei " data-locale="zh-TW" href="javascript:void(0);">繁</a>
+    </div>
+</div>
+
+
+<!-- Javascripts
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="__PUBLIC__/home/js/base-ded41764c207f7ff545c28c670922d25.js"></script>
+
+<script src="__PUBLIC__/home/js/reading-base-06726ff5d69bf2b105271301958f5a0a.js"></script>
+<script src="__PUBLIC__/home/js/sign_in-dc7bcf8df657ef61ccb0c891a3aa96e5.js"></script>
+<script type="text/javascript" charset="utf-8" id="gt_lib" src="__PUBLIC__/home/js/geetest.5.5.23.js"></script>
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-35169517-1']);
+    _gaq.push(['_setCustomVar', 2, 'User Type', 'Visitor', 1]);
+    _gaq.push(['_trackPageview']);
+
+</script>
+
+
+</body>
+</html>
+
+

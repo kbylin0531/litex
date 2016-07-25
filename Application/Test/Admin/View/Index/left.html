@@ -1,0 +1,53 @@
+<extend file="/Admin/View/Base/common.html"/>
+<block name="script">
+    <script>
+        $(function () {
+            //导航切换
+            $(".menuson li").click(function () {
+                $(".menuson li.active").removeClass("active")
+                $(this).addClass("active");
+            });
+
+            $('.title').click(function () {
+                var $ul = $(this).next('ul');
+                $('dd').find('ul').slideUp();
+                if ($ul.is(':visible')) {
+                    $(this).next('ul').slideUp();
+                } else {
+                    $(this).next('ul').slideDown();
+                }
+            });
+        })
+    </script>
+</block>
+<block name="body">
+    <style>
+        .leftmenu .title>span{
+            margin-top: 0;
+        }
+        .leftmenu i.fa {
+             color: rebeccapurple;
+            font-size: 1.33333333em;
+            line-height: 0.75em;
+            vertical-align: -15%;
+         }
+    </style>
+    <body style="background:#f0f9fd;">
+    <div class="lefttop"><span></span></div>
+    <dl class="leftmenu">
+        <volist name="sidemenu" id="vo">
+            <dd>
+                <div class="title"><span><i class="fa {$vo.icon}"></i></span>{$vo.title}</div>
+                <notempty name="vo.children">
+                    <ul class="menuson">
+                        <div class="clear"></div>
+                        <volist name="vo.children" id="v">
+                            <li><cite></cite><a href="{$v.url}" target="rightFrame">{$v.title}</a></li>
+                        </volist>
+                    </ul>
+                </notempty>
+            </dd>
+        </volist>
+    </dl>
+    </body>
+</block>

@@ -1,0 +1,32 @@
+<extend file="/Admin/View/Common/login.html" />
+<block name="form">
+    <form action="__ACTION__" method="post" class="box tile animated active" id="box-login">
+        <h2 class="m-t-0 m-b-15">Login</h2>
+        <input type="text" name="username" class="login-control m-b-10" placeholder="Username or Email Address">
+        <input type="password" name="password" class="login-control" placeholder="Password">
+        <div class="checkbox m-b-20">
+            <label>
+                <input type="checkbox" name="remember">
+                Remember Me
+            </label>
+        </div>
+        <button class="btn btn-sm m-r-5">Sign In</button>
+
+        <small>
+            <a href="__CONTROLLER__/register">Don't have an Account?</a> or
+            <a href="__CONTROLLER__/reset">Forgot Password?</a>
+        </small>
+    </form>
+    <script>
+        L.ready(function () {
+            $("#box-login").on("submit",function () {
+                var password = $("[name=password]");
+                password.val(L.md5(L.sha1(password.val())));
+            });
+            var hash = L.E.hash();
+            if(hash){
+                L.toast.warning(decodeURI(hash));
+            }
+        });
+    </script>
+</block>

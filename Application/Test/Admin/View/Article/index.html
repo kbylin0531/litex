@@ -1,0 +1,117 @@
+<extend file="/Admin/View/Common/admin.html"/>
+
+<block name="content">
+    <div class="block-area">
+        <h3 class="block-title">Articles</h3>
+        <div class="table-responsive overflow">
+            <table id="table" class="table table-bordered table-hover tile">
+            </table>
+        </div>
+    </div>
+
+    <form class="form-horizontal hidden" id="edit" role="form">
+
+        <div class="form-group">
+            <label class="col-md-5 control-label">公众号类型 * </label>
+            <div class="col-md-7">
+                <select class="select" name="type">
+                    <option value="0">普通订阅号</option>
+                    <option value="1">微信认证订阅号</option>
+                    <option value="2">普通服务号</option>
+                    <option value="3">微信认证服务号</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-5 control-label">公众号名称</label>
+            <div class="col-md-7">
+                <input type="text" name="name" class="form-control input-sm">
+            </div>
+        </div>
+
+    </form>
+</block>
+<block name="script">
+    <script>
+        $(function () {
+            var datalist = L.O.toObj('{$datalist}');
+             console.log(datalist);
+            var dtable = L.P.datatable().create('#table',{
+                'columns':[
+                    {
+                        'title':'ID',
+                        'data':'id',
+                        width:'3%'
+                    },
+                    {
+                        'title':'标题',
+                        'className':'text-center',
+                        'data':'title',
+                        width:'12%'
+                    },
+                    {
+                        'title':'概览',
+                        'className':'text-center',
+                        'data':'summary',
+                        width:'12%'
+                    },
+                    {
+                        'title':'作者',
+                        'className':'text-center',
+                        'data':'author',
+                        width:'13%'
+                    },
+                    {
+                        'title':'添加时间',
+                        'className':'text-center',
+                        'data':'ctime',
+                        width:'10%'
+                    },
+                    {
+                        'title':'修改时间',
+                        'className':'text-center',
+                        'data':'etime',
+                        width:'10%'
+                    },
+                    {
+                        'title':'类型',
+                        'className':'text-center',
+                        'data':function (row) {
+                            /* category */
+                        },
+                        width:'10%'
+                    }
+                ]
+            }).load(datalist);
+            var modal = L.P.modal().create("#edit");
+            var editform = $("#edit");
+
+            L.select.init('.select');
+
+            $(".edit").click(function (e) {
+                var row = $(this).parents("tr");
+                var data = dtable.data(row);
+
+                L.P.form(editform,data);
+                modal.title('Edit').onConfirm(function () {
+                    var values = editform.serialize();
+                    $.post("__CONTROLLER__/updateAccount",values,function (data) {
+                        console.log(data);
+                        if(data.type > 0){
+                            $.sticky('Success to update!');
+                            modal.hide();
+                        }else{
+                            $.sticky('Failed to update!');
+                        }
+                    });
+                }).show();
+            });
+
+            $(".delete").click(function () {
+            });
+
+
+        });
+    </script>
+
+</block>
