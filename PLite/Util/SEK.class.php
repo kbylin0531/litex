@@ -32,6 +32,16 @@ final class SEK {
         }
     }
 
+    /**
+     * Returns the MIME types array from config/mimes.php
+     *
+     * @return	array
+     */
+    public static function &getMimes(){
+        static $_mimes;
+        $_mimes  or  $_mimes = include PATH_PLITE.'/Common/mime.php';
+        return $_mimes;
+    }
 
     /**
      * 将参数二的配置合并到参数一种，如果存在参数一数组不存在的配置项，跳过其设置

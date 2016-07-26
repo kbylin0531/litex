@@ -1,0 +1,107 @@
+<extend file="../Base/sticky_header_layout" />
+<block name="wrapper">
+        <div class="row">
+            <div class="col-md-6">
+                <!--statistics start-->
+                <div class="row state-overview">
+                    <div class="col-md-6 col-xs-12 col-sm-6">
+                        <div class="panel purple pcursor" >
+                            <div class="symbol">
+                                <i class="fa fa-gavel"></i>
+                            </div>
+                            <div class="state-value">
+                                <div class="value">230</div>
+                                <div class="title">New Order</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xs-12 col-sm-6">
+                        <div class="panel red pcursor">
+                            <div class="symbol">
+                                <i class="fa fa-tags"></i>
+                            </div>
+                            <div class="state-value">
+                                <div class="value">3490</div>
+                                <div class="title">Copy Sold</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row state-overview">
+                    <div class="col-md-6 col-xs-12 col-sm-6">
+                        <div class="panel blue pcursor">
+                            <div class="symbol">
+                                <i class="fa fa-money"></i>
+                            </div>
+                            <div class="state-value">
+                                <div class="value">22014</div>
+                                <div class="title"> Total Revenue</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xs-12 col-sm-6">
+                        <div class="panel green pcursor">
+                            <div class="symbol">
+                                <i class="fa fa-eye"></i>
+                            </div>
+                            <div class="state-value">
+                                <div class="value">390</div>
+                                <div class="title"> Unique Visitors</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--statistics end-->
+            </div>
+            <div class="col-md-6">
+                <!--more statistics box start-->
+                <div class="panel deep-purple-box">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-7 col-sm-7 col-xs-7">
+                                <div id="graph-donut" class="revenue-graph"></div>
+                            </div>
+                            <div class="col-md-5 col-sm-5 col-xs-5">
+                                <ul class="bar-legend">
+                                    <li><span class="blue"></span> Open rate</li>
+                                    <li><span class="green"></span> Click rate</li>
+                                    <li><span class="purple"></span> Share rate</li>
+                                    <li><span class="red"></span> Unsubscribed rate</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--more statistics box end-->
+            </div>
+        </div>
+
+
+</block>
+
+<block name="script">
+    <!--Morris Chart-->
+    <script src="__PUBLIC__/js/morris-chart/morris.js"></script>
+    <script src="__PUBLIC__/js/morris-chart/raphael-min.js"></script>
+    <script>
+        // Use Morris.Area instead of Morris.Line
+        Morris.Donut({
+            element: 'graph-donut',
+            data: [
+                { value: 40, label: 'New Visit', formatted: 'at least 70%' },
+                { value: 30, label: 'Unique Visits', formatted: 'approx. 15%' },
+                { value: 20, label: 'Bounce Rate', formatted: 'approx. 10%' },
+                { value: 10, label: 'Up Time', formatted: 'at most 99.99%' }
+            ],
+            backgroundColor: false,
+            labelColor: '#fff',
+            colors: [ '#4acacb','#6a8bc0','#5ab6df','#fe8676'],
+            formatter: function (x, data) { return data.formatted; }
+        });
+    </script>
+</block>
+<block name="style">
+    <!--Morris Chart CSS -->
+    <link rel="stylesheet" href="__PUBLIC__/js/morris-chart/morris.css">
+</block>
+

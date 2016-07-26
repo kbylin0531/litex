@@ -9,6 +9,7 @@
 namespace PLite\Library;
 use PLite\core\URL;
 use PLite\Debugger;
+use PLite\Library\View\Think;
 use PLite\PLiteException;
 use PLite\Util\SEK;
 
@@ -113,7 +114,6 @@ class Controller {
         $view = View::getInstance();
         //模板变量导入
         $view->assign($this->_tVars);
-
         //格式化模板变量
         Debugger::status('display_begin');
 //        \PLite\dumpout($context);

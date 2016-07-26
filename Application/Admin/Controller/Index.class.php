@@ -11,9 +11,7 @@ namespace Application\Admin\Controller;
 class Index extends Admin{
 
     public function index(){
-        $this->display();
+        $this->show();
     }
-
-
 
 }

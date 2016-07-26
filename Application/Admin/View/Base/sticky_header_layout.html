@@ -3,29 +3,47 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Basic Table</title>
+    <title>{$website.title|default="LiteX"}</title>
 
     <include file="../Base/Public/head"/>
     <block name="style"></block>
 </head>
 
-<body class="sticky-header">
+<body class="sticky-header">`
     <section>
-        <!-- left side start-->
-        <include file="../Base/Public/sider"/>
+        <include file="../Base/Public/section_sider"/>
 
         <div class="main-content">
 
-            <include file="../Base/Public/header" />
+            <include file="../Base/Public/section_header" />
 
-            <include file="../Base/Public/heading" />
+            <notempty name="page">
+                <div class="page-heading">
+                    <notempty name="page.title">
+                        <h3>{$page.title}</h3>
+                    </notempty>
+                    <notempty name="page.breadcrumb">
+                        <ul class="breadcrumb">
+                            <volist name="page.breadcrumb" id="v">
+                                <li><a href="{$v.url}">{$v.title}</a></li>
+                            </volist>
+                        </ul>
+                        <script>
+                            L.ready(function () {
+                                $(".breadcrumb>li:last").addClass("active").attr("href","javascript:void(0);");
+                            });
+                        </script>
+                    </notempty>
+                </div>
+            </notempty>
+
             <div class="wrapper">
                 <block name="wrapper"></block>
             </div>
         </div>
     </section>
 
-    <include file="../Base/Public/tail" />
+    <include file="../Base/Public/section_script" />
 
     <block name="script"></block>
 </body>

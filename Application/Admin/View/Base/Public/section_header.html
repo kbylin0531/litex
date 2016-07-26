@@ -1,0 +1,47 @@
+<div class="header-section">
+
+    <a class="toggle-btn"><i class="fa fa-bars"></i></a>
+
+    <form class="searchform" action="{$website.search_url}" method="post">
+        <!-- input and press enter to search -->
+        <input type="text" class="form-control" name="keyword" placeholder="Search" />
+    </form>
+
+    <div class="menu-right">
+        <ul class="notification-menu">
+            <notempty name="notifications">
+                <li>
+                    <a href="#" class="btn btn-default dropdown-toggle info-number" data-toggle="dropdown">
+                        <i class="fa fa-bell-o"></i>
+                        <span class="badge">{$notifications.count}</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-head pull-right">
+                        <h5 class="title">{$notifications.title}</h5>
+                        <ul class="dropdown-list normal-list">
+                            <volist name="notifications.list" id="vo">
+                                <li class="{$vo.class|default='new'}">
+                                    <a href="javascript:void(0);">
+                                        <span class="label label-danger"><i class="fa fa-bolt"></i></span>
+                                        <span class="name">{$vo.title}</span>
+                                        <em class="small">{$vo.small}</em>
+                                    </a>
+                                </li>
+                            </volist>
+                            <li class="new"><a href="{$notifications.detail_url}">Look all</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </notempty>
+            <li>
+                <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <img src="{$userinfo.profile}" alt="" />{$userinfo.nickname}<span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
+                    <volist name="website.user_menu" id="vo">
+                        <li><a href="__PUBLIC__{$vo.url}"><i class="fa fa-{$vo.icon|default='circle'}"></i> {$vo.title}</a></li>
+                    </volist>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>

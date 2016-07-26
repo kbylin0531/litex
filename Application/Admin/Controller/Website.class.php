@@ -14,7 +14,12 @@ namespace Application\Admin\Controller;
  */
 class Website extends Admin {
 
+    public function info(){
+        $this->show();
+    }
 
-
+    public function menu(){
+        $this->display();
+    }
 
 }

@@ -53,7 +53,7 @@ namespace {
     define('PATH_BASE', IS_WINDOWS?str_replace('\\','/',dirname(__DIR__)):dirname(__DIR__));
     defined('APP_DIR')  or define('APP_DIR','Application');//dir name opposide to base path
     defined('APP_PATH') or define('PATH_APP',PATH_BASE.'/'.APP_DIR);
-    const PATH_PLite    = PATH_BASE.'/PLite';
+    const PATH_PLITE    = PATH_BASE.'/PLite';
     const PATH_CONFIG   = PATH_BASE.'/Config';
     const PATH_RUNTIME  = PATH_BASE.'/Runtime';
     const PATH_PUBLIC   = PATH_BASE.'/Public';
@@ -184,8 +184,8 @@ namespace {
         public static function loadTemplate($tpl,array $vars=null, $clean=true, $isfile=false){
             $clean and ob_get_level() > 0 and ob_end_clean();
             $vars and extract($vars, EXTR_OVERWRITE);
-            $path = ($isfile or is_file($tpl))?$tpl:PATH_PLite."/tpl/{$tpl}.php";
-            is_file($path) or $path = PATH_PLite.'/tpl/systemerror.php';
+            $path = ($isfile or is_file($tpl))?$tpl:PATH_PLITE."/tpl/{$tpl}.php";
+            is_file($path) or $path = PATH_PLITE.'/tpl/systemerror.php';
             include $path;
         }
     }
@@ -420,6 +420,9 @@ namespace PLite {
             ob_get_level() > 0 and ob_end_clean();
             $trace = $e->getTrace();
             if(!empty($trace[0])){
+                empty($trace[0]['file']) and $trace[0]['file'] = 'Unkown file';
+                empty($trace[0]['line']) and $trace[0]['line'] = 'Unkown line';
+
                 $vars = [
                     'message'   => get_class($e).' : '.$e->getMessage(),
                     'position'  => 'File:'.$trace[0]['file'].'   Line:'.$trace[0]['line'],
