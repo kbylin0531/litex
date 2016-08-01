@@ -87,7 +87,8 @@ class Model {
      */
     protected $tablename = null;
     /**
-     * 字段列表(可以修改)
+     * 字段列表
+     * 增加时自动添加
      * @var array|null
      */
     protected $fields = null;
@@ -145,14 +146,6 @@ class Model {
      */
     protected function getTable(){
         return $this->tablename;
-    }
-
-    /**
-     * 获取字段列表
-     * @return array|null
-     */
-    protected function getFields(){
-        return $this->fields;
     }
 
     /**
@@ -237,8 +230,7 @@ class Model {
             //是数组的情况通常用于update/create
             $keys = array_keys($fields);
             array_walk($keys,function(&$field){
-                $field = $this->dao->escape($field);});//对字段进行转义
-//            dumpout($fields);
+            $field = $this->dao->escape($field);});//对字段进行转义
             $this->_options['fields'] = implode(',', $keys);
             $this->_inputs['fields'] = array_values($fields);
         }elseif(is_string($fields)){
@@ -247,8 +239,7 @@ class Model {
         }elseif(true === $fields){
             $this->_options['fields'] = ' * ';
         }
-        //it will pass if params is invalid
-//        Exception::throwing($fields,'fields方法期待的参数类型是\'array|string|true\'');
+//        Exception::throwing($fields,'fields方法期待的参数类型是\'array|string|true\'');//it will pass if params is invalid
         return $this;
     }
 
@@ -325,12 +316,12 @@ class Model {
             $holder = rtrim(str_repeat('?,', count($this->_inputs['fields'])),',');
 
             //检查必要的两个字段
-            $tablename = $this->_options['table']?$this->_options['table']:Exception::throwing('No table to insert!',static::class);
+            $tablename = $this->_options['table']?$this->dao->escape($this->_options['table']):Exception::throwing('No table to insert!',static::class);
             $fields = $this->_options['fields']?$this->_options['fields']:Exception::throwing('Empty fields is not allowed!');
             //输入参数只使用到了fields字段
 
             $inputs = $this->_inputs['fields'];
-            $sql = "INSERT INTO {$tablename}  ( {$fields} ) VALUES ({$holder});";
+            $sql = "INSERT INTO {$tablename} ({$fields}) VALUES ({$holder});";
 //            \PLite\dumpout($sql,$inputs);
             return $this->exec($sql,$inputs);
         }else{
@@ -511,7 +502,6 @@ class Model {
             $sql = $this->_options['distinct']?'SELECT DISTINCE ':'SELECT ';
             empty($this->_options['table']) and Exception::throwing('Model has no table binded!');
 
-//            dumpout($this->_options);
             //set the mastable parameters(fields and table)
             $sql .= $this->_options['fields'].' FROM '.$this->_options['table'];
 
@@ -522,15 +512,14 @@ class Model {
 
             //for mysql
             if($this->_options['limit']){
-                if($this->_options['offset']){
-                    $sql .= ' LIMIT '.$this->_options['offset'].' , '.$this->_options['limit'];
+                if(empty($this->_options['offset'])){
+                    $sql .= " LIMIT {$this->_options['limit']} ";
                 }else{
-                    $sql .= ' LIMIT '.$this->_options['limit'];
+                    $sql .= " LIMIT {$this->_options['offset']},{$this->_options['limit']} ";//                    $sql .= ' LIMIT '.$this->_options['offset'].' , '.$this->_options['limit'];
                 }
             }
-            //set the input parameters
-            if(isset($this->_inputs['fields'])) $inputs = $this->_inputs['fields'];
-            else $inputs = [];
+            //set the input parameters,order by 'fields' and '
+            $inputs = isset($this->_inputs['fields'])?$this->_inputs['fields']:null;
             if(isset($this->_inputs['where'])) $inputs = array_merge($inputs,$this->_inputs['where']);
 
 //            \PLite\dumpout($sql,$inputs,$this->query($sql,$inputs),$this->error);
@@ -793,6 +782,15 @@ class Model {
 
 
 //------------------------------------------- EXT -----------------------------------------------------------------------------------//
+
+    /**
+     * 获取字段列表
+     * @return array|null
+     */
+    protected function getFields(){
+        return $this->fields;
+    }
+
     public function data(array $info,array $base=null,$comparer=null){
         $data = $base?$base:$this->fields;
         SEK::merge($data,$info);

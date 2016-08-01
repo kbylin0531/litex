@@ -11,7 +11,6 @@ use PLite\Core\Dao\DaoDriver;
 use PLite\Lite;
 use PDO;
 use PDOStatement;
-use PDOException;
 use PLite\PLiteException as Exception;
 
 /**

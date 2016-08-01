@@ -298,3 +298,29 @@ function is_php($version)
 
     return $_is_php[$version];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+$GLOBALS['_MSGS_'] = [];
+function debug(){
+    $params = func_get_args();
+    $traces = debug_backtrace();
+    $color='#';$str='9ABCDEF';//随机浅色背景
+    for($i=0;$i<6;$i++) $color=$color.$str[rand(0,strlen($str)-1)];
+    $str = "<pre style='background: {$color};width: 100%;padding: 10px'>";
+    $str .= "<h3 style='color: midnightblue'><b>F:</b>{$traces[0]['file']} << <b>L:</b>{$traces[0]['line']} >> </h3>";
+    foreach ($params as $key=>$val) $str .= '<b>P '.$key.':</b><br />'.var_export($val, true).'<br />';
+    $GLOBALS['_MSGS_'][] = $str.'</pre>';
+}
+register_shutdown_function(function (){
+    if(!empty($GLOBALS['_MSGS_'])){
+        $content = '';
+        foreach ($GLOBALS['_MSGS_'] as $item){
+            $content .= $item;
+        }
+        if(!file_put_contents(__DIR__.'/debug.html',$content)){
+            debug_print_backtrace();
+        }
+    }
+});
+//----------------------------------------------------------------------------------------------------------------------

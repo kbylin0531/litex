@@ -7,14 +7,19 @@
  */
 
 namespace Application\Admin\Model;
-
-
 use PLite\Library\Model;
 
 class WebsiteModel extends Model {
 
     protected $tablename = 'lx_website';
+    protected $fields = [
+        'name'          => null,
+        'value'         => null,
+        'title'         => null,
+        'description'   => null,
+    ];
 
+//---------------------------------------- for general query -------------------------------------------------------------------------------//
     /**
      * @param bool $name_as_key
      * @return array|false
@@ -31,7 +36,6 @@ class WebsiteModel extends Model {
         }
         return $list;
     }
-
     /**
      * @param bool $format
      * @return array|false
@@ -74,5 +78,12 @@ class WebsiteModel extends Model {
         $list = $this->table('lx_menu')->where('type = 2')->order('`order` desc')->select();
         return $list;
     }
+
+//---------------------------------------- for management -------------------------------------------------------------------------------//
+
+    public function revise(){
+
+    }
+
 
 }
