@@ -6,7 +6,6 @@
  * Time: 6:06 PM
  */
 namespace {
-
     use PLite\AutoLoader;
     use PLite\Core\Dispatcher;
     use PLite\Core\Router;
@@ -14,7 +13,6 @@ namespace {
     use PLite\Debugger;
     use PLite\Library\Response;
     use PLite\PLiteException;
-
 
 //---------------------------------- mode constant -------------------------------------//
     defined('DEBUG_MODE_ON') or define('DEBUG_MODE_ON', true);
@@ -32,7 +30,6 @@ namespace {
     define('IS_WINDOWS',false !== stripos(PHP_OS, 'WIN'));
     define('IS_REQUEST_AJAX', ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ));
     define('IS_METHOD_POST',$_SERVER['REQUEST_METHOD'] === 'POST');//“GET”, “HEAD”，“POST”，“PUT”
-
 
     define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
     define('HTTP_PREFIX', (isset ($_SERVER ['HTTPS']) and $_SERVER ['HTTPS'] === 'on') ? 'https://' : 'http://' );
@@ -94,7 +91,7 @@ namespace {
          * @param array|null $config
          * @return void
          */
-        private static function init(array $config=null){
+        public static function init(array $config=null){
             DEBUG_MODE_ON and Debugger::import('app_begin',$GLOBALS['_status_begin']);
             Debugger::status('app_init_begin');
             $config and self::$_config = array_merge(self::$_config,$config);
@@ -272,7 +269,7 @@ namespace PLite {
          * @return true 实际返回void
          */
         public static function showTrace(){
-            if(!self::$_allowTrace) return ;//如果被禁止了trace页面,则不显示该页面
+            if(!self::$_allowTrace) return true;//如果被禁止了trace页面,则不显示该页面
             //吞吐率  1秒/单次执行时间
             if(count(self::$_status) > 1){
                 $last  = end(self::$_status);
@@ -336,6 +333,7 @@ namespace PLite {
                 ],
             ];
             \PLite::loadTemplate('trace',$vars,false);//参数三表示不清空之前的缓存区
+            return true;
         }
     }
 
@@ -367,10 +365,9 @@ namespace PLite {
                 }
             }
             //auto init class
-            $staticfunc = "{$clsnm}::_init_class_";
-            is_callable($staticfunc) and $staticfunc();
+            $funcname = '_init_class_';
+            is_callable("{$clsnm}::{$funcname}") and $clsnm::$funcname();
         }
-
     }
 
     /**
@@ -387,11 +384,7 @@ namespace PLite {
          * @since 5.1.0
          */
         public function __construct($message, $code=0, \Exception $previous=null){
-            if(!is_string($message)){
-                $message = var_export($message,true);
-            }
-            $this->message = $message;
-            parent::__construct($message, $code, $previous);
+            $this->message = is_string($message)?$message:var_export($message,true);
         }
         /**
          * 直接抛出异常信息
@@ -673,4 +666,17 @@ namespace PLite {
             return $result;
         }
     }
+
+    class ConfigHandler {
+
+        public function get(){
+
+        }
+
+        public function cache(){
+
+        }
+
+    }
+
 }

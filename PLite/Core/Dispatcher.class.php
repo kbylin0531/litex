@@ -69,7 +69,7 @@ class Dispatcher extends Lite {
         strpos($modules,'/') and $modules = str_replace('/','\\',$modules);
 
         //模块检测
-        is_dir($modulepath) or PLiteException::throwing('Module not found!',$modules);
+        is_dir($modulepath) or PLiteException::throwing("Module '{$modules}' not found!");
 
         //在执行方法之前定义常量,为了能在控制器的构造函数中使用这三个常量
         define('REQUEST_MODULE',$modules);//请求的模块
