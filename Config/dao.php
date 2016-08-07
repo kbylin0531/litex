@@ -15,7 +15,7 @@ return [
         [
             'dbname'    => 'litex',//选择的数据库
             'username'  => 'lin',
-            'password'  => 'ASD123zxc',
+            'password'  => '123456',
             'host'      => '127.0.0.1',
             'port'      => '3306',
             'charset'   => 'UTF8',

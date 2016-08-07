@@ -26,15 +26,18 @@ namespace {
         REQUEST_MICROTIME,
         memory_get_usage(),
     ];
-    define('IS_CLIENT',PHP_SAPI === 'cli');
+
     define('IS_WINDOWS',false !== stripos(PHP_OS, 'WIN'));
     define('IS_REQUEST_AJAX', ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ));
     define('IS_METHOD_POST',$_SERVER['REQUEST_METHOD'] === 'POST');//“GET”, “HEAD”，“POST”，“PUT”
 
     define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
     define('HTTP_PREFIX', (isset ($_SERVER ['HTTPS']) and $_SERVER ['HTTPS'] === 'on') ? 'https://' : 'http://' );
-    define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
+    define('__PUBLIC__',empty($_SERVER['SERVER_PORT']) || 80 === $_SERVER['SERVER_PORT']?
+            HTTP_PREFIX.$_SERVER['SERVER_NAME']:
+            HTTP_PREFIX.$_SERVER['SERVER_NAME'].':80'.dirname($_SERVER['SCRIPT_NAME']));
 
+    const IS_CLIENT = PHP_SAPI === 'cli';
 //---------------------------------- variable type constant ------------------------------//
     const TYPE_BOOL     = 'boolean';
     const TYPE_INT      = 'integer';
@@ -667,13 +670,13 @@ namespace PLite {
         }
     }
 
-    class ConfigHandler {
+    class Configger {
 
-        public function get(){
+        public static function get(){
 
         }
 
-        public function cache(){
+        public static function cache(){
 
         }
 

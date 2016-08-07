@@ -12,7 +12,8 @@ use PLite\Library\Session;
 class Index {
 
     public function index(){
-        $this->sphinx();
+        $href = __PUBLIC__.'index.php/Admin/Index/index';
+        echo "<a href='{$href}'>Click to background</a>";
     }
 
     public function memcache(){
