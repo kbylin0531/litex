@@ -9,6 +9,7 @@ namespace PLite\Library;
 use PLite\Core\Dao;
 use PLite\PLiteException as Exception;
 use PLite\Util\SEK;
+use PLite\Utils;
 
 /**
  * Class Model 模型类
@@ -793,8 +794,8 @@ class Model {
 
     public function data(array $info,array $base=null,$comparer=null){
         $data = $base?$base:$this->fields;
-        SEK::merge($data,$info);
-        SEK::filter($data,$comparer);
+        $data = Utils::merge($data,$info);
+        Utils::filter($data,$comparer);
         return $data;
     }
 

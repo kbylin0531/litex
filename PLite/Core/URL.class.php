@@ -32,7 +32,7 @@ use PLite\Util\SEK;
  */
 class URL extends Lite{
 
-    const CONF_NAME = 'uri';
+    const CONF_NAME = 'url';
     const CONF_CONVENTION = [
         //API模式，直接使用$_GET
         'API_MODE_ON'   => false,

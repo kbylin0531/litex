@@ -26,18 +26,15 @@ namespace {
         REQUEST_MICROTIME,
         memory_get_usage(),
     ];
-
+    define('IS_CLIENT',PHP_SAPI === 'cli');
     define('IS_WINDOWS',false !== stripos(PHP_OS, 'WIN'));
     define('IS_REQUEST_AJAX', ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ));
     define('IS_METHOD_POST',$_SERVER['REQUEST_METHOD'] === 'POST');//“GET”, “HEAD”，“POST”，“PUT”
 
     define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
     define('HTTP_PREFIX', (isset ($_SERVER ['HTTPS']) and $_SERVER ['HTTPS'] === 'on') ? 'https://' : 'http://' );
-    define('__PUBLIC__',empty($_SERVER['SERVER_PORT']) || 80 === $_SERVER['SERVER_PORT']?
-            HTTP_PREFIX.$_SERVER['SERVER_NAME']:
-            HTTP_PREFIX.$_SERVER['SERVER_NAME'].':80'.dirname($_SERVER['SCRIPT_NAME']));
+    define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
 
-    const IS_CLIENT = PHP_SAPI === 'cli';
 //---------------------------------- variable type constant ------------------------------//
     const TYPE_BOOL     = 'boolean';
     const TYPE_INT      = 'integer';
@@ -194,7 +191,6 @@ namespace {
 namespace PLite {
 
     use PLite\Library\Response;
-    use PLite\Util\SEK;
 
     /**
      * Class Debugger
@@ -557,13 +553,13 @@ namespace PLite {
             $clsnm or $clsnm = static::class;
             if(!isset(self::$_configs[$clsnm])){
                 //get convention
-                self::$_configs[$clsnm] = SEK::classConstant($clsnm,'CONF_CONVENTION',[]);
+                self::$_configs[$clsnm] = Utils::constant($clsnm,'CONF_CONVENTION',[]);
 
                 //load the outer config
-                if(null === $conf) $conf = SEK::classConstant($clsnm,'CONF_NAME',null);//outer constant name
+                if(null === $conf) $conf = Utils::constant($clsnm,'CONF_NAME',null);//outer constant name
                 if(is_string($conf)) $conf = Lite::load($conf);
 //            \PLite\dumpout($conf,self::$_configs[$clsnm]);
-                is_array($conf) and SEK::merge(self::$_configs[$clsnm],$conf,true);
+                is_array($conf) and self::$_configs[$clsnm] = Utils::merge(self::$_configs[$clsnm],$conf,true);
             }
         }
 
@@ -654,7 +650,7 @@ namespace PLite {
                 case 'array'://for multiple config
                     foreach($name as $item){
                         $temp = self::load($item);
-                        $temp and SEK::merge($result,$temp);
+                        $temp and $result = Utils::merge($result,$temp);
                     }
                     break;
                 case 'string':
@@ -669,8 +665,75 @@ namespace PLite {
             return $result;
         }
     }
+    class ConfigHandler {
+        /**
+         * @var string config file-build path
+         */
+        private static $_build_path = null;
+        /**
+         * @var array map of class fullname of its config name
+         */
+        private static $_map = [];
 
-    class Configger {
+        /**
+         * @var array config of this class
+         */
+        private static $_config = [
+            'AUTO_BUILD'        => true,
+            'AUTO_CLASS_LIST'   => [
+                '\\PLite\\Core\\Dao',
+                '\\PLite\\Core\\Router',
+                '\\PLite\\Core\\Storage',
+                '\\PLite\\Core\\URL',
+                '\\PLite\\Library\\View',
+            ],
+        ];
+        /**
+         * @var array
+         */
+        private static $_cache = null;
+
+        /**
+         * Init the config cache
+         * @param array $config
+         * @return void
+         */
+        public static function init(array $config=null){
+            $config and self::$_config = array_merge(self::$_config,$config);
+            if(self::$_build_path and is_readable(self::$_build_path)){
+                self::$_cache = include self::$_build_path;
+            }elseif(self::$_config['AUTO_BUILD'] and !empty(self::$_config['AUTO_CLASS_LIST'])){
+                foreach (self::$_config['AUTO_CLASS_LIST'] as $clsnm){
+                    self::getOuterConfig($clsnm);
+                }
+            }
+            is_array(self::$_cache) or self::$_cache = [];
+        }
+
+        /**
+         * get class config
+         * @param string $clsnm class name
+         * @param bool $refresh is rerfresh the config
+         * @return array
+         * @throws PLiteException
+         */
+        public static function load($clsnm,$refresh=false){
+            if($refresh or null === self::$_cache) self::init();
+            return empty(self::$_cache[$clsnm])?self::getOuterConfig($clsnm):self::$_cache[$clsnm];
+        }
+
+        /**
+         * read the outer class config (instead of modifying the class self)
+         * @param string $clsnm class name
+         * @return array
+         */
+        private static function getOuterConfig($clsnm){
+            $cname = Utils::constant($clsnm,'CONF_NAME',null);//outer constant name
+            self::$_map[$cname] = $clsnm;
+            strpos('.', $cname) and $cname = str_replace('.', '/' ,$cname);
+            $path = PATH_CONFIG."/{$cname}.php";
+            return self::$_cache[$clsnm] = is_readable($path)?include $path:[];
+        }
 
         public static function get(){
 
@@ -680,6 +743,78 @@ namespace PLite {
 
         }
 
+    }
+
+    /**
+     * Class Utils general utils for this framework
+     * @package PLite
+     */
+    class Utils {
+
+        /**
+         * 获取类常量
+         * use defined() to avoid error of E_WARNING level
+         * @param string $class 完整的类名称
+         * @param string $constant 常量名称
+         * @param mixed $replacement 不存在时的代替
+         * @return mixed
+         */
+        public static function constant($class,$constant,$replacement=null){
+            if(!class_exists($class,true)) return $replacement;
+            $constant = "{$class}::{$constant}";
+            return defined($constant)?constant($constant):$replacement;
+        }
+
+        /**
+         * 将参数二的配置合并到参数一种，如果存在参数一数组不存在的配置项，跳过其设置
+         * @param array $dest dest config
+         * @param array $sourse sourse config whose will overide the $dest config
+         * @param bool|false $cover it will merge the target in recursion while $cover is true
+         *                  (will perfrom a high efficiency for using the built-in function)
+         * @return mixed
+         */
+        public static function merge(array $dest,array $sourse,$cover=false){
+            foreach($sourse as $key=>$val){
+                $exists = key_exists($key,$dest);
+                if($cover){
+                    //覆盖模式
+                    if($exists and is_array($dest[$key])){
+                        //键存在 为数组
+                        $dest[$key] = self::merge($dest[$key],$val,true);
+                    }else{
+                        //key not exist or not array 直接覆盖
+                        $dest[$key] = $val;
+                    }
+                }else{
+                    //非覆盖模式
+                    $exists and $dest[$key] = $val;
+                }
+            }
+            return $dest;
+        }
+
+        /**
+         * 过滤掉数组中与参数二计算值相等的值，可以是保留也可以是剔除
+         * @param array $array
+         * @param callable|array|mixed $comparer
+         * @param bool $leave
+         * @return void
+         */
+        public static function filter(array &$array, $comparer=null, $leave=true){
+            static $result = [];
+            $flag = is_callable($comparer);
+            $flag2 = is_array($comparer);
+            foreach ($array as $key=>$val){
+                if($flag?$comparer($key,$val):($flag2?in_array($val,$comparer):($comparer === $val))){
+                    if($leave){
+                        unset($array[$key]);
+                    }else{
+                        $result[$key] = $val;
+                    }
+                }
+            }
+            $leave or $array = $result;
+        }
     }
 
 }
