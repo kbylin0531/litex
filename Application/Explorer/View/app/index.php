@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"  menu="menubody">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -35,8 +34,8 @@ http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 			<ul class="app-list"></ul>
 		</div>
 	</div>
-<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="./index.php?user/common_js#id=<?php echo rand_string(8);?>"></script>
+<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js"></script>
+<script src="index.php?user/common_js#id=<?php echo rand_string(8);?>"></script>
 <script type="text/javascript">
 	seajs.config({
 		base: "<?php echo STATIC_PATH;?>js/",

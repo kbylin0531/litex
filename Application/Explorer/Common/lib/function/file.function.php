@@ -30,8 +30,12 @@
  * 写日志到LOG_PATH下		write_log('dd','default|.自建目录.','log|error|warning|debug|info|db')
  */
 
-// 传入参数为程序编码时，有传出，则用程序编码，
-// 传入参数没有和输出无关时，则传入时处理成系统编码。
+/**
+ * 传入参数为程序编码时，有传出，则用程序编码，
+ * 传入参数没有和输出无关时，则传入时处理成系统编码。
+ * @param $str
+ * @return string
+ */
 function iconv_app($str){
 	global $config;
 	$result = iconv($config['system_charset'], $config['app_charset'], $str);
@@ -56,6 +60,8 @@ function get_filesize($path){
 /**
  * 获取文件详细信息
  * 文件名从程序编码转换成系统编码,传入utf8，系统函数需要为gbk
+ * @param string $path
+ * @return string
  */
 function file_info($path){
 	$name = get_path_this($path);
@@ -98,6 +104,8 @@ function folder_info($path){
 /**
  * 获取一个路径(文件夹&文件) 当前文件[夹]名
  * test/11/ ==>11 test/1.c  ==>1.c
+ * @param string $path
+ * @return string
  */
 function get_path_this($path){
     $path = str_replace('\\','/', rtrim(trim($path),'/'));
@@ -106,6 +114,8 @@ function get_path_this($path){
 /**
  * 获取一个路径(文件夹&文件) 父目录
  * /test/11/==>/test/   /test/1.c ==>/www/test/
+ * @param string $path
+ * @return string
  */
 function get_path_father($path){
     $path = str_replace('\\','/', rtrim(trim($path),'/'));
@@ -113,6 +123,8 @@ function get_path_father($path){
 }
 /**
  * 获取扩展名
+ * @param string $path
+ * @return string
  */
 function get_path_ext($path){
     $name = get_path_this($path);
@@ -184,6 +196,8 @@ function path_writable($path) {
 
 /**
  * 获取文件夹详细信息,文件夹属性时调用，包含子文件夹数量，文件数量，总大小
+ * @param $path
+ * @return array
  */
 function path_info($path){
 	//if (!is_dir($path)) return false;
@@ -235,13 +249,16 @@ function _path_info_more($dir, &$file_num = 0, &$path_num = 0, &$size = 0){
 
 /**
  * 获取多选文件信息,包含子文件夹数量，文件数量，总大小，父目录权限
+ * @param $list
+ * @param $time_type
+ * @return array|string
  */
 function path_info_muti($list,$time_type){
 	if (count($list) == 1) {
 		if ($list[0]['type']=="folder"){
-	        return path_info($list[0]['path'],$time_type);
+	        return path_info($list[0]['path']);
 	    }else{
-	        return file_info($list[0]['path'],$time_type);
+	        return file_info($list[0]['path']);
 	    }
 	}
 	$pathinfo = array(
@@ -501,8 +518,9 @@ function path_search($path,$search,$is_content=false,$file_ext='',$is_case=false
 
 /**
  * 修改文件、文件夹权限
- * @param  $path 文件(夹)目录
- * @return :string
+ * @param string $path 文件(夹)目录
+ * @param $mod
+ * @return bool
  */
 function chmod_path($path,$mod){
 	//$mod = 0777;//
@@ -522,10 +540,9 @@ function chmod_path($path,$mod){
 
 /**
  * 文件大小格式化
- * 
- * @param  $ :$bytes, int 文件大小
- * @param  $ :$precision int  保留小数点
- * @return :string
+ * @param int $bytes 文件大小
+ * @param int $precision 保留小数点
+ * @return string
  */
 function size_format($bytes, $precision = 2){
 	if ($bytes == 0) return "0 B";
@@ -539,14 +556,15 @@ function size_format($bytes, $precision = 2){
 	foreach ($unit as $un => $mag) {
 		if (doubleval($bytes) >= $mag)
 			return round($bytes / $mag, $precision).' '.$un;
-	} 
+	}
+	return null;
 } 
 
 /**
  * 判断路径是不是绝对路径
  * 返回true('/foo/bar','c:\windows').
- * 
- * @return 返回true则为绝对路径，否则为相对路径
+ * @param string $path
+ * @return bool 返回true则为绝对路径，否则为相对路径
  */
 function path_is_absolute($path){
 	if (realpath($path) == $path)// *nux 的绝对路径 /home/my
@@ -561,8 +579,8 @@ function path_is_absolute($path){
 /**
  * 获取扩展名的文件类型
  * 
- * @param  $ :$ext string 扩展名
- * @return :string;
+ * @param string $ext  扩展名
+ * @return string
  */
 function ext_type($ext){
 	$ext2type = array(
@@ -581,12 +599,15 @@ function ext_type($ext){
 		if (in_array($ext, $exts)) {
 			return $type;
 		} 
-	} 
+	}
+	return null;
 } 
 
 /**
  * 输出、文件下载
  * 默认以附件方式下载；$download为false时则为输出文件
+ * @param string $file
+ * @param bool $download
  */
 function file_put_out($file,$download=false){
 	if (!is_file($file)) show_json('not a file!');
@@ -639,6 +660,9 @@ function file_put_out($file,$download=false){
  * 远程文件下载到服务器
  * 支持fopen的打开都可以；支持本地、url 
  * 
+ * @param $from
+ * @param $file_name
+ * @return bool
  */
 function file_download_this($from, $file_name){
 	set_time_limit(0);
@@ -665,6 +689,8 @@ function file_download_this($from, $file_name){
 
 /**
  * 获取文件(夹)权限 rwx_rwx_rwx
+ * @param $file
+ * @return string
  */
 function get_mode($file){
 	$Mode = fileperms($file);
@@ -716,6 +742,8 @@ function get_post_max(){
  * 文件上传处理。单个文件上传,多个分多次请求
  * 调用demo
  * upload('file','D:/www/');
+ * @param $fileInput
+ * @param string $path
  */
 function upload($fileInput, $path = './'){
 	global $config,$L;
@@ -725,7 +753,7 @@ function upload($fileInput, $path = './'){
 	$file_name = iconv_system($file['name']);
 	$save_path = get_filename_auto($path.$file_name);
 	if(move_uploaded_file($file['tmp_name'],$save_path)){
-		show_json($L['upload_success'],true,iconv_app($save_pathe));
+		show_json($L['upload_success'],true,iconv_app($save_path));
 	}else {
 		show_json($L['move_error'],false);
 	}

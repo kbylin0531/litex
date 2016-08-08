@@ -6,12 +6,8 @@
 * @license http://kalcaddle.com/tools/licenses/license.txt
 */
 
-    @date_default_timezone_set(@date_default_timezone_get());
     @set_time_limit(600);//10min pathInfoMuti,search,upload,download...
     @ini_set('session.cache_expire',600);
-    @ini_set("display_errors","on");
-    @error_reporting(E_ERROR|E_WARNING|E_PARSE);
-    //error_reporting(E_ALL);
 
     function P($path){return str_replace('\\','/',$path);}
     $web_root = str_replace(P($_SERVER['SCRIPT_NAME']),'',P(dirname(dirname(__FILE__))).'/index.php').'/';

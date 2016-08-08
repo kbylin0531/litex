@@ -60,7 +60,7 @@
 
 
 <script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="./index.php?user/common_js&type=explorer&id=<?php echo rand_string(8);?>"></script>
+<script src="index.php?user/common_js&type=explorer&id=<?php echo rand_string(8);?>"></script>
 <script type="text/javascript">
 	G.this_path = "<?php echo $dir;?>";
 	seajs.config({

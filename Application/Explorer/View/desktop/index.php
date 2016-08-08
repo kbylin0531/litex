@@ -69,11 +69,11 @@
 			<li><a href="#" onclick="core.setting('wall');"><span><?php echo $L['setting_wall'];?></span></a></li>
 			<li><a href="#" onclick="core.setting('fav');"><span><?php echo $L['setting_fav'];?></span></a></li>
 			<li><a href="#" onclick="core.setting('theme');"><span><?php echo $L['setting_theme'];?></span></a></li>
-			<li><a href="./index.php?user/logout" style="margin-top:70px;"><span><?php echo $L['ui_logout'];?>></span></a></li>            
+			<li><a href="index.php?user/logout" style="margin-top:70px;"><span><?php echo $L['ui_logout'];?>></span></a></li>            
 		</ul>
 	</div>
 <script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="./index.php?user/common_js&type=desktop&id=<?php echo rand_string(8);?>"></script>
+<script src="index.php?user/common_js&type=desktop&id=<?php echo rand_string(8);?>"></script>
 <script type="text/javascript">
 	G.this_path = "<?php echo MYHOME.'desktop/';?>";
 	seajs.config({

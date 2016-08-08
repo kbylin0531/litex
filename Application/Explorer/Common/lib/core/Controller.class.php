@@ -60,8 +60,8 @@ abstract class Controller {
 	/**
 	 * 显示模板
 	 * 
-	 * TODO smarty
 	 * @param
+     * @param
 	 */
 	protected function assign($key,$value){
 		$this->values[$key] = $value;
