@@ -1,10 +1,7 @@
 <?php 
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
+namespace Application\Explore\Controller;
+use Application\Explore\Common\Library\FileCache;
+use Application\Explore\Common\Controller;
 
 class editor extends Controller{
 	function __construct()    {
@@ -71,10 +68,10 @@ class editor extends Controller{
 		);
 		$config_file = USER.'data/editor_config.php';		
 		if (!file_exists($config_file)) {//不存在则创建
-			$sql=new fileCache($config_file);
+			$sql=new FileCache($config_file);
 			$sql->reset($default);
 		}else{
-			$sql=new fileCache($config_file);
+			$sql=new FileCache($config_file);
 			$default = $sql->get();
 		}
 		if (!isset($default['function_list'])) {
@@ -93,7 +90,7 @@ class editor extends Controller{
 		$key= $this->in['k'];
 		$value = $this->in['v'];
         if ($key !='' && $value != '') {
-        	$sql=new fileCache($file);
+        	$sql=new FileCache($file);
         	if(!$sql->update($key,$value)){
         		$sql->add($key,$value);//没有则添加一条
         	}

@@ -1,11 +1,9 @@
-<?php 
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
+<?php
 
+namespace Application\Explore\Controller;
+
+use Application\Explore\Common\Library\FileCache;
+use Application\Explore\Common\Controller;
 class setting extends Controller{
     private $sql;
     function __construct(){
@@ -57,7 +55,7 @@ class setting extends Controller{
         }
         //$setting['menu'] = $GLOBALS['config']['setting_menu_default'];
         //为了保存更多的数据；不直接覆盖文件 $data->setting_file;
-        fileCache::save($setting_file,$setting);
+        FileCache::save($setting_file,$setting);
         show_json($this->L['success']);
         //show_json($setting);
     }
@@ -82,7 +80,7 @@ class setting extends Controller{
             for ($i=0; $i < $num; $i++) { 
                 $conf[$arr_k[$i]] = $arr_v[$i];
             }
-            fileCache::save($file,$conf);
+            FileCache::save($file,$conf);
             show_json($this->L["setting_success"]);
         }else{
             show_json($this->L['error'],false);

@@ -1,11 +1,8 @@
-<?php 
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
+<?php
+namespace Application\Explore\Controller;
 
+use Application\Explore\Common\Library\FileCache;
+use Application\Explore\Common\Controller;
 class share extends Controller{
     private $sql;
     private $share_info;
@@ -44,7 +41,7 @@ class share extends Controller{
         if (!file_exists($share_data)) {
             $this->error($this->L['share_error_user']);
         }
-        $this->sql=new fileCache($share_data);
+        $this->sql=new FileCache($share_data);
         $list = $this->sql->get();
         if (!isset($list[$this->in['sid']])){
             $this->error($this->L['share_error_sid']);
@@ -82,7 +79,7 @@ class share extends Controller{
     }
     private function _init_info(){
         //获取用户组，根据是否为root 定义前缀
-        $member = new fileCache(USER_SYSTEM.'member.php');
+        $member = new FileCache(USER_SYSTEM.'member.php');
         $user = $member->get($this->in['user']);
         if (!is_array($user) || !isset($user['password'])) {
             $this->error($this->L['share_error_user']);
@@ -164,7 +161,7 @@ class share extends Controller{
     //==========================
     //页面统一注入变量
     private function _assign_info(){
-        $user_config = new fileCache(USER.'data/config.php');
+        $user_config = new FileCache(USER.'data/config.php');
         $config = $user_config->get();
         if (count($config)<1) {
             $config = $GLOBALS['config']['setting_default'];

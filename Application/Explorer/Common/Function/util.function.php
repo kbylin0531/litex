@@ -98,7 +98,7 @@ function checkExtUnzip($s,$info){
     return checkExt($info['stored_filename']);
 }
 //扩展名权限判断 有权限则返回1 不是true
-function checkExt($file,$changExt=false){
+function checkExt($file){
     if (strstr($file,'<') || strstr($file,'>') || $file=='') {
         return 0;
     }
@@ -173,8 +173,7 @@ function init_lang(){
 
     $lang = str_replace(array('/','\\','..','.'),'',$lang);
     define('LANGUAGE_TYPE', $lang);
-    include(LANGUAGE_PATH.$lang.'/main.php');
-    $GLOBALS['L'] = $L;
+    $GLOBALS['L'] = include(LANGUAGE_PATH.$lang.'/main.php');
 }
 
 function init_setting(){
@@ -182,9 +181,9 @@ function init_setting(){
     if (!file_exists($setting_file)){//不存在则建立
         $setting = $GLOBALS['config']['setting_system_default'];
         $setting['menu'] = $GLOBALS['config']['setting_menu_default'];
-        fileCache::save($setting_file,$setting);
+        \Application\Explore\Common\Library\FileCache::save($setting_file,$setting);
     }else{
-        $setting = fileCache::load($setting_file);   
+        $setting = \Application\Explore\Common\Library\FileCache::load($setting_file);   
     }
     if (!is_array($setting)) {
         $setting = $GLOBALS['config']['setting_system_default'];

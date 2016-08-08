@@ -1,12 +1,5 @@
 <?php
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
-
-
+namespace Application\Explore\Common\Library;
 /**
 * 数据的缓存存储类；key=>value 模式；value可以是任意类型数据。
 * 完整流程测试；读取最低5000次/s  含有写的1000次/s
@@ -35,8 +28,7 @@
 *     查找方式更新  update('group','system','root');
 *     查找方式获取  get('group','','root');
 */
-define('CONFIG_EXIT', '<?php exit;?>');
-class fileCache
+class FileCache
 {
     private $data;
     private $file;
@@ -47,7 +39,8 @@ class fileCache
     
     /**
     * 重置所有数据；不传参数代表清空数据
-    */
+     * @param array $list
+     */
     public function reset($list=array()){
         $this->data = $list;
         self::save($this->file,$this->data);
@@ -55,7 +48,10 @@ class fileCache
 
     /**
     * 添加一条数据，不能重复；如果已存在则返回false;1k次/s
-    */
+     * @param $k
+     * @param $v
+     * @return bool
+     */
     public function add($k,$v){
         if (!isset($this->data[$k])) {
             $this->data[$k] = $v;
@@ -66,11 +62,12 @@ class fileCache
     }
 
     /**
-    * 获取数据;不存在则返回false;100w次/s
-    * $k null   不传则返回全部;
-    * $k string 为字符串；则根据key获取数据，只有一条数据
-    * $search_value 设置时；表示以查找的方式筛选数据筛选条件为 $key=$k 值为$search_value的数据；多条
-    */
+     * 获取数据;不存在则返回false;100w次/s
+     * @param string $k 不传则返回全部
+     * @param string $v 为字符串；则根据key获取数据，只有一条数据
+     * @param bool $search_value 设置时；表示以查找的方式筛选数据筛选条件为 $key=$k 值为$search_value的数据；多条
+     * @return array|bool|mixed
+     */
     public function get($k = '',$v='',$search_value=false){
         if ($k === '') return $this->data;
         
@@ -101,11 +98,11 @@ class fileCache
 
     /**
     * 更新数据;不存在;或者任意一条不存在则返回false;不进行保存
-    * $k $v string 为字符串；则根据key只更新一条数据
-    * $k $v array  array($key1,$key2,...),array($value1,$value2,...) 
-    *              则表示更新多条数据
-    * $search_value 设置时；表示以查找的方式更新数据中的数据
-    */
+     * @param string $k 为字符串；则根据key只更新一条数据
+     * @param  array $v array($key1,$key2,...),array($value1,$value2,...),则表示更新多条数据
+     * @param bool $search_value 设置时；表示以查找的方式更新数据中的数据
+     * @return bool
+     */
     public function update($k,$v,$search_value=false){
         if ($search_value === false) {
             if (is_array($k)) {
@@ -140,7 +137,7 @@ class fileCache
     */
     public function replace_update($key_old,$key_new,$value_new){
         if(isset($this->data[$key_old])){
-            $value = $this->data[$key_old];
+//            $value = $this->data[$key_old];
             unset($this->data[$key_old]);
             $this->data[$key_new] = $value_new;
             self::save($this->file,$this->data);
@@ -150,8 +147,12 @@ class fileCache
     }
     
     /**
-    * 删除;不存在返回false
-    */
+     * 删除;不存在返回false
+     * @param string $k
+     * @param string $v
+     * @param bool $search_value
+     * @return bool
+     */
     public function delete($k,$v='',$search_value=false){
         if ($search_value === false) {
             if (is_array($k)) {
@@ -185,8 +186,12 @@ class fileCache
 
     //=====================================================
     /**
-    * 排序
-    */
+     * 排序
+     * @param $arr
+     * @param $key
+     * @param string $type
+     * @return array
+     */
     public static function arr_sort(&$arr,$key, $type = 'asc'){
         $keysvalue = $new_array = array();
         foreach ($arr as $k => $v) {
@@ -205,19 +210,22 @@ class fileCache
     }
 
     /**
-    * 加载数据；并解析成程序数据
-    */
+     * 加载数据；并解析成程序数据
+     * @param $file
+     * @return array|mixed
+     */
     public static function load($file){//10000次需要4s 数据量差异不大。
         if (!file_exists($file)) touch($file);
         $str = file_get_contents($file);
-        $str = substr($str, strlen(CONFIG_EXIT));
         $data= json_decode($str,true);
         if (is_null($data)) $data = array();
         return $data;
     }
     /**
-    * 保存数据；
-    */
+     * 保存数据；
+     * @param $file
+     * @param $data
+     */
     public static function save($file,$data){//10000次需要6s 
         if (!$file) return;
         if (file_exists($file) && !is_writable($file)) {
@@ -225,8 +233,7 @@ class fileCache
         }
         if($fp = fopen($file, "w")){
             if (flock($fp, LOCK_EX)) {  // 进行排它型锁定
-                $str = CONFIG_EXIT.json_encode($data);
-                fwrite($fp, $str);
+                fwrite($fp, json_encode($data));
                 fflush($fp);            // flush output before releasing the lock
                 flock($fp, LOCK_UN);    // 释放锁定
             }

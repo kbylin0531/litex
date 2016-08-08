@@ -84,6 +84,8 @@ function file_info($path){
 }
 /**
  * 获取文件夹细信息
+ * @param $path
+ * @return array
  */
 function folder_info($path){
 	$info = array(
@@ -185,6 +187,8 @@ function get_filename_auto($path,$file_add = "",$same_file_type=''){
 
 /**
  * 判断文件夹是否可写
+ * @param $path
+ * @return bool
  */
 function path_writable($path) {	
 	$file = $path.'/test'.time().'.txt';
@@ -208,6 +212,8 @@ function path_info($path){
 
 /**
  * 检查名称是否合法
+ * @param $path
+ * @return bool
  */
 function path_check($path){
 	$check = array('/','\\',':','*','?','"','<','>','|');
@@ -223,9 +229,15 @@ function path_check($path){
 
 /**
  * 递归获取文件夹信息： 子文件夹数量，文件数量，总大小
+ * @param $dir
+ * @param int $file_num
+ * @param int $path_num
+ * @param int $size
+ * @return array
  */
 function _path_info_more($dir, &$file_num = 0, &$path_num = 0, &$size = 0){
-	if (!$dh = opendir($dir)) return false;
+    $pathinfo = [];
+	if (!$dh = opendir($dir)) return [];
 	while (($file = readdir($dh)) !== false) {
 		if ($file != "." && $file != "..") {
 			$fullpath = $dir . "/" . $file;
@@ -250,10 +262,9 @@ function _path_info_more($dir, &$file_num = 0, &$path_num = 0, &$size = 0){
 /**
  * 获取多选文件信息,包含子文件夹数量，文件数量，总大小，父目录权限
  * @param $list
- * @param $time_type
  * @return array|string
  */
-function path_info_muti($list,$time_type){
+function path_info_muti($list){
 	if (count($list) == 1) {
 		if ($list[0]['type']=="folder"){
 	        return path_info($list[0]['path']);
@@ -291,6 +302,10 @@ function path_info_muti($list,$time_type){
  * 获取文件夹下列表信息
  * dir 包含结尾/   d:/wwwroot/test/
  * 传入需要读取的文件夹路径,为程序编码
+ * @param $dir
+ * @param bool $list_file
+ * @param bool $check_children
+ * @return array
  */
 function path_list($dir,$list_file=true,$check_children=false){
 	$dir = rtrim($dir,'/').'/';
@@ -341,6 +356,8 @@ function path_haschildren($dir,$check_file=false){
 
 /**
  * 删除文件 传入参数编码为操作系统编码. win--gbk
+ * @param $fullpath
+ * @return bool
  */
 function del_file($fullpath){
 	if (!@unlink($fullpath)) { // 删除不了，尝试修改文件权限
@@ -348,13 +365,14 @@ function del_file($fullpath){
 		if (!@unlink($fullpath)) {
 			return false;
 		} 
-	} else {
-		return true;
 	}
-} 
+    return true;
+}
 
 /**
  * 删除文件夹 传入参数编码为操作系统编码. win--gbk
+ * @param $dir
+ * @return bool
  */
 function del_dir($dir){
 	if (!$dh = opendir($dir)) return false;
@@ -392,41 +410,42 @@ function del_dir($dir){
  * 就会将wordpress下面文件复制到D:/wwwroot/www/explorer/0000/del/1/下面
  * $from = 'D:/wwwroot/wordpress';
  * $to = 'D:/wwwroot/www/explorer/0000/del/1/wordpress';
+ * @param $source
+ * @param $dest
+ * @return bool|void
  */
-
 function copy_dir($source, $dest){
-	if (!$dest) return false;
-
-	if ($source == substr($dest,0,strlen($source))) return;//防止父文件夹拷贝到子文件夹，无限递归
 	$result = false;
-	if (is_file($source)) {
-		if ($dest[strlen($dest)-1] == '/') {
-			$__dest = $dest . "/" . basename($source);
-		} else {
-			$__dest = $dest;
-		} 
-		$result = copy($source, $__dest); 
-		chmod($__dest, 0777);
-	}elseif (is_dir($source)) {
-		if ($dest[strlen($dest)-1] == '/') {
-			$dest = $dest . basename($source);		
-		}
-		if (!is_dir($dest)) {
-			mkdir($dest,0777);
-		}
-		if (!$dh = opendir($source)) return false;
-		while (($file = readdir($dh)) !== false) {
-			if ($file != "." && $file != "..") {
-				if (!is_dir($source . "/" . $file)) {
-					$__dest = $dest . "/" . $file;
-				} else {
-					$__dest = $dest . "/" . $file;
-				} 
-				$result = copy_dir($source . "/" . $file, $__dest);
-			} 
-		} 
-		closedir($dh);
-	}
+    if($dest and $source != substr($dest,0,strlen($source))){////防止父文件夹拷贝到子文件夹，无限递归
+        if (is_file($source)) {
+            if ($dest[strlen($dest)-1] == '/') {
+                $__dest = $dest . "/" . basename($source);
+            } else {
+                $__dest = $dest;
+            }
+            $result = copy($source, $__dest);
+            chmod($__dest, 0777);
+        }elseif (is_dir($source)) {
+            if ($dest[strlen($dest)-1] == '/') {
+                $dest = $dest . basename($source);
+            }
+            if (!is_dir($dest)) {
+                mkdir($dest,0777);
+            }
+            if (!$dh = opendir($source)) return false;
+            while (($file = readdir($dh)) !== false) {
+                if ($file != "." && $file != "..") {
+                    if (!is_dir($source . "/" . $file)) {
+                        $__dest = $dest . "/" . $file;
+                    } else {
+                        $__dest = $dest . "/" . $file;
+                    }
+                    $result = copy_dir($source . "/" . $file, $__dest);
+                }
+            }
+            closedir($dh);
+        }
+    }
 	return $result;
 }
 
