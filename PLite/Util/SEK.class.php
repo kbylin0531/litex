@@ -152,22 +152,6 @@ final class SEK {
     }
 
     /**
-     * 从字面商判断$path是否被包含在$scope的范围内
-     * @param string $path 路径
-     * @param string $scope 范围
-     * @return bool
-     */
-    public static function checkPathContainedInScope($path, $scope) {
-        if (false !== strpos($path, '\\')) $path = str_replace('\\', '/', $path);
-        if (false !== strpos($scope, '\\')) $scope = str_replace('\\', '/', $scope);
-        $path = rtrim($path, '/');
-        $scope = rtrim($scope, '/');
-//        dumpout($path,$scope);
-        return (IS_WINDOWS ? stripos($path, $scope) : strpos($path, $scope)) === 0;
-    }
-
-
-    /**
      * 调用位置
      */
     const PLACE_BACKWORD           = 0; //表示调用者自身的位置
