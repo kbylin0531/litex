@@ -1,11 +1,7 @@
 <?php 
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
+namespace Application\Explore\Controller;
 
+use Application\Explore\Common\Controller;
 class desktop extends Controller{
     function __construct() {
         parent::__construct();

@@ -1,11 +1,8 @@
-<?php 
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
+<?php
+namespace Application\Explore\Controller;
 
+use Application\Explore\Common\Library\FileCache;
+use Application\Explore\Common\Controller;
 class explorer extends Controller{
     public $path;
     public function __construct(){
@@ -177,7 +174,7 @@ class explorer extends Controller{
             return;
         }
         $check_file = ($app == 'editor'?true:false);
-        $favData=new fileCache($this->config['user_fav_file']);
+        $favData=new FileCache($this->config['user_fav_file']);
         $fav_list = $favData->get();
         $fav = array();
         foreach($fav_list as $key => $val){

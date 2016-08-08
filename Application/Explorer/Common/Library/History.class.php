@@ -1,11 +1,5 @@
-<?php 
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
-
+<?php
+namespace Application\Explore\Common\Library;
 
 /**
 * 历史记录操作类
@@ -25,7 +19,8 @@
 * )
 */
 
-class history{
+class History{
+
 	var $history_num;
 	var $first;
 	var $last;
@@ -76,23 +71,22 @@ class history{
 	}
 
 	function add($path){
-		if ($path==$this->history[$this->first]['path']) {//和最后相同，则不记录
-			return 0;
-		}
-		if ($this->back!=0) {//有后退操作记录的情况下，进行插入。
-			$this->goedit($path);
-			return;
-		}		
-		if ($this->history[0]['path']=='') {//刚构造，不用加一.首位不前移
-			$this->history[$this->first]['path']=$path;
-			return;
-		}else{
-			$this->first=$this->nextNum($this->first);//首位前移
-			$this->history[$this->first]['path']=$path;			
-		}
-		if ($this->first==$this->last) {//起始位置与终止位置相遇
-			$this->last=$this->nextNum($this->last);//末尾位置前移。
-		}		
+		if ($path != $this->history[$this->first]['path']) {//和最后相同，则不记录
+            if ($this->back!=0) {//有后退操作记录的情况下，进行插入。
+                $this->goedit($path);
+                return;
+            }
+            if ($this->history[0]['path']=='') {//刚构造，不用加一.首位不前移
+                $this->history[$this->first]['path']=$path;
+                return;
+            }else{
+                $this->first=$this->nextNum($this->first);//首位前移
+                $this->history[$this->first]['path']=$path;
+            }
+            if ($this->first==$this->last) {//起始位置与终止位置相遇
+                $this->last=$this->nextNum($this->last);//末尾位置前移。
+            }
+        }
 	}
 
 	function goback(){//返回从first后退N步的地址。

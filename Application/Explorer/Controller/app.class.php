@@ -5,11 +5,14 @@
 * @copyright warlee 2014.(Shanghai)Co.,Ltd
 * @license http://kalcaddle.com/tools/licenses/license.txt
 */
+namespace Application\Explore\Controller;
+use Application\Explore\Common\Library\FileCache;
+use Application\Explore\Common\Controller;
 
 class app extends Controller{
     function __construct()    {
         parent::__construct();
-        $this->sql=new fileCache(USER_SYSTEM.'apps.php');
+        $this->sql=new FileCache(USER_SYSTEM.'apps.php');
     }
 
     /**
@@ -40,7 +43,7 @@ class app extends Controller{
             file_put_contents($path, json_encode($data));
         }
         $user_info['status'] = 1;
-        $member = new fileCache(USER_SYSTEM.'member.php');
+        $member = new FileCache(USER_SYSTEM.'member.php');
         $member->update($user_info['name'],$user_info);
     }
 

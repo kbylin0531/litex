@@ -1,16 +1,14 @@
-<?php 
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
+<?php
 
+namespace Application\Explore\Controller;
+use Application\Explore\Common\Library\FileCache;
+
+use Application\Explore\Common\Controller;
 class fav extends Controller{
     private $sql;
     function __construct(){
         parent::__construct();
-        $this->sql=new fileCache($this->config['user_fav_file']);
+        $this->sql=new FileCache($this->config['user_fav_file']);
     }
 
     /**

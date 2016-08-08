@@ -1,11 +1,9 @@
 <?php
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
 
+namespace Application\Explore\Controller;
+
+use Application\Explore\Common\Library\FileCache;
+use Application\Explore\Common\Controller;
 class user extends Controller
 {
     private $user;  //用户相关信息
@@ -51,13 +49,13 @@ class user extends Controller
             $this->config['user_share_file']   = USER.'data/share.php';    // 收藏夹文件存放地址.
             $this->config['user_fav_file']     = USER.'data/fav.php';    // 收藏夹文件存放地址.
             $this->config['user_seting_file']  = USER.'data/config.php'; //用户配置文件
-            $this->config['user']  = fileCache::load($this->config['user_seting_file']);
+            $this->config['user']  = FileCache::load($this->config['user_seting_file']);
             if($this->config['user']['theme']==''){
                 $this->config['user'] = $this->config['setting_default'];
             }
             return;
         }else if($_COOKIE['kod_name']!='' && $_COOKIE['kod_token']!=''){
-            $member = new fileCache(USER_SYSTEM.'member.php');
+            $member = new FileCache(USER_SYSTEM.'member.php');
             $user = $member->get($_COOKIE['kod_name']);
             if (!is_array($user) || !isset($user['password'])) {
                 $this->logout();
@@ -185,7 +183,7 @@ class user extends Controller
                 // pr($_SESSION['check_code'].'--'.strtolower($this->in['check_code']));exit;
                 $this->login($this->L['code_error']);
             }
-            $member = new fileCache(USER_SYSTEM.'member.php');
+            $member = new FileCache(USER_SYSTEM.'member.php');
             $user = $member->get($name);
             if ($user ===false){
                 $msg = $this->L['user_not_exists'];
@@ -219,7 +217,7 @@ class user extends Controller
         if (!$password_now && !$password_new)show_json($this->L['password_not_null'],false);
         if ($this->user['password']==md5($password_now)){
             $member_file = USER_SYSTEM.'member.php';
-            $sql=new fileCache(USER_SYSTEM.'member.php');
+            $sql=new FileCache(USER_SYSTEM.'member.php');
             $this->user['password'] = md5($password_new);
             $sql->update($this->user['name'],$this->user);
             setcookie('kod_token',md5(md5($password_new)),time()+3600*24*365);
@@ -241,7 +239,7 @@ class user extends Controller
 
         //有权限限制的函数
         $key = ST.':'.ACT;
-        $group  = new fileCache(USER_SYSTEM.'group.php');
+        $group  = new FileCache(USER_SYSTEM.'group.php');
         $auth= $group->get($this->user['role']);
         
         //向下版本兼容处理

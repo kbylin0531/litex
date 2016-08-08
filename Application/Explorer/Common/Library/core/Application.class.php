@@ -11,6 +11,7 @@
  * 这里类判断外界参数调用内部方法
  */
 class Application {
+
 	public $default_controller = null;	//默认的类名
 	public $default_do = null;			//默认的方法名
 	public $sub_dir ='';				//控制器子目录

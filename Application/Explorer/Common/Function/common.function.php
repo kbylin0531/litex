@@ -1,13 +1,8 @@
 <?php
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
 
 /**
  * 加载类，从class目录；controller；model目录中寻找class
+ * @param $className
  */
 function _autoload($className){
 	if (file_exists(CLASS_DIR . strtolower($className) . '.class.php')) {
@@ -22,6 +17,8 @@ function _autoload($className){
 }
 /**
  * 生产model对象
+ * @param $model_name
+ * @return bool|object
  */
 function init_model($model_name){
 	if (!class_exists($model_name.'Model')) {
@@ -39,6 +36,8 @@ function init_model($model_name){
 }
 /**
  * 生产controller对象
+ * @param $controller_name
+ * @return bool|object
  */
 function init_controller($controller_name){
 	if (!class_exists($controller_name)) {
@@ -56,6 +55,7 @@ function init_controller($controller_name){
 
 /**
  * 加载类
+ * @param $class
  */
 function load_class($class){
 	$filename = CLASS_DIR.$class.'.class.php';
@@ -67,6 +67,7 @@ function load_class($class){
 }
 /**
  * 加载函数库
+ * @param $function
  */
 function load_function($function){
 	$filename = FUNCTION_DIR.$function.'.function.php';
@@ -78,6 +79,8 @@ function load_function($function){
 }
 /**
  * 文本字符串转换
+ * @param $str
+ * @return mixed
  */
 function mystr($str){
 	$from = array("\r\n", " ");
@@ -100,6 +103,9 @@ function mtime(){
 }
 /**
  * 过滤HTML
+ * @param $HTML
+ * @param bool $br
+ * @return mixed|string
  */
 function clear_html($HTML, $br = true){
 	$HTML = htmlspecialchars(trim($HTML));
@@ -114,7 +120,7 @@ function clear_html($HTML, $br = true){
 /**
  * 将obj深度转化成array
  * 
- * @param  $obj 要转换的数据 可能是数组 也可能是个对象 还可能是一般数据类型
+ * @param  object $obj 要转换的数据 可能是数组 也可能是个对象 还可能是一般数据类型
  * @return array || 一般数据类型
  */
 function obj2array($obj){
@@ -134,8 +140,8 @@ function obj2array($obj){
 /**
  * 计算时间差
  * 
- * @param char $pretime 
- * @return char 
+ * @param string $pretime
+ * @return string
  */
 function spend_time(&$pretime){
 	$now = microtime(1);
@@ -162,7 +168,7 @@ function check_code($code){
     imagerectangle($im, 0, 0, $width-1, $height-1, $border_color);//画矩形，边框颜色200,200,200
 
     for ($i = 0; $i < $len; $i++) {//写入随机字串
-        $current = $str[mt_rand(0, strlen($str)-1)];
+//        $current = $str[mt_rand(0, strlen($str)-1)];
         $text_color = imagecolorallocate($im,mt_rand(30, 140),mt_rand(30,140),mt_rand(30,140));
         imagechar($im,10,$i*$fontsize+6,rand(1,$height/3),$code[$i],$text_color);
     }
@@ -181,8 +187,9 @@ function microtime_float(){
 }
 /**
  * 计算N次方根
- * @param  $num 
- * @param  $root 
+ * @param $num
+ * @param int $root
+ * @return float
  */
 function croot($num, $root = 3){
 	$root = intval($root);
@@ -228,8 +235,9 @@ if (!function_exists('hex2bin')) {
 /**
  * 二维数组按照指定的键值进行排序，
  * 
- * @param  $keys 根据键值
- * @param  $type 升序降序
+ * @param $arr
+ * @param string $keys 根据键值
+ * @param string $type 升序降序
  * @return array $array = array(
  * array('name'=>'手机','brand'=>'诺基亚','price'=>1050),
  * array('name'=>'手表','brand'=>'卡西欧','price'=>960)
@@ -303,6 +311,7 @@ function array_get($arr,$index){
        $index--;
        if($index<0) return array($k,$v);
    }
+   return null;
 }
 
 function show_tips($message){
@@ -326,8 +335,9 @@ END;
 } 
 /**
  * 打包返回AJAX请求的数据
- * @params {int} 返回状态码， 通常0表示正常
- * @params {array} 返回的数据集合
+ * @param mixed $data
+ * @param bool $code 返回状态码， 通常0表示正常
+ * @param string $info 返回的数据集合
  */
 function show_json($data,$code = true,$info=''){
 	$use_time = mtime() - $GLOBALS['config']['app_startTime'];
@@ -350,6 +360,13 @@ function show_json($data,$code = true,$info=''){
  * $arr="default=淡蓝(默认)=5|mac=mac海洋=6|mac1=mac1海洋=7";
  * $tpl="<li class='list {this}' theme='{0}'>{1}_{2}</li>\n";
  * echo getTplList('|','=',$arr,$tpl,'mac'),'<br/>';
+ * @param $cute1
+ * @param $cute2
+ * @param $arraylist
+ * @param $tpl
+ * @param $this
+ * @param string $this_str
+ * @return string
  */
 function getTplList($cute1, $cute2, $arraylist, $tpl,$this,$this_str=''){
 	$list = explode($cute1, $arraylist);
@@ -358,7 +375,7 @@ function getTplList($cute1, $cute2, $arraylist, $tpl,$this,$this_str=''){
 	foreach ($list as $value) {
 		$info = explode($cute2, $value);
 		$arr_replace = array();	
-		foreach ($info as $key => $value) {
+		foreach ($info as $key => $v) {
 			$arr_replace[$key]='{'.$key .'}';
 		}
 		if ($info[0] == $this) {
@@ -493,10 +510,10 @@ function get_utf8_str($string, $length, $dot = '...'){
  * 字符串截取，支持中文和其他编码
  * 
  * @param string $str 需要转换的字符串
- * @param string $start 开始位置
+ * @param int $start 开始位置
  * @param string $length 截取长度
  * @param string $charset 编码格式
- * @param string $suffix 截断显示字符
+ * @param bool $suffix 截断显示字符
  * @return string 
  */
 function msubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = true){
@@ -554,13 +571,16 @@ function web2wap(&$content){
 /**
  * 获取变量的名字
  * eg hello="123" 获取ss字符串
+ * @param $aVar
+ * @return int|string
  */
 function get_var_name(&$aVar){
 	foreach($GLOBALS as $key => $var) {
 		if ($aVar == $GLOBALS[$key] && $key != "argc") {
 			return $key;
 		} 
-	} 
+	}
+	return null;
 } 
 // -----------------变量调试-------------------
 /**
@@ -572,10 +592,10 @@ function get_var_name(&$aVar){
 function pr($var, $exit = false){
 	ob_start();
 	$style = '<style>
-	pre#debug{margin:10px;font-size:14px;color:#222;font-family:Consolas ;line-height:1.2em;background:#f6f6f6;border-left:5px solid #444;padding:5px;width:95%;word-break:break-all;}
+	pre#debug{margin:10px;font-size:14px;color:#222;line-height:1.2em;background:#f6f6f6;border-left:5px solid #444;padding:5px;width:95%;word-break:break-all;}
 	pre#debug b{font-weight:400;}
 	#debug #debug_str{color:#E75B22;}
-	#debug #debug_keywords{font-weight:800;color:00f;}
+	#debug #debug_keywords{font-weight:800;color:#0000ff;}
 	#debug #debug_tag1{color:#22f;}
 	#debug #debug_tag2{color:#f33;font-weight:800;}
 	#debug #debug_var{color:#33f;}
@@ -588,7 +608,7 @@ function pr($var, $exit = false){
 	} else if (is_resource($var)) {
 		echo (string)$var;
 	} else {
-		echo var_dump($var);
+		var_dump($var);
 	} 
 	$out = ob_get_clean(); //缓冲输出给$out 变量	
 	$out = preg_replace('/"(.*)"/', '<b id="debug_var_str">"' . '\\1' . '"</b>', $out); //高亮字符串变量
@@ -612,8 +632,6 @@ function pr($var, $exit = false){
 /**
  * 调试输出变量，对象的值。
  * 参数任意个(任意类型的变量)
- * 
- * @return echo 
  */
 function debug_out(){
 	$avg_num = func_num_args();
@@ -630,9 +648,9 @@ function debug_out(){
 /**
  * 取$from~$to范围内的随机数
  * 
- * @param  $from 下限
- * @param  $to 上限
- * @return unknown_type 
+ * @param  int $from 下限
+ * @param  int $to 上限
+ * @return mixed
  */
 function rand_from_to($from, $to){
 	$size = $from - $to; //数值区间
@@ -641,9 +659,9 @@ function rand_from_to($from, $to){
 		return $from + mt_rand(0, $size);
 	} else {
 		if ($size % $max) {
-			return $from + random_from_to(0, $size / $max) * $max + mt_rand(0, $size % $max);
+			return $from + rand_from_to(0, $size / $max) * $max + mt_rand(0, $size % $max);
 		} else {
-			return $from + random_from_to(0, $size / $max) * $max + mt_rand(0, $max);
+			return $from + rand_from_to(0, $size / $max) * $max + mt_rand(0, $max);
 		} 
 	} 
 } 
@@ -651,10 +669,10 @@ function rand_from_to($from, $to){
 /**
  * 产生随机字串，可用来自动生成密码 默认长度6位 字母和数字混合
  * 
- * @param string $len 长度
+ * @param int $len 长度
  * @param string $type 字串类型：0 字母 1 数字 2 大写字母 3 小写字母  4 中文  
  * 其他为数字字母混合(去掉了 容易混淆的字符oOLl和数字01，)
- * @param string $addChars 额外字符
+ * @_param string $addChars 额外字符
  * @return string 
  */
 function rand_string($len = 4, $type='check_code'){
@@ -715,8 +733,8 @@ function make_password(){
 function des_decode($key, $encrypted){
 	$encrypted = base64_decode($encrypted);
 	$td = mcrypt_module_open(MCRYPT_DES, '', MCRYPT_MODE_CBC, ''); //使用MCRYPT_DES算法,cbc模式
-	$iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	$ks = mcrypt_enc_get_key_size($td);
+//	$iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+//	$ks = mcrypt_enc_get_key_size($td);
 
 	mcrypt_generic_init($td, $key, $key); //初始处理
 	$decrypted = mdecrypt_generic($td, $encrypted); //解密
@@ -735,7 +753,7 @@ function des_decode($key, $encrypted){
 function des_encode($key, $text){
 	$y = pkcs5_pad($text);
 	$td = mcrypt_module_open(MCRYPT_DES, '', MCRYPT_MODE_CBC, ''); //使用MCRYPT_DES算法,cbc模式
-	$ks = mcrypt_enc_get_key_size($td);
+//	$ks = mcrypt_enc_get_key_size($td);
 
 	mcrypt_generic_init($td, $key, $key); //初始处理
 	$encrypted = mcrypt_generic($td, $y); //解密

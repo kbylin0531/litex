@@ -1,17 +1,15 @@
 <?php
-/*
-* @link http://www.kalcaddle.com/
-* @author warlee | e-mail:kalcaddle@qq.com
-* @copyright warlee 2014.(Shanghai)Co.,Ltd
-* @license http://kalcaddle.com/tools/licenses/license.txt
-*/
+namespace Application\Explore\Controller;
+
+use Application\Explore\Common\Library\FileCache;
+use Application\Explore\Common\Controller;
 
 class member extends Controller{
     private $sql;
     function __construct()    {
         parent::__construct();
         $this->tpl = TEMPLATE.'member/';
-        $this->sql=new fileCache(USER_SYSTEM.'member.php');
+        $this->sql=new FileCache(USER_SYSTEM.'member.php');
     }
     
     /**
@@ -102,6 +100,6 @@ class member extends Controller{
         foreach ($home as $dir) {
             mk_dir($user_path.'home/'.$dir);
         }
-        fileCache::save($user_path.'data/config.php',$this->config['setting_default']);
+        FileCache::save($user_path.'data/config.php',$this->config['setting_default']);
     }
 }
