@@ -74,15 +74,4 @@ class File implements ConfiggerInterface {
         return Storage::getInstance(0)->write($path,serialize($config)) !== false; //闭包函数无法写入
     }
 
-    /**
-     * 将配置项转换成配置文件路径
-     * @param string $item 配置项
-     * @param mixed $check 检查文件是否存在
-     * @return null|string 返回配置文件路径，参数二位true并且文件不存在时返回null
-     */
-    protected function item2path($item,$check=true){
-        $path = $this->convention['CUSTOM_CONF_PATH']."{$item}.php";
-        if($check and !is_file($path)) return null;
-        return ($check and !is_file($path))?null:$path;
-    }
 }

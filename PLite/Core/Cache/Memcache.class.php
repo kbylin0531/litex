@@ -56,7 +56,7 @@ class Memcache implements CacheInterface{
             $this->options = array_merge($this->options, $options);
         }
 
-        $this->handler = new \Memcache();
+        $this->handler = new \Memcached();
         // 支持集群
         if(false !== strpos($this->options['host'],',')){
             $hosts = explode(',', $this->options['host']);

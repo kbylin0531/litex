@@ -194,39 +194,4 @@ class Configger extends Lite{
         return true;
     }
 
-    /**
-     * 配置类型
-     * 值使用字符串而不是效率更高的数字是处于可以直接匹配后缀名的考虑
-     */
-    const TYPE_PHP     = 'php';
-    const TYPE_INI     = 'ini';
-    const TYPE_YAML    = 'yaml';
-    const TYPE_XML     = 'xml';
-    const TYPE_JSON    = 'json';
-
-    /**
-     * 加载配置文件
-     * @param string $path 配置文件的路径
-     * @param string|null $type 配置文件的类型,参数为null时根据文件名称后缀自动获取
-     * @param callable $parser 配置解析方法 有些格式需要用户自己解析
-     * @return array
-     */
-    public static function load($path,$type=null,callable $parser=null){
-        isset($type) or $type = pathinfo($path, PATHINFO_EXTENSION);
-        switch ($type) {
-            case self::TYPE_PHP:
-                return include $path;
-            case self::TYPE_INI:
-                return parse_ini_file($path);
-            case self::TYPE_YAML:
-                return yaml_parse_file($path);
-            case self::TYPE_XML:
-                return (array)simplexml_load_file($path);
-            case self::TYPE_JSON:
-                return json_decode(file_get_contents($path), true);
-            default:
-                return $parser?$parser($path):Exception::throwing('无法解析配置文件');
-        }
-    }
-
 }

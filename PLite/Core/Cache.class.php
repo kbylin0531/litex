@@ -7,6 +7,7 @@
  * Time: 7:03 PM
  */
 namespace PLite\Core;
+use PLite\Core\Cache\CacheInterface;
 use PLite\Lite;
 
 class Cache extends Lite{
@@ -54,7 +55,7 @@ class Cache extends Lite{
     private static $writeTimes  = 0;
     /**
      * to declare the driver type
-     * @var CacherInterface
+     * @var CacheInterface
      */
     protected $driver = null;
 
@@ -121,10 +122,4 @@ class Cache extends Lite{
         return $this->driver->clean();
     }
 
-    /**
-     * 加载静态输出脚本
-     */
-    public static function loadStatic(){}
-    public static function saveStatic(){}
-    public static function hasStatic(){}
 }

@@ -7,7 +7,6 @@
  */
 namespace PLite\Util;
 use PLite\PLiteException;
-use PLite\Util\Helper\StringHelper;
 
 /**
  * Class SEK System execute kits
@@ -44,6 +43,17 @@ final class SEK {
     }
 
     /**
+     * 根据文件名后缀获取响应文件类型
+     * @param string $suffix 后缀名，不包括点号
+     * @return null|string
+     */
+    public static function getMimeBysuffix($suffix){
+        static $mimes = null;
+        $mimes or $mimes = include dirname(__DIR__).'/Common/mime.php';
+        isset($mimes[$suffix]) or PLiteException::throwing();
+        return $mimes[$suffix];
+    }
+    /**
      * 解析资源文件地址
      * 模板文件资源位置格式：
      *      ModuleA/ModuleB@ControllerName/ActionName:themeName
@@ -56,116 +66,6 @@ final class SEK {
         $path = "{$path}{$context['a']}.html";
         return $path;
     }
-    /**
-     * 模块序列转换成数组形式
-     * 且数组形式的都是大写字母开头的单词形式
-     * @param string|array $modules 模块序列
-     * @param string $mmbridge 模块之间的分隔符
-     * @return array
-     * @throws \Exception
-     */
-    public static function toModulesArray($modules, $mmbridge='/'){
-        if(is_string($modules)){
-            if(false === stripos($modules,$mmbridge)){
-                $modules = [$modules];
-            }else{
-                $modules = explode($mmbridge,$modules);
-            }
-        }
-        if(!is_array($modules)){
-            throw new \Exception('Parameter should be an array!');
-        }
-        return array_map(function ($val) {
-            return StringHelper::toJavaStyle($val);
-        }, $modules);
-    }
-
-    /**
-     * 模块学列数组转换成模块序列字符串
-     * 模块名称全部小写化
-     * @param array|string $modules 模块序列
-     * @param string $mmb
-     * @return string
-     * @throws PLiteException
-     */
-    public static function toModulesString($modules,$mmb='/'){
-        if(is_array($modules)){
-            $modules = implode($mmb,$modules);
-        }
-        is_string($modules) or PLiteException::throwing('Invalid Parameters!');
-        return trim($modules,' /');
-    }
-    /**
-     * 将参数序列装换成参数数组，应用Router模块的配置
-     * @param string $params 参数字符串
-     * @param string $ppb
-     * @param string $pkvb
-     * @return array
-     */
-    public static function toParametersArray($params,$ppb='/',$pkvb='/'){//解析字符串成数组
-        $pc = [];
-        if($ppb !== $pkvb){//使用不同的分割符
-            $parampairs = explode($ppb,$params);
-            foreach($parampairs as $val){
-                $pos = strpos($val,$pkvb);
-                if(false === $pos){
-                    //非键值对，赋值数字键
-                }else{
-                    $key = substr($val,0,$pos);
-                    $val = substr($val,$pos+strlen($pkvb));
-                    $pc[$key] = $val;
-                }
-            }
-        }else{//使用相同的分隔符
-            $elements = explode($ppb,$params);
-            $count = count($elements);
-            for($i=0; $i<$count; $i += 2){
-                if(isset($elements[$i+1])){
-                    $pc[$elements[$i]] = $elements[$i+1];
-                }else{
-                    //单个将被投入匿名参数,先废弃
-                }
-            }
-        }
-        return $pc;
-    }
-
-    /**
-     * 将参数数组转换成参数序列，应用Router模块的配置
-     * @param array $params 参数数组
-     * @param string $ppb
-     * @param string $pkvb
-     * @return string
-     */
-    public static function toParametersString(array $params=null,$ppb='/',$pkvb='/'){
-        //希望返回的是字符串是，返回值是void，直接修改自$params
-        if(empty($params)) return '';
-        $temp = '';
-        if($params){
-            foreach($params as $key => $val){
-                $temp .= "{$key}{$pkvb}{$val}{$ppb}";
-            }
-            return substr($temp,0,strlen($temp) - strlen($ppb));
-        }else{
-            return $temp;
-        }
-    }
-
-    /**
-     * 从字面商判断$path是否被包含在$scope的范围内
-     * @param string $path 路径
-     * @param string $scope 范围
-     * @return bool
-     */
-    public static function checkPathContainedInScope($path, $scope) {
-        if (false !== strpos($path, '\\')) $path = str_replace('\\', '/', $path);
-        if (false !== strpos($scope, '\\')) $scope = str_replace('\\', '/', $scope);
-        $path = rtrim($path, '/');
-        $scope = rtrim($scope, '/');
-//        dumpout($path,$scope);
-        return (IS_WINDOWS ? stripos($path, $scope) : strpos($path, $scope)) === 0;
-    }
-
 
     /**
      * 调用位置
@@ -306,39 +206,6 @@ final class SEK {
         return $stripStr;
     }
 
-    /**
-     * 自动从运行环境中获取URI
-     * 直接访问：
-     *  http://www.xor.com:8056/                => '/'
-     *  http://localhost:8056/_xor/             => '/_xor/'  ****** BUG *******
-     * @param bool $reget 是否重新获取，默认为false
-     * @return null|string
-     */
-    public static function pathInfo($reget=false){
-        static $uri = '/';
-        if($reget or '/' === $uri){
-            if(isset($_SERVER['PATH_INFO'])){
-                //如果设置了PATH_INFO则直接获取之
-                $uri = $_SERVER['PATH_INFO'];
-            }else{
-                $scriptlen = strlen($_SERVER['SCRIPT_NAME']);
-                if(strlen($_SERVER['REQUEST_URI']) > $scriptlen){
-                    $pos = strpos($_SERVER['REQUEST_URI'],$_SERVER['SCRIPT_NAME']);
-                    if(false !== $pos){
-                        //在不支持PATH_INFO...或者PATH_INFO不存在的情况下(URL省略将被认定为普通模式)
-                        //REQUEST_URI获取原生的URL地址进行解析(返回脚本名称后面的部分)
-                        if(0 === $pos){//PATHINFO模式
-                            $uri = substr($_SERVER['REQUEST_URI'], $scriptlen);
-                        }else{
-                            //重写模式
-                            $uri = $_SERVER['REQUEST_URI'];
-                        }
-                    }
-                }else{}//URI短于SCRIPT_NAME，则PATH_INFO等于'/'
-            }
-        }
-        return $uri;
-    }
     /**
      * 数组递归遍历
      * @param array $array 待递归调用的数组
