@@ -1,4 +1,4 @@
-<div class='h1'><i class="font-icon icon-dashboard"></i><?php echo $L['setting_theme'];?></div>
+<div class='h1'><i class="font-icon icon-dashboard"></i>{$Think.L.setting_theme}</div>
 <div class="section">
 	<div class='box' data-type="theme">
 	<?php 

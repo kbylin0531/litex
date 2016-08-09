@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="renderer" content="webkit">
-	<title><?php echo $share_info['name'].' - '.$L['share_title'].' - '.$L['kod_name'].$L['kod_power_by'];?></title>
+	<title><?php echo $share_info['name'].' - '.$L['share_title'].' - '.$L['kod_name'].$L['kod_power_by}</title>
 	<link rel="Shortcut Icon" href="<?php echo STATIC_PATH;?>images/favicon.ico">
 	<link href="<?php echo STATIC_PATH;?>js/lib/picasa/style/style.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
 	<link href="<?php echo STATIC_PATH;?>style/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
@@ -30,33 +30,33 @@
 		<div class="header-content">
 			<div class="header-left">
 				<div class="btn-group btn-group-sm">
-					<button class="btn btn-default" id='history_back' title='<?php echo $L['history_back'];?>' type="button">
+					<button class="btn btn-default" id='history_back' title='{$Think.L.history_back}' type="button">
 						<i class="font-icon icon-arrow-left"></i>
 					</button>
-					<button class="btn btn-default" id='history_next' title='<?php echo $L['history_next'];?>' type="button">
+					<button class="btn btn-default" id='history_next' title='{$Think.L.history_next}' type="button">
 						<i class="font-icon icon-arrow-right"></i>
 					</button>
-					<button class="btn btn-default" id='refresh' title='<?php echo $L['refresh_all'];?>' type="button">
+					<button class="btn btn-default" id='refresh' title='{$Think.L.refresh_all}' type="button">
 						<i class="font-icon icon-refresh"></i>
 					</button>
 				</div>
 			</div><!-- /header left -->
 			
 			<div class='header-middle'>
-				<button class="btn btn-default" id='home' title='<?php echo $L['root_path'];?>'>
+				<button class="btn btn-default" id='home' title='{$Think.L.root_path}'>
 					<i class="font-icon icon-home"></i>
 				</button>
 
-				<div id='yarnball' title="<?php echo $L['address_in_edit'];?>"></div>
+				<div id='yarnball' title="{$Think.L.address_in_edit}"></div>
 				<div id='yarnball_input'><input type="text" name="path" value="" class="path" id="path"/></div>
-				<button class="btn btn-default" id='up' title='<?php echo $L['go_up'];?>' type="button">
+				<button class="btn btn-default" id='up' title='{$Think.L.go_up}' type="button">
 					<i class="font-icon icon-circle-arrow-up"></i>
 				</button>
 			</div><!-- /header-middle end-->
 
 			<div class='header-right'>
 				<input type="text" name="seach"/>
-				<button class="btn btn-default" id='search' title='<?php echo $L['search'];?>' type="button">
+				<button class="btn btn-default" id='search' title='{$Think.L.search}' type="button">
 					<i class="font-icon icon-search"></i>
 				</button>
 			</div>
@@ -75,24 +75,24 @@
 						<!-- 文件功能 -->
 						<div class="btn-group btn-group-sm kod_path_tool">
 					        <button id='selectAll' class="btn btn-default" type="button">
-					        	<i class="font-icon icon-refresh"></i><?php echo $L['selectAll'];?>
+					        	<i class="font-icon icon-refresh"></i>{$Think.L.selectAll}
 					        </button> 
 							<button id='down' class="btn btn-default" type="button">
-					        	<i class="font-icon icon-download"></i><?php echo $L['download'];?>
+					        	<i class="font-icon icon-download"></i>{$Think.L.download}
 					        </button>					        				        
 						</div>
-						<span class='msg'><?php echo $L['path_loading'];?></span>
+						<span class='msg'>{$Think.L.path_loading}</span>
 					</div>
 					<div class="tools-right tools_list">
 						<div class="btn-group btn-group-sm">
-						  <button id='set_icon' title="<?php echo $L['list_icon'];?>" type="button" class="btn btn-default">
+						  <button id='set_icon' title="{$Think.L.list_icon}" type="button" class="btn btn-default">
 						  	<i class="font-icon icon-th"></i>
 						  </button>
-						  <button id='set_list' title="<?php echo $L['list_list'];?>" type="button" class="btn btn-default">
+						  <button id='set_list' title="{$Think.L.list_list}" type="button" class="btn btn-default">
 						  	<i class="font-icon icon-list"></i>
 						  </button>
 						  <div class="btn-group btn-group-sm">
-						    <button id="set_theme" title="<?php echo $L['setting_theme'];?>" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+						    <button id="set_theme" title="{$Think.L.setting_theme}" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
 						      <i class="font-icon icon-dashboard"></i>&nbsp;&nbsp;<span class="caret"></span>
 						    </button>
 						    <ul class="dropdown-menu pull-right dropdown-menu-theme fadein">
@@ -115,12 +115,12 @@
 	</div><!-- / frame-main end-->
 <?php include(TEMPLATE.'common/footer.html');?>
 <script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="./index.php?share/common_js&user=<?php echo $_GET['user'];?>&sid=<?php echo $_GET['sid'];?>&#=<?php echo rand_string(8);?>"></script>
+<script src="./index.php?share/common_js&user=<?php echo $_GET['user}&sid=<?php echo $_GET['sid}&#=<?php echo rand_string(8);?>"></script>
 <script type="text/javascript">
 	AUTH  = {'explorer:fileDownload':<?php echo $can_download;?>};
 	G.this_path = "<?php echo $dir;?>";
-	G.user = "<?php echo $_GET['user'];?>";
-	G.sid = "<?php echo $_GET['sid'];?>";
+	G.user = "<?php echo $_GET['user}";
+	G.sid = "<?php echo $_GET['sid}";
 	G.share_info = <?php echo json_encode($share_info);?>;
 	G.theme = "<?php echo $config_theme;?>";
 	seajs.config({

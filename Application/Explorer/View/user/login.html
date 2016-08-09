@@ -7,8 +7,8 @@
 	<img class="background" src="__PUBLIC__/images/wall_page/<?php echo $get; ?>.jpg" />
 	<div class="loginbox" >
 		<div class="title">
-			<div class="logo"><i class="icon-cloud"></i><?php echo $L['kod_name'];?></div>
-			<div class='info'>——<?php echo $L['kod_name_desc'];?></div>
+			<div class="logo"><i class="icon-cloud"></i>{$Think.L.kod_name}</div>
+			<div class='info'>——{$Think.L.kod_name_desc}</div>
 		</div>
 		<div class="form">
 			<div class="inputs">
@@ -32,7 +32,7 @@
 
 			<div class='guest'>
 				<?php if ($this->config['setting_system']['auto_login'] == '1') {?>
-				<a href="__PUBLIC__/index.php?user/loginSubmit&name=guest&password=guest"><?php echo $L['guest_login'];?><i class=' icon-arrow-right'></i></a>
+				<a href="__PUBLIC__/index.php?user/loginSubmit&name=guest&password=guest">{$Think.L.guest_login}<i class=' icon-arrow-right'></i></a>
 				<?php } ?>
 			</div>
 		</div>

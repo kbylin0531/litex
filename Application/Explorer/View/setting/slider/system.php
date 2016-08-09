@@ -5,64 +5,64 @@
 		}
 	}
 ?>
-<div class='h1'><i class="font-icon icon-user"></i><?php echo $L['system_setting'];?></div>
+<div class='h1'><i class="font-icon icon-user"></i>{$Think.L.system_setting}</div>
 <div class="nav">
-    <a href="javascript:;"  class="this" data-page="setting"><?php echo $L['system_setting'];?></a>
-    <a href="javascript:;" class="" data-page="setting_menu"><?php echo $L['system_setting_menu'];?></a>
+    <a href="javascript:;"  class="this" data-page="setting">{$Think.L.system_setting}</a>
+    <a href="javascript:;" class="" data-page="setting_menu">{$Think.L.system_setting_menu}</a>
     <div style="clear:both;"></div>
 </div>
 
 <div class="section setting system_setting">
 	<div class="box_line">
-	    <span class='infotitle'><?php echo $L['system_name'];?>:</span><input type="text" name="system_name" 
-      value="<?php echo $config['setting_system']['system_name'];?>" />
-	    <i><?php echo $L['system_name_desc'];?></i>
+	    <span class='infotitle'>{$Think.L.system_name}:</span><input type="text" name="system_name" 
+      value="<?php echo $config['setting_system']['system_name}" />
+	    <i>{$Think.L.system_name_desc}</i>
 	</div>
 	<div class="box_line">
-		<span class='infotitle'><?php echo $L['system_desc'];?>:</span><input type="text" name="system_desc" 
-    value="<?php echo $config['setting_system']['system_desc'];?>" />
-		<i><?php echo $L['system_desc'];?></i>
+		<span class='infotitle'>{$Think.L.system_desc}:</span><input type="text" name="system_desc" 
+    value="<?php echo $config['setting_system']['system_desc}" />
+		<i>{$Think.L.system_desc}</i>
 	</div>
 	<div class="box_line">
-		<span class='infotitle'><?php echo $L['path_hidden'];?>:</span><input type="text" name="path_hidden" 
-      value="<?php echo $config['setting_system']['path_hidden'];?>" />
-		<i><?php echo $L['path_hidden_desc'];?></i>
+		<span class='infotitle'>{$Think.L.path_hidden}:</span><input type="text" name="path_hidden" 
+      value="<?php echo $config['setting_system']['path_hidden}" />
+		<i>{$Think.L.path_hidden_desc}</i>
 	</div>
 	<div class="box_line">
-		<span class='infotitle'><?php echo $L['new_user_folder'];?>:</span>
-		<input type="text" name="new_user_folder" value="<?php echo $config['setting_system']['new_user_folder'];?>" />
-		<i><?php echo $L['new_user_folder_desc'];?></i>
+		<span class='infotitle'>{$Think.L.new_user_folder}:</span>
+		<input type="text" name="new_user_folder" value="<?php echo $config['setting_system']['new_user_folder}" />
+		<i>{$Think.L.new_user_folder_desc}</i>
 	</div>
 	<div class="box_line">
-		<span class='infotitle'><?php echo $L['new_user_app'];?>:</span>
+		<span class='infotitle'>{$Think.L.new_user_app}:</span>
 		<input type="text" name="new_user_app" 
-			value="<?php echo $config['setting_system']['new_user_app'];?>"/>
-        <i><?php echo $L['new_user_app_desc'];?></i>
+			value="<?php echo $config['setting_system']['new_user_app}"/>
+        <i>{$Think.L.new_user_app_desc}</i>
 	</div>
 	<div class="box_line">
-		<span class='infotitle'><?php echo $L['auto_login'];?>:</span>
+		<span class='infotitle'>{$Think.L.auto_login}:</span>
 			<label>
 			<input type="checkbox" name="auto_login" 
 		      <?php if($config['setting_system']['auto_login']=="1") echo 'checked="checked"';?> />
-		    <i><?php echo $L['auto_login_desc'];?></i>
+		    <i>{$Think.L.auto_login_desc}</i>
 		    </label>		
 	</div>
 	<div class="box_line">
-		<span class='infotitle'><?php echo $L['first_in'];?>:</span>
-		<label><input type="radio" name="first_in" value="desktop" <?php check_first_in('desktop');?> /><?php echo $L['ui_desktop'];?></label>
-		<label><input type="radio" name="first_in" value="explorer" <?php check_first_in('explorer');?> /><?php echo $L['ui_explorer'];?></label>
-		<label><input type="radio" name="first_in" value="editor" <?php check_first_in('editor');?> /><?php echo $L['ui_editor'];?></label>
+		<span class='infotitle'>{$Think.L.first_in}:</span>
+		<label><input type="radio" name="first_in" value="desktop" <?php check_first_in('desktop');?> />{$Think.L.ui_desktop}</label>
+		<label><input type="radio" name="first_in" value="explorer" <?php check_first_in('explorer');?> />{$Think.L.ui_explorer}</label>
+		<label><input type="radio" name="first_in" value="editor" <?php check_first_in('editor');?> />{$Think.L.ui_editor}</label>
 	  <div style="clear:both"></div>
   </div>
   <div class="box_line">
-    <a href="javascript:void(0);" class="system_save button"><?php echo $L['button_save'];?></a>
+    <a href="javascript:void(0);" class="system_save button">{$Think.L.button_save}</a>
   </div>
   <div style="clear:both;"></div>
 </div>
 
 <div class="section setting_menu hidden">
     <table id="list" align="center" border="0" cellspacing="0" cellpadding="0">
-	    <tbody><tr class="title"><td width="10%"><?php echo $L['menu_name'];?></td><td><?php echo $L['url_path'];?><span>(<?php echo $L['url_path_desc'];?>)</span></td><td><?php echo $L['action'];?></td></tr>
+	    <tbody><tr class="title"><td width="10%">{$Think.L.menu_name}</td><td>{$Think.L.url_path}<span>({$Think.L.url_path_desc})</span></td><td>{$Think.L.action}</td></tr>
         <?php 
          $config['setting_system']['menu'][] = array('name'=>'','type'=>'','url'=>'','target'=>'_blank','use'=>'1');
          foreach($config['setting_system']['menu'] as $key => $menu) { 
@@ -72,28 +72,28 @@
         ?>
         <tr class="menu_list <?php echo $the_type.$the_use.$the_null;?>">
             <td class="name"><input type="text" name="name" value="<?php echo htmlspecialchars(urldecode($menu['name']));?>"/>
-                <span><?php echo $L['ui_'.$menu['name']];?></span>
+                <span>{$Think.L.ui_'.$menu['name']];?></span>
             </td>
             <td class="url">
                 <input type="text" name="url" value="<?php echo htmlspecialchars(urldecode($menu['url']));?>">
-                <span><?php echo $menu['name'];?></span>
-                <label><input type="checkbox" name="target" value="<?php echo $menu['target'];?>" 
-                    <?php if($menu['target']=='_blank'){echo "checked='checked'";}?> /><?php echo $L['menu_open_window'];?></label> 
+                <span><?php echo $menu['name}</span>
+                <label><input type="checkbox" name="target" value="<?php echo $menu['target}" 
+                    <?php if($menu['target']=='_blank'){echo "checked='checked'";}?> />{$Think.L.menu_open_window}</label> 
             </td>
             <td class="action">
             	<a href="javascript:void(0)" class="button move_up icon-arrow-up"></a>
             	<a href="javascript:void(0)" class="button move_down icon-arrow-down"></a>
             	<a href="javascript:void(0)" class="button move_hidden">
-                    <?php echo $menu['use']=='1'?$L['menu_hidden']:$L['menu_show'];?>
+                    <?php echo $menu['use']=='1'?$L['menu_hidden']:$L['menu_show}
                 </a>
-                <a href="javascript:void(0)" class="button move_del"><?php echo $L['menu_move_del'];?></a>
+                <a href="javascript:void(0)" class="button move_del">{$Think.L.menu_move_del}</a>
             </td>
     	</tr>
         <?php } ?>
 		</tbody>
     </table>
-    <a href="javascript:void(0)" class="add system_menu_add"><i class="icon-plus pr-10"></i><?php echo $L['button_add'];?></a>
-    <a href="javascript:void(0);" class="system_menu_save button"><?php echo $L['button_save'];?></a>
+    <a href="javascript:void(0)" class="add system_menu_add"><i class="icon-plus pr-10"></i>{$Think.L.button_add}</a>
+    <a href="javascript:void(0);" class="system_menu_save button">{$Think.L.button_save}</a>
 </div>
 
 <?php
