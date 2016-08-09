@@ -17,7 +17,7 @@ class ExtDebugger {
      * 开启Trace
      * @return void
      */
-    final public static function openTrace(){
+    public static function openTrace(){
         self::$_allowTrace = true;
     }
 
@@ -25,7 +25,7 @@ class ExtDebugger {
      * 关闭trace
      * @return void
      */
-    final public static function closeTrace(){
+    public static function closeTrace(){
         self::$_allowTrace = false;
     }
 
@@ -191,7 +191,7 @@ endline;
         if(IS_REQUEST_AJAX){
             exit($e->getMessage());
         }
-        ob_get_level() > 0 and ob_end_clean();
+        EXCEPTION_CLEAN and ob_get_level() > 0 and ob_end_clean();
         $trace = $e->getTrace();
         if(!empty($trace[0])){
             empty($trace[0]['file']) and $trace[0]['file'] = 'Unkown file';
@@ -221,7 +221,7 @@ endline;
      */
     public static function handleError($errno,$errstr,$errfile,$errline){
         IS_REQUEST_AJAX and exit($errstr);
-        ob_get_level() > 0 and ob_end_clean();
+        EXCEPTION_CLEAN and ob_get_level() > 0 and ob_end_clean();
         if(!is_string($errstr)) $errstr = serialize($errstr);
         $trace = debug_backtrace();
         $vars = [

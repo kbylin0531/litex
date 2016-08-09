@@ -1,8 +1,15 @@
 <?php
 namespace Application\Explorer\Common\Library;
-
+use PLite\Core\URL;
+use PLite\Library\FileCache;
+use PLite\Response;
+use PLite\Storage;
 
 class ExplorerUtils {
+
+    private static $noCheck = [
+        'loginFirst','common_js','login','logout','loginSubmit','checkCode','public_link'
+    ];
 
     public static function &getAppConfig(){
         if(isset($GLOBALS['config'])){
@@ -90,6 +97,88 @@ class ExplorerUtils {
             ];
         }
         return $GLOBALS['config'];
+    }
+
+    /**
+     * redirect to login page
+     */
+    public static function goLogin(){
+        touch(USER_SYSTEM.'install.lock');
+        URL::redirect(__PUBLIC__.'/index.php?user/login');
+        exit;
+    }
+
+    /**
+     * 检查用户是否登录
+     * @return bool
+     */
+    public static function checkLogin(){
+        //共享页面
+        if(REQUEST_CONTROLLER === 'share' or in_array(REQUEST_ACTION,self::$noCheck)) return true;
+
+        if($_SESSION['kod_login']===true and !empty($_SESSION['kod_user']['name'])){
+            define('USER',USER_PATH.$_SESSION['kod_user']['name'].'/');//personal dir
+            define('USER_TEMP',USER.'data/temp/');
+            define('USER_RECYCLE',USER.'recycle/');
+            if (!file_exists(USER)) {
+                Storage::mkdir(USER);
+            }
+            if ($_SESSION['kod_user']['role'] == 'root') {
+                define('MYHOME',USER.'home/');
+                define('HOME','');
+                $GLOBALS['web_root'] = WEB_ROOT;//服务器目录
+                $GLOBALS['is_root'] = 1;
+            }else{
+                define('MYHOME','/');
+                define('HOME',USER.'home/');
+                $GLOBALS['web_root'] = str_replace(WEB_ROOT,'',HOME);//从服务器开始到用户目录
+                $GLOBALS['is_root'] = 0;
+            }
+            $config = self::getAppConfig();
+            $config['user_share_file']   = USER.'data/share.php';    // 收藏夹文件存放地址.
+            $config['user_fav_file']     = USER.'data/fav.php';    // 收藏夹文件存放地址.
+            $config['user_seting_file']  = USER.'data/config.php'; //用户配置文件
+            $config['user']  = FileCache::load($config['user_seting_file']);//用户设置
+            if($config['user']['theme']==''){
+                $config['user'] = $config['setting_default'];
+            }
+        }else if($_COOKIE['kod_name']!='' && $_COOKIE['kod_token']!=''){
+            //cookie未过期
+            $member = new FileCache(USER_SYSTEM.'member.json');
+            $user = $member->get($_COOKIE['kod_name']);
+            if (is_array($user) and isset($user['password'])) {
+                if(md5($user['password'].get_client_ip()) == $_COOKIE['kod_token']){
+                    session_start();//re start
+                    $_SESSION['kod_login'] = true;
+                    $_SESSION['kod_user']= $user;
+                    setcookie('kod_name', $_COOKIE['kod_name'], time()+3600*24*7);
+                    setcookie('kod_token',$_COOKIE['kod_token'],time()+3600*24*7); //密码的MD5值再次md5
+                    Response::cleanOutput();
+                    header('location:'.get_url());
+                    exit;
+                }else{
+                    self::logout();
+                }
+            }
+        }else{
+            file_exists(USER_SYSTEM.'install.lock') or URL::redirect(__PUBLIC__.'/index.php/app/install');
+        }
+        return false;
+    }
+
+    /**
+     * 用户登出
+     */
+    public static function logout(){
+        session_start();
+        Response::cleanOutput();
+        setcookie('PHPSESSID', '', time()-3600,'/');
+        setcookie('kod_name', '', time()-3600);
+        setcookie('kod_token', '', time()-3600);
+        setcookie('kod_user_language', '', time()-3600);
+        session_destroy();
+        header('location:__PUBLIC__/index.php?user/login');
+        exit;
     }
 
 }

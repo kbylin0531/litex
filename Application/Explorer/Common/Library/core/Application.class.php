@@ -84,8 +84,6 @@ class Application {
 		$URI = $GLOBALS['in']['URLremote'];
 		if (!isset($URI[0]) || $URI[0] == '') $URI[0] = $this->default_controller;
 		if (!isset($URI[1]) || $URI[1] == '') $URI[1] = $this->default_action;
-		define('ST',$URI[0]);
-		define('ACT',$URI[1]);
 		//自动加载运行类。
 		$this->autorun();
 		$this->appRun(ST,ACT);

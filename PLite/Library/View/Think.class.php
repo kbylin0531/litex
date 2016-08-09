@@ -825,7 +825,7 @@ class Think implements ViewInterface{
     /**
      * TagLib标签属性分析 返回标签属性数组
      * @access public
-     * @param $attr
+     * @param string $attr
      * @param string $tag 标签内容
      * @return array|false
      */

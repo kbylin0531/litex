@@ -1,0 +1,21 @@
+<extend file="../basic/general.html"/>
+<block name="body">
+    <div class="background" style="background-image:url(__PUBLIC__/images/wall_page/{$bg}.jpg)"></div>
+    <div class="loginbox">
+        <div class="title">
+            <div class="logo"><i class="icon-cloud"></i>{$Think.L.kod_name}</div>
+            <div class='info'>——{$Think.L.kod_name_desc}</div>
+        </div>
+        <div class="form" style="padding: 10px 20px;">
+            <h3>{$Think.L.php_env_check}</h3>
+            <if condition="!$error">
+                <div class='success'><h4>Successful!</h4>,{$Think.L.install_login},<br/>{$Think.L.install_user_default}</div>
+                <div class="guest"><a href="__PUBLIC__/index.php?user/loginFirst"> {$Think.L.login} </a></div>
+            <else/>
+                    <div class="error"><h4>error:</h4>{$error}</div>
+                <div class="guest"><a href="__PUBLIC__/index.php?user/loginFirst">{$Think.L.php_env_error_ignore}</a></div>
+            </if>
+        </div>
+    </div>
+</block>
+</html>

@@ -1,5 +1,6 @@
 <?php
 namespace Application\Explorer\Common\Library;
+use PLite\Core\URL;
 use PLite\Util\Helper\ClientAgent;
 
 /**
@@ -46,16 +47,7 @@ abstract class Controller extends \PLite\Library\Controller{
         $this -> values['config'] = &$config;
         $this -> values['in'] = &$in;
 
-        //user
-        $this->tpl  = TEMPLATE  . 'user/';
-        if(!isset($_SESSION)){//避免session不可写导致循环跳转
-            $this->login("session write error!");
-        }else{
-            $this->user = &$_SESSION['kod_user'];
-        }
-        //不需要判断的action
-        $this->notCheck = array('loginFirst','login','logout','loginSubmit','checkCode','public_link');
-
+        ExplorerUtils::checkLogin();
     }
     /**
      * 语言包加载：优先级：cookie获取>自动识别
@@ -125,6 +117,10 @@ abstract class Controller extends \PLite\Library\Controller{
          */
         define('OFFICE_SERVER',"https://view.officeapps.live.com/op/view.aspx?src=");
         define('KOD_VERSION','3.21');
+
+
+        define('ST',REQUEST_CONTROLLER);
+        define('ACT',REQUEST_ACTION);
     }
 
 }
