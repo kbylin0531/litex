@@ -1,5 +1,5 @@
 <?php
-$L= array(
+return array(
 	"upload_clear"  			=>'清空',
 	"upload_setting"  			=>"设置",
 	"upload_tips"  				=>'采用分片上传,不再受php.ini限制;推荐chrome体验文件夹拖拽上传',

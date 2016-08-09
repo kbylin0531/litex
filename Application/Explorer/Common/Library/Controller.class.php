@@ -83,27 +83,7 @@ abstract class Controller extends \PLite\Library\Controller{
 
         $lang = str_replace(array('/','\\','..','.'),'',$lang);
         define('LANGUAGE_TYPE', $lang);
-        return $GLOBALS['L'] = include(LANGUAGE_PATH.$lang.'/main.php');
-    }
-    /**
-     * 登录view
-     * @param string $msg
-     */
-    public function login($msg = ''){
-        $this->assign([
-            'L' => $this->L,
-
-        ]);
-        if (!file_exists(USER_SYSTEM.'install.lock')) {
-            $this->display('install.html');exit;
-        }
-        $this->assign('msg',$msg);
-        if (is_wap()) {
-            $this->display('login_wap.html');
-        }else{
-            $this->display('login.html');
-        }
-        exit;
+        return $GLOBALS['L'] = include(LANGUAGE_PATH.LANGUAGE_TYPE.'/main.php');
     }
 
     private function constant(){

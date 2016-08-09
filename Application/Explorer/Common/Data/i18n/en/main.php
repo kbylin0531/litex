@@ -1,5 +1,5 @@
 <?php
-$L = array(
+return array(
 	"upload_clear"  			=>'clear',
 	"upload_setting"  			=>"setting",
 	"upload_tips"  				=>'use piecewise upload, no longer limited to php.ini;',

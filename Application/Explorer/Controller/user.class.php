@@ -1,7 +1,6 @@
 <?php
 
 namespace Application\Explorer\Controller;
-
 use Application\Explorer\Common\Library\Controller;
 use Application\Explorer\Common\Library\FileCache;
 use Application\Explorer\Common\Library\Mcrypt;
@@ -11,7 +10,24 @@ class user extends Controller
     function __construct(){
         parent::__construct();
     }
-    
+
+    /**
+     * 登录view
+     * @param string $msg
+     */
+    public function login($msg = ''){
+        if (!file_exists(PATH_RUNTIME.'install.lock')) {
+            $this->assign('error',php_env_check());
+            $this->display('install.html');
+        }
+        $this->assign('msg',$msg);
+        if (is_wap()) {
+            $this->display('login_wap.html');
+        }else{
+            $this->display('login.html');
+        }
+        exit;
+    }
     /**
      * 登录状态检测;并初始化数据状态
      * @return bool|void

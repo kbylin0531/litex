@@ -194,7 +194,7 @@ function path_writable($path) {
 	$file = $path.'/test'.time().'.txt';
 	$dir  = $path.'/test'.time();
 	if(@is_writable($path) && @touch($file) && @unlink($file)) return true;
-	if(@mkdir($dir,0777) && @rmdir($dir)) return true;
+	if(@mkdir($dir,0777,true) && @rmdir($dir,true)) return true;
 	return false;
 }
 
