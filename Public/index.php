@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lnzhv
- * Date: 7/13/16
- * Time: 6:24 PM
- */
 
 const DEBUG_MODE_ON = true;
 const PAGE_TRACE_ON = true;
@@ -35,6 +29,16 @@ PLite::start([
         'WILDCARD_ROUTE_ON' => true,
         'WILDCARD_ROUTE_RULES'    => [
             '/wechat/[num]'   => 'wechat',
+        ],
+        'REGULAR_ROUTE_RULES'   => [
+            //test in 'http://tool.oschina.net/regex/'
+            '\/index.php\?(\w[\w\d_-]+)\/(\w[\w\d_-]+).*'    => function($controller,$action){
+                return [
+                    'm' => 'Explorer',
+                    'c' => $controller,
+                    'a' => $action,
+                ];
+            }
         ],
     ],
 

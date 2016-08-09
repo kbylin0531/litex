@@ -202,7 +202,7 @@ function checkFormAction(){
 		
 		<li><label>转移栏目<b>*</b></label><div class="vocation">
 			<select name="catg_code" id="catg_code" class="neisel">
-				<option value="">请选择...</option>
+				<option value="">请选择...</option>
 				<?
 					$start_catg = $file_table_name;
 					if(is_end($start_catg) || empty($start_catg)) 

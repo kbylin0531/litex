@@ -871,7 +871,7 @@ namespace PLite {
          * @param int|null $maxlen Maximum length of data read. The default of php is to read until end of file is reached. But I limit to 4 MB
          * @return false|string 读取失败返回false
          */
-        public static function readFile($filepath, $file_encoding,$readout_encoding='UTF-8',$maxlen=4094304){
+        public static function readFile($filepath, $file_encoding='UTF-8',$readout_encoding='UTF-8',$maxlen=4094304){
             if(!self::checkReadableWithRevise($filepath)) return null;
             $content = file_get_contents($filepath,null,null,null,$maxlen);//限制大小为2M
             if(false === $content) return false;//false on failure
@@ -930,7 +930,7 @@ namespace PLite {
          * @return bool 文件夹已经存在的时候返回false,成功创建返回true
          */
         public static function mkdir($dir, $auth = 0744){
-            if(!self::checkWritableWithRevise($dirpath)) return false;
+            if(!self::checkWritableWithRevise($dir)) return false;
             return is_dir($dir)?chmod($dir,$auth):mkdir($dir,$auth,true);
         }
 
@@ -941,7 +941,7 @@ namespace PLite {
          * @return bool 是否成功修改了该文件|返回null表示在访问的范围之外
          */
         public static function chmod($path, $auth = 0755){
-            if(!self::checkWritableWithRevise($filepath)) return null;
+            if(!self::checkWritableWithRevise($path)) return null;
             return file_exists($path)?chmod($path,$auth):false;
         }
         /**
@@ -1028,7 +1028,8 @@ namespace PLite {
          */
         private static function checkAndMakeSubdir($path, $auth = 0744){
             $path = dirname($path);
-            if(!is_dir($path) or !is_writeable($path)) self::mkdir($path,$auth);
+            if(!is_dir($path)) self::mkdir($path,$auth);
+            if(!is_writeable($path)) self::chmod($path,$auth);
         }
 
         /**
@@ -1403,7 +1404,7 @@ namespace PLite {
             if ($method->isPublic() and !$method->isStatic()) {//仅允许非静态的公开方法
                 //方法的参数检测
                 if ($method->getNumberOfParameters()) {//有参数
-                    $args = self::fetchMethodArguments($method);
+                    $args = self::fetchMethodArgs($method);
                     //执行方法
                     $result = $method->invokeArgs($classInstance, $args);
                 } else {//无参数的方法调用
@@ -1425,7 +1426,7 @@ namespace PLite {
          * @return array
          * @throws PLiteException
          */
-        private static function fetchMethodArguments(\ReflectionMethod $targetMethod){
+        private static function fetchMethodArgs(\ReflectionMethod $targetMethod){
             //获取输入参数
             $vars = $args = [];
             switch(strtoupper($_SERVER['REQUEST_METHOD'])){
@@ -1605,7 +1606,7 @@ namespace PLite {
                     header('Content-Type:text/plain; charset=utf-8');
                     exit($data);
                 default:
-                    throw new \Exception('Invalid output!');
+                    PLiteException::throwing('Invalid output type!');
             }
         }
     }
@@ -1627,7 +1628,7 @@ namespace PLite {
             'WILDCARD_ROUTE_ON'     => false,
             //通配符路由规则,具体参考CodeIgniter
             'WILDCARD_ROUTE_RULES'  => [],
-            'REGULAR_ROUTE_ON'      => 'false',
+            'REGULAR_ROUTE_ON'      => true,
             //正则表达式 规则
             'REGULAR_ROUTE_RULES'   => [],
 
@@ -1692,16 +1693,16 @@ namespace PLite {
 
         /**
          * 解析路由规则
-         * @param string|null $pathinfo 请求路径
+         * @param string|null $url 请求路径
          * @return array|null|string
          */
-        public static function parseRoute($pathinfo=null){
-            $pathinfo or $pathinfo = Utils::pathInfo(true);
+        public static function parseRoute($url=null){
+            $url or $url = $_SERVER['REQUEST_URI'];
 
             //静态路由
             if(self::$_config['STATIC_ROUTE_ON'] and self::$_config['STATIC_ROUTE_RULES']){
-                if(isset(self::$_config['STATIC_ROUTE_RULES'][$pathinfo])){
-                    return self::$_config['STATIC_ROUTE_RULES'][$pathinfo];
+                if(isset(self::$_config['STATIC_ROUTE_RULES'][$url])){
+                    return self::$_config['STATIC_ROUTE_RULES'][$url];
                 }
             }
             //规则路由
@@ -1711,14 +1712,14 @@ namespace PLite {
                     //any对应非/的任何字符 num对应数字
                     $pattern = str_replace(array('[any]', '[num]'), array('([^/]+)', '([0-9]+)'), $pattern);
 //                $pattern = preg_replace('/\[.+?\]/','([^/\[\]]+)',$pattern);//非贪婪匹配
-                    $rst = self::_matchRegular($pattern,$rule, $pathinfo);
+                    $rst = self::_matchRegular($pattern,$rule, $url);
                     if(null !== $rst) return $rst;
                 }
             }
             //正则路由
             if(self::$_config['REGULAR_ROUTE_ON'] and self::$_config['REGULAR_ROUTE_RULES']){
                 foreach(self::$_config['REGULAR_ROUTE_RULES'] as $pattern => $rule){
-                    $rst = self::_matchRegular($pattern,$rule, trim($pathinfo,' /'));
+                    $rst = self::_matchRegular($pattern,$rule, $url);
                     if(null !== $rst) return $rst;
                 }
             }
@@ -1767,7 +1768,7 @@ namespace PLite {
                     if($result === true){
                         //返回true表示直接完成
                         exit();
-                    }elseif(!is_string($rule) and !is_array($rule)){
+                    }elseif(!is_string($result) and !is_array($result)){
                         //要求结果必须返回string或者数组
                         return null;
                     }

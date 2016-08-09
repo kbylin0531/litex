@@ -8,10 +8,9 @@
 
 namespace PLite\Library\View;
 use PLite\Core\Dao;
-use PLite\Core\Storage;
 use PLite\Core\URL;
-use PLite\Library\Logger;
 use PLite\PLiteException;
+use PLite\Storage;
 use PLite\Util\SEK;
 
 /**
@@ -282,13 +281,13 @@ class Think implements ViewInterface{
         if(is_file($templateFile)) {
             $this->templateFile    =  $templateFile;
             // 读取模板文件内容
-            $tmplContent =  Storage::read($templateFile);//file_get_contents($templateFile);
+            $tmplContent =  Storage::readFile($templateFile);//file_get_contents($templateFile);
         }else{
             $tmplContent =  $templateFile;
         }
         // 编译模板内容
         $tmplContent =  $this->compiler($tmplContent);
-        Storage::getInstance(0)->write($tmplCacheFile,trim($tmplContent));
+        Storage::write($tmplCacheFile,trim($tmplContent));
         return $tmplCacheFile;
     }
 
@@ -429,7 +428,7 @@ class Think implements ViewInterface{
      * 分析XML属性
      * @access private
      * @param string $attrs XML属性字符串
-     * @return array
+     * @return array|false
      */
     private function parseXmlAttrs($attrs) {
         $xml        =   '<tpl><tag '.$attrs.' /></tpl>';
@@ -839,7 +838,7 @@ class Think implements ViewInterface{
      * @access public
      * @param $attr
      * @param string $tag 标签内容
-     * @return array
+     * @return array|false
      */
     public function parseXmlAttr($attr,$tag) {
         //XML解析安全过滤

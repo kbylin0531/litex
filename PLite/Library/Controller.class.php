@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lnzhv
- * Date: 7/13/16
- * Time: 10:13 PM
- */
-
 namespace PLite\Library;
 use PLite\core\URL;
 use PLite\Debugger;
-use PLite\Library\View\Think;
 use PLite\PLiteException;
+use PLite\Response;
 use PLite\Util\SEK;
 
 /**
