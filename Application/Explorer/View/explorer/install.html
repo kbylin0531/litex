@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE >
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title><?php echo $L['php_env_check'].' - '.$L['kod_name'].$L['kod_power_by'];?></title>
@@ -29,14 +28,14 @@
 			<?php
 	            $error = php_env_check();
 	            if ($error=='') {
-	            	echo '<div class="success"><h4>Successful!</h4>',$L['install_login'],
-	            	'<br/>'.$L['install_user_default'].'</div></div><div class="guest"><a href="./index.php?user/loginFirst">'.$L['login'].'</a></div>';
+	            	echo '<div class="success"><h4>Successful!</h4>',{$L['install_login']},
+	            	'<br/>{$L['install_user_default']}</div></div><div class="guest"><a href="./index.php?user/loginFirst"> {$L['login']} </a></div>';
 	            }else{
-	            	echo '<div class="error"><h4>error:</h4>'.$error.'</div></div><div class="guest"><a href="./index.php?user/loginFirst">'.$L['php_env_error_ignore'].'</a></div>';
+	            	echo '<div class="error"><h4>error:</h4>'.$error.'</div></div><div class="guest"><a href="./index.php?user/loginFirst">{$L['php_env_error_ignore']}</a></div>';
 	            }
 	        ?>
 		</div>
 	</div>
-<div class="common_footer"><?php echo $L['copyright_pre'].' v'.KOD_VERSION.' | '.$L['copyright_info'];?></div>
+<div class="common_footer">{$Think.L.copyright_pre} v{$Think.const.LITE_VERSION} {$Think.L.copyright_info}</div>
 </body>
 </html>

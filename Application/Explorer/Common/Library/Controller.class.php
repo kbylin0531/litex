@@ -1,5 +1,6 @@
 <?php
 namespace Application\Explorer\Common\Library;
+use PLite\Util\Helper\ClientAgent;
 
 /**
  * Class Controller
@@ -13,6 +14,10 @@ abstract class Controller extends \PLite\Library\Controller{
     public $tpl;	// 模板目录,default as 'user'
     public $values;	// 模板变量
     public $L;
+    /**
+     * @var FileCache
+     */
+    protected $sql;
 
     //user
     protected $user;  //用户相关信息
@@ -22,7 +27,7 @@ abstract class Controller extends \PLite\Library\Controller{
      * 构造函数
      */
     function __construct(){
-        global $in,$config,$db,$L;
+        global $in,$config,$db;
 
         include_once PATH_APP.'/Explorer/Common/Function/web.function.php';
         include_once PATH_APP.'/Explorer/Common/Function/file.function.php';
@@ -30,19 +35,16 @@ abstract class Controller extends \PLite\Library\Controller{
         include_once PATH_APP.'/Explorer/Common/Function/common.function.php';
 
         $this->constant();
-        $this->config = ExplorerUtils::getAppConfig();
 
         @set_time_limit(600);//10min pathInfoMuti,search,upload,download...
         @ini_set('session.cache_expire',600);
 
         $this -> db  = $db;
-        $this -> L 	 = $L;
-        $this -> config = &$config;
-        $this -> in = &$in;
+        $this -> L 	 = $this->initLang();
+        $this -> config = &ExplorerUtils::getAppConfig();
+        $this -> in = &$GLOBALS['in'];
         $this -> values['config'] = &$config;
         $this -> values['in'] = &$in;
-
-
 
         //user
         $this->tpl  = TEMPLATE  . 'user/';
@@ -55,12 +57,43 @@ abstract class Controller extends \PLite\Library\Controller{
         $this->notCheck = array('loginFirst','login','logout','loginSubmit','checkCode','public_link');
 
     }
+    /**
+     * 语言包加载：优先级：cookie获取>自动识别
+     * 首次没有cookie则自动识别——存入cookie,过期时间无限
+     * @return array
+     */
+    private function initLang(){
+        if (isset($_COOKIE['kod_user_language'])) {
+            $lang = $_COOKIE['kod_user_language'];
+        }else{//没有cookie
+            $lang = ClientAgent::getClientLang();
+            switch (substr($lang,0,2)) {
+                case 'zh':
+                    if ($lang != 'zn-TW'){
+                        $lang = 'zh-CN';
+                    }
+                    break;
+                case 'en':$lang = 'en';break;
+                default:$lang = 'en';break;
+            }
+            $lang = str_replace('-', '_',$lang);
+            setcookie('kod_user_language',$lang, time()+3600*24*365);
+        }
+        if ($lang == '') $lang = 'en';
 
+        $lang = str_replace(array('/','\\','..','.'),'',$lang);
+        define('LANGUAGE_TYPE', $lang);
+        return $GLOBALS['L'] = include(LANGUAGE_PATH.$lang.'/main.php');
+    }
     /**
      * 登录view
      * @param string $msg
      */
     public function login($msg = ''){
+        $this->assign([
+            'L' => $this->L,
+
+        ]);
         if (!file_exists(USER_SYSTEM.'install.lock')) {
             $this->display('install.html');exit;
         }
@@ -72,6 +105,7 @@ abstract class Controller extends \PLite\Library\Controller{
         }
         exit;
     }
+
     private function constant(){
         $web_root = str_replace(P($_SERVER['SCRIPT_NAME']),'',P(dirname(dirname(__FILE__))).'/index.php').'/';
         if (substr($web_root,-10) == 'index.php/') {//解决部分主机不兼容问题
@@ -81,18 +115,13 @@ abstract class Controller extends \PLite\Library\Controller{
         define('HOST', (is_HTTPS() ? 'https://' :'http://').$_SERVER['HTTP_HOST'].'/');
         define('BASIC_PATH',    PATH_BASE.'/');
         define('APPHOST',       HOST.str_replace(WEB_ROOT,'',BASIC_PATH));//程序根目录
-        define('TEMPLATE',		BASIC_PATH .'template/');	//模版文件路径
-        define('CONTROLLER_DIR',BASIC_PATH .'controller/'); //控制器目录
-        define('MODEL_DIR',		BASIC_PATH .'model/');		//模型目录
-        define('LIB_DIR',		BASIC_PATH .'lib/');		//库目录
-        define('FUNCTION_DIR',	LIB_DIR .'function/');		//函数库目录
-        define('CLASS_DIR',		LIB_DIR .'class/');			//内目录
-        define('CORER_DIR',		LIB_DIR .'core/');			//核心目录
-        define('DATA_PATH',     BASIC_PATH .'data/');       //用户数据目录
-        define('LOG_PATH',      DATA_PATH .'log/');         //日志目录
-        define('USER_SYSTEM',   DATA_PATH .'system/');      //用户数据存储目录
-        define('DATA_THUMB',    DATA_PATH .'thumb/');       //缩略图生成存放
-        define('LANGUAGE_PATH', DATA_PATH .'i18n/');        //多语言目录
+        define('TEMPLATE',		PATH_APP .'/Explorer/View/');	//模版文件路径
+
+        define('LIB_DIR',		PATH_APP .'/Explorer/Common/Library/');		//库目录
+        define('DATA_PATH',     PATH_APP .'/Explorer/Common/Data');       //用户数据目录
+        define('LANGUAGE_PATH', DATA_PATH .'/i18n/');        //多语言目录
+        define('USER_SYSTEM',   PATH_RUNTIME .'/USER_SYSTEM/');      //用户数据存储目录
+        define('DATA_THUMB',    PATH_RUNTIME .'/DATA_THUMB/');       //缩略图生成存放
 
         define('STATIC_JS','app');  //_dev(开发状态)||app(打包压缩)
         define('STATIC_LESS','css');//less(开发状态)||css(打包压缩)

@@ -1,7 +1,11 @@
 <?php
 namespace Application\Explorer\Controller;
 use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\CreatMiniature;
 use Application\Explorer\Common\Library\FileCache;
+use Application\Explorer\Common\Library\History;
+use Application\Explorer\Common\Library\Mcrypt;
+use Application\Explorer\Common\Library\PclZip;
 
 class explorer extends Controller{
     public $path;
@@ -35,7 +39,7 @@ class explorer extends Controller{
         foreach ($info_list as &$val) {          
             $val['path'] = _DIR($val['path']);
         }
-        $data = path_info_muti($info_list,$this->L['time_type_info']);
+        $data = path_info_muti($info_list);
 
         //属性查看，单个文件则生成临时下载地址。
         if (count($info_list)==1 && 
@@ -88,12 +92,11 @@ class explorer extends Controller{
         show_json($this->L['rname_success']);
     }
     public function pathList(){
-        load_class('history');
         session_start();//re start
         $session=isset($_SESSION['history'])?$_SESSION['history']:false;
         $user_path = $this->in['path'];
         if (is_array($session)){
-            $hi=new history($session);
+            $hi=new History($session);
             if ($user_path==""){
                 $user_path=$hi->getFirst();
             }else {
@@ -101,7 +104,7 @@ class explorer extends Controller{
                 $_SESSION['history']=$hi->getHistory();
             }
         }else {
-            $hi=new history(array(),20);
+            $hi=new History(array(),20);
             if ($user_path=="")  $user_path='/';
             $hi->add($user_path);
             $_SESSION['history']=$hi->getHistory();
@@ -212,7 +215,6 @@ class explorer extends Controller{
     }
 
     public function historyBack(){
-        load_class('history');
         session_start();//re start
         $session=$_SESSION['history'];
         if (is_array($session)){
@@ -229,11 +231,10 @@ class explorer extends Controller{
         }
     }
     public function historyNext(){
-        load_class('history');
         session_start();//re start
         $session=$_SESSION['history'];
         if (is_array($session)){
-            $hi=new history($session);
+            $hi=new History($session);
             $path=$hi->gonext();            
             $_SESSION['history']=$hi->getHistory();
             $folderlist=$this->path(_DIR($path));
@@ -323,21 +324,13 @@ class explorer extends Controller{
     public function pathCopy(){
         session_start();//re start
         $copy_list = json_decode($this->in['list'],true);
-        $list_num = count($copy_list);
-        for ($i=0; $i < $list_num; $i++) { 
-            $copy_list[$i]['path'] =$copy_list[$i]['path'];
-        }
-        $_SESSION['path_copy']= json_encode($copy_list);            
+        $_SESSION['path_copy']= json_encode($copy_list);
         $_SESSION['path_copy_type']='copy';
         show_json($this->L['copy_success']);
     }
     public function pathCute(){
         session_start();//re start
         $cute_list = json_decode($this->in['list'],true);
-        $list_num = count($cute_list);
-        for ($i=0; $i < $list_num; $i++) { 
-            $cute_list[$i]['path'] = $cute_list[$i]['path'];
-        }
         $_SESSION['path_copy']= json_encode($cute_list);
         $_SESSION['path_copy_type']='cute';
         show_json($this->L['cute_success']);
@@ -384,7 +377,6 @@ class explorer extends Controller{
 
     public function clipboard(){
         $clipboard = json_decode($_SESSION['path_copy'],true);
-        $msg = '';
         if (count($clipboard) == 0){
             $msg = '<div style="padding:20px;">null!</div>';
         }else{
@@ -485,7 +477,6 @@ class explorer extends Controller{
         show_json($this->L['zip_success'],true,get_path_this($zip_file));
     }
     public function zip($zip_path=''){
-        load_class('pclzip');
         ini_set('memory_limit', '2028M');//2G;
         $zip_list = json_decode($this->in['list'],true);
         $list_num = count($zip_list);
@@ -524,9 +515,9 @@ class explorer extends Controller{
                 return iconv_app($zipname);
             }
         }
+        return null;
     }
     public function unzip(){
-        load_class('pclzip');
         ini_set('memory_limit', '2028M');//2G;
         $path=$this->path; 
         $name = get_path_this($path);
@@ -551,7 +542,7 @@ class explorer extends Controller{
                                 PCLZIP_OPT_REPLACE_NEWER);//解压到某个地方,覆盖方式
         }
         if ($result == 0) {
-            show_json("Error : ".$zip->errorInfo(true),fasle);
+            show_json("Error : ".$zip->errorInfo(true),false);
         }else{
             show_json($this->L['unzip_success']);
         }
@@ -560,7 +551,6 @@ class explorer extends Controller{
         if (filesize($this->path) <= 1024*10) {//小于10k 不再生成缩略图
             file_put_out($this->path);
         }
-        load_class('imageThumb');
         $image= $this->path;
         $image_md5  = @md5_file($image);//文件md5
         if (strlen($image_md5)<5) {
@@ -599,7 +589,7 @@ class explorer extends Controller{
                     'uuid'      => $this->in['uuid'],
                     'length'    => (int)$info['length'],
                     'size'      => (int)filesize($info['path']),
-                    'time'      => mtime()
+                    'time'      => REQUEST_MICROTIME
                 );
                 show_json($result);
             }else{
@@ -623,7 +613,7 @@ class explorer extends Controller{
         }
         $save_path = $save_path.urldecode($header['name']);
         if (!checkExt($save_path)){//不允许的扩展名
-            $save_path = _DIR($this->in['save_path']).date().'.txt';
+            $save_path = _DIR($this->in['save_path']).date('Y-m-d').'.txt';
         }
         $save_path = get_filename_auto(iconv_system($save_path));
         $save_path_temp = $save_path.'.downloading';
@@ -651,7 +641,6 @@ class explorer extends Controller{
             return '';
         }
 
-        load_class('mcrypt');
         $pass = $GLOBALS['config']['setting_system']['system_password'];
         $fid = Mcrypt::encode($file_path,$pass,$GLOBALS['config']['settings']['download_url_time']);
         //文件对外界公开的地址;有效期在user_setting.php中设定；末尾追加文件名为了kod远程下载
@@ -732,7 +721,7 @@ class explorer extends Controller{
         $path_hidden = $this->config['setting_system']['path_hidden'];
         $ex_name = explode(',',$path_hidden);
 
-        $userShare = init_controller('userShare');
+        $userShare = new userShare();
         $share_list = $userShare->get();
         $list = array(
             'folderlist'    => array(),

@@ -12,6 +12,7 @@ use PLite\Core\URL;
 use PLite\PLiteException;
 use PLite\Storage;
 use PLite\Util\SEK;
+use PLite\Utils;
 
 /**
  * Class Think
@@ -102,13 +103,10 @@ class Think implements ViewInterface{
      */
     public function __construct(array $config = null){
         $config and $this->config = array_merge($this->config,$config);
-        $this->config['CACHE_PATH']         =   $this->_config('CACHE_PATH');
-        $this->config['TEMPLATE_SUFFIX']    =   $this->_config('TEMPLATE_SUFFIX');
-        $this->config['CACHFILE_SUFFIX']    =   $this->_config('CACHFILE_SUFFIX');
-        $this->config['TAGLIB_BEGIN']       =   $this->stripPreg($this->_config('TAGLIB_BEGIN'));
-        $this->config['TAGLIB_END']         =   $this->stripPreg($this->_config('TAGLIB_END'));
-        $this->config['L_DELIM']            =   $this->stripPreg($this->_config('L_DELIM'));
-        $this->config['R_DELIM']            =   $this->stripPreg($this->_config('R_DELIM'));
+        $this->config['TAGLIB_BEGIN']       =   $this->stripPreg($this->config['TAGLIB_BEGIN']);
+        $this->config['TAGLIB_END']         =   $this->stripPreg($this->config['TAGLIB_END']);
+        $this->config['L_DELIM']            =   $this->stripPreg($this->config['L_DELIM']);
+        $this->config['R_DELIM']            =   $this->stripPreg($this->config['R_DELIM']);
     }
     /**
      * 让模板引擎知道调用的相关上下文环境
@@ -170,7 +168,6 @@ class Think implements ViewInterface{
      * @return void
      */
     public function display($template = null, $cache_id = null, $compile_id = null, $parent = null) {
-//        dumpout($template,is_file($template));
         //模板常量
         defined('__ROOT__') or define('__ROOT__',URL::getBasicUrl());
         defined('__MODULE__') or define('__MODULE__',__PUBLIC__.'/'.REQUEST_MODULE);
@@ -190,14 +187,6 @@ class Think implements ViewInterface{
     protected $template = null;
 
 //----------------------------------------- 修改自ThinkPHP --------------------------------------------------------------------------//
-    /**
-     * 获取配置项
-     * @param string $key
-     * @return mixed|null
-     */
-    private function _config($key){
-        return isset($this->config[$key])?$this->config[$key]:null;
-    }
 
     /**
      * 字符串替换 避免正则混淆
@@ -206,8 +195,10 @@ class Think implements ViewInterface{
      * @return string
      */
     private function stripPreg($str)     {
-        return str_replace(['{', '}', '(', ')', '|', '[', ']', '-', '+', '*', '.', '^', '?'],
-            ['\{', '\}', '\(', '\)', '\|', '\[', '\]', '\-', '\+', '\*', '\.', '\^', '\?'],$str);
+        return str_replace(
+            ['{', '}', '(', ')', '|', '[', ']', '-', '+', '*', '.', '^', '?'],
+            ['\{', '\}', '\(', '\)', '\|', '\[', '\]', '\-', '\+', '\*', '\.', '\^', '\?'],
+            $str);
     }
 
     /**
@@ -242,7 +233,7 @@ class Think implements ViewInterface{
     public function fetch($templateFile,$templateVar,$prefix='') {
         $this->tVar =   $templateVar;
         $cachefile  =   $this->loadTemplate($templateFile,$prefix);
-        \PLite::loadTemplate($cachefile,$this->tVar);
+        Utils::loadTemplate($cachefile,$this->tVar);
     }
 
     /**
@@ -261,7 +252,7 @@ class Think implements ViewInterface{
         // 根据模版文件名定位缓存文件
 //        $tmplCacheFile = $folder.$prefix.md5($templateFile).$this->config['CACHFILE_SUFFIX'];
 
-        if($this->_config('CACHE_ON') and $this->config['CACHE_EXPIRE'] > 0 and is_file($tmplCacheFile)){
+        if($this->config['CACHE_ON'] and $this->config['CACHE_EXPIRE'] > 0 and is_file($tmplCacheFile)){
             $lastmtime = Storage::mtime($tmplCacheFile);
             //缓存开启并且缓存文件存在的情况下价差缓存是否过期
 //            \PLite\dumpout($lastmtime,$this->config['CACHE_EXPIRE'],$_SERVER['REQUEST_TIME']);
@@ -370,7 +361,7 @@ class Think implements ViewInterface{
             $content = preg_replace('/(<\?(?!php|=|$))/i', '<?php echo \'\\1\'; ?>'."\n", $content );
         }
         // PHP语法检查
-        if($this->_config('DENY_PHP') && false !== strpos($content,'<?php')) {
+        if($this->config['DENY_PHP'] && false !== strpos($content,'<?php')) {
             PLiteException::throwing('denyed using raw php in template!');
         }
         return $content;
@@ -592,7 +583,7 @@ class Think implements ViewInterface{
             return '';
         }
         // 未识别的标签直接返回
-        return $this->_config('L_DELIM') . $tagStr .$this->_config('R_DELIM');
+        return $this->config['L_DELIM'] . $tagStr .$this->config['R_DELIM'];
     }
 
     /**
@@ -619,7 +610,7 @@ class Think implements ViewInterface{
                 //支持 {$var.property}
                 $vars = explode('.',$var);
                 $var  =  array_shift($vars);
-                switch(strtolower($this->_config('VAR_IDENTIFY'))) {
+                switch(strtolower($this->config['VAR_IDENTIFY'])) {
                     case 'array': // 识别为数组
                         $name = '$'.$var;
                         foreach ($vars as $key=>$val)
@@ -668,7 +659,7 @@ class Think implements ViewInterface{
         //对变量使用函数
         $length = count($varArray);
         //取得模板禁止使用函数列表
-        $template_deny_funs = explode(',',$this->_config('DENY_FUNC_LIST'));
+        $template_deny_funs = explode(',',$this->config['DENY_FUNC_LIST']);
         for($i=0;$i<$length ;$i++ ){
             $args = explode('=',$varArray[$i],2);
             //模板函数过滤
@@ -707,7 +698,7 @@ class Think implements ViewInterface{
             $varStr = $varStr[1];
         }
         $vars       = explode('.',$varStr);
-        $vars[1]    = strtoupper(trim($vars[1]));
+        $vars[1]    = strtoupper(trim($vars[1]));//identify
         $parseStr   = '';
         if(count($vars)>=3){
             $vars[2] = trim($vars[2]);
@@ -718,38 +709,36 @@ class Think implements ViewInterface{
                 case 'COOKIE':
                     if(isset($vars[3])) {
                         $parseStr = '$_COOKIE[\''.$vars[2].'\'][\''.$vars[3].'\']';
-                    }
-//                    elseif(C('COOKIE_PREFIX')){$parseStr = '$_COOKIE[\''.C('COOKIE_PREFIX').$vars[2].'\']';}
-                    else{
+                    }else{
                         $parseStr = '$_COOKIE[\''.$vars[2].'\']';
                     }
                     break;
                 case 'SESSION':
                     if(isset($vars[3])) {
                         $parseStr = '$_SESSION[\''.$vars[2].'\'][\''.$vars[3].'\']';
-                    }
-//                    elseif(C('SESSION_PREFIX')){$parseStr = '$_SESSION[\''.C('SESSION_PREFIX').'\'][\''.$vars[2].'\']';}
-                    else{
+                    }else{
                         $parseStr = '$_SESSION[\''.$vars[2].'\']';
                     }
                     break;
                 case 'ENV':         $parseStr = '$_ENV[\''.$vars[2].'\']';break;
-                case 'REQUEST':  $parseStr = '$_REQUEST[\''.$vars[2].'\']';break;
+                case 'REQUEST':   $parseStr = '$_REQUEST[\''.$vars[2].'\']';break;
                 case 'CONST':     $parseStr = strtoupper($vars[2]);break;
-                case 'LANG':       $parseStr = 'L("'.$vars[2].'")';break;
-                case 'CONFIG':    $parseStr = 'C("'.$vars[2].'")';break;
+                case 'GLOBALS':       $parseStr = '$GLOBALS[\''.$vars[2].'\']';break;
+                default:
+                    $len = count($vars);
+                    $parseStr = '$GLOBALS[\''.$vars[1].'\']';
+                    for($i=2;$i<$len;$i++){
+                        $parseStr .= '[\''.$vars[$i].'\']';
+                    }
             }
         }else if(count($vars)==2){
             switch($vars[1]){
                 case 'NOW':       $parseStr = "date('Y-m-d g:i a',time())";break;
-                case 'VERSION':  $parseStr = 'THINK_VERSION';break;
-                case 'TEMPLATE':$parseStr = 'C("TEMPLATE_NAME")';break;
-                case 'LDELIM':    $parseStr = 'C("L_DELIM")';break;
-                case 'RDELIM':    $parseStr = 'C("R_DELIM")';break;
-                default:  if(defined($vars[1])) $parseStr = $vars[1];
+                case 'VERSION':   $parseStr = 'LITE_VERSION';break;
+                default:  if(defined($vars[1])) $parseStr = $vars[1];//constant
             }
         }
-        return $parseStr;
+        return " $parseStr ";
     }
 
     /**
@@ -891,7 +880,7 @@ class Think implements ViewInterface{
     public function parseCondition($condition) {
         $condition = str_ireplace(array_keys($this->comparison),array_values($this->comparison),$condition);
         $condition = preg_replace('/\$(\w+):(\w+)\s/is','$\\1->\\2 ',$condition);
-        switch(strtolower($this->_config('VAR_IDENTIFY'))) {
+        switch(strtolower($this->config['VAR_IDENTIFY'])) {
             case 'array': // 识别为数组
                 $condition  =   preg_replace('/\$(\w+)\.(\w+)\s/is','$\\1["\\2"] ',$condition);
                 break;
@@ -919,7 +908,7 @@ class Think implements ViewInterface{
         }elseif(strpos($name,'.')) {
             $vars = explode('.',$name);
             $var  =  array_shift($vars);
-            switch(strtolower($this->_config('VAR_IDENTIFY'))) {
+            switch(strtolower($this->config['VAR_IDENTIFY'])) {
                 case 'array': // 识别为数组
                     $name = '$'.$var;
                     foreach ($vars as $key=>$val){

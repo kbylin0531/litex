@@ -1,9 +1,15 @@
 <?php
 namespace Application\Explorer\Controller;
 
+use Application\Explorer\Common\Library\CreatMiniature;
 use Application\Explorer\Common\Library\FileCache;
 use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\PclZip;
+
 class share extends Controller{
+    /**
+     * @var FileCache
+     */
     private $sql;
     private $share_info;
     private $share_path;
@@ -50,8 +56,7 @@ class share extends Controller{
         $this->share_info = $list[$this->in['sid']];
         $share_info = $this->share_info;
         //检查是否过期
-        if (isset($share_info['time'])&&
-            $share_info['time'].length!=0) {
+        if (isset($share_info['time'])&& $share_info['time']) {
             $date = date_create_from_format('y/m/d',$share_info['time_to']);
             if (time() > $date) {
                 $this->error($this->L['share_error_time']);
@@ -114,7 +119,7 @@ class share extends Controller{
     private function _clear($path){
         return  iconv_system(_DIR_CLEAR(rawurldecode($path)));
     }
-    private function error($msg){
+    public function error($msg){
         $this->assign('msg',$msg);
         $this->display('tips.php');
         exit;
@@ -225,7 +230,7 @@ class share extends Controller{
         foreach ($info_list as &$val) {          
             $val['path'] = $this->share_path.$this->_clear($val['path']);
         }
-        $data = path_info_muti($info_list,$this->L['time_type_info']);
+        $data = path_info_muti($info_list);
         _DIR_OUT($data['path']);
         show_json($data);
     }
@@ -381,7 +386,6 @@ class share extends Controller{
         if (!isset($zip_path)) {
             show_json($this->L['share_not_download_tips'],false);
         }
-        load_class('pclzip');
         ini_set('memory_limit', '2028M');//2G;
         $zip_list = json_decode($this->in['list'],true);
         $list_num = count($zip_list);
@@ -403,7 +407,7 @@ class share extends Controller{
         }
         $remove_path_pre = get_path_father($zip_list[0]['path']);
         $archive = new PclZip($zipname);
-        $v_list = $archive->create(implode(',',$files),PCLZIP_OPT_REMOVE_PATH,$remove_path_pre);
+        $archive->create(implode(',',$files),PCLZIP_OPT_REMOVE_PATH,$remove_path_pre);
         return iconv_app($zipname);
     }
 
@@ -450,7 +454,6 @@ class share extends Controller{
         if (filesize($this->path) <= 1024*10) {//小于10k 不再生成缩略图
             file_put_out($this->path);
         }
-        load_class('imageThumb');
         $image= $this->path;
         $image_thum = DATA_THUMB.md5($image).'.png';
         if (!is_dir(DATA_THUMB)){

@@ -1,335 +1,218 @@
 <?php
+//
+//// 清除多余空格和回车字符
+//function strip($str){
+//	return preg_replace('!\s+!', '', $str);
+//}
 
-/**
- * 加载类，从class目录；controller；model目录中寻找class
- * @param $className
- */
-function _autoload($className){
-	if (file_exists(CLASS_DIR . strtolower($className) . '.class.php')) {
-		require_once(CLASS_DIR . strtolower($className) . '.class.php');
-	} else if (file_exists(CONTROLLER_DIR . strtolower($className) . '.class.php')) {
-		require_once(CONTROLLER_DIR . strtolower($className) . '.class.php');
-	} else if (file_exists(MODEl_DIR . strtolower($className) . '.class.php')) {
-		require_once(MODEl_DIR . strtolower($className) . '.class.php');
-	} else {
-		// error code;
-	} 
-}
-/**
- * 生产model对象
- * @param $model_name
- * @return bool|object
- */
-function init_model($model_name){
-	if (!class_exists($model_name.'Model')) {
-		$model_file = MODEL_DIR.$model_name.'Model.class.php';
-		require_once ($model_file);
-		
-		if(!is_file($model_file)){
-			return false;
-		}
-	}
-	$reflectionObj = new ReflectionClass($model_name.'Model');
-	$args = func_get_args();
-	array_shift($args);
-	return $reflectionObj -> newInstanceArgs($args);
-}
-/**
- * 生产controller对象
- * @param $controller_name
- * @return bool|object
- */
-function init_controller($controller_name){
-	if (!class_exists($controller_name)) {
-		$model_file = CONTROLLER_DIR.$controller_name.'.class.php';
-		if(!is_file($model_file)){
-			return false;
-		}
-		require_once ($model_file);
-	}
-	$reflectionObj = new ReflectionClass($controller_name);
-	$args = func_get_args();
-	array_shift($args);
-	return $reflectionObj -> newInstanceArgs($args);
-}
+///**
+// * 获取精确时间
+// */
+//function mtime(){
+//	$t= explode(' ',microtime());
+//	$time = $t[0]+$t[1];
+//	return $time;
+//}
+///**
+// * 过滤HTML
+// * @param $HTML
+// * @param bool $br
+// * @return mixed|string
+// */
+//function clear_html($HTML, $br = true){
+//	$HTML = htmlspecialchars(trim($HTML));
+//	$HTML = str_replace("\t", ' ', $HTML);
+//	if ($br) {
+//		return nl2br($HTML);
+//	} else {
+//		return str_replace("\n", '', $HTML);
+//	}
+//}
 
-/**
- * 加载类
- * @param $class
- */
-function load_class($class){
-	$filename = CLASS_DIR.$class.'.class.php';
-	if (file_exists($filename)) {
-		require($filename);
-	}else{
-		pr($filename.' is not exist',1);
-	}
-}
-/**
- * 加载函数库
- * @param $function
- */
-function load_function($function){
-	$filename = FUNCTION_DIR.$function.'.function.php';
-	if (file_exists($filename)) {
-		require($filename);
-	}else{
-		pr($filename.' is not exist',1);
-	}
-}
-/**
- * 文本字符串转换
- * @param $str
- * @return mixed
- */
-function mystr($str){
-	$from = array("\r\n", " ");
-	$to = array("<br/>", "&nbsp");
-	return str_replace($from, $to, $str);
-} 
+///**
+// * 将obj深度转化成array
+// * @param array|object $obj 要转换的数据 可能是数组 也可能是个对象 还可能是一般数据类型
+// * @return array 一般数据类型
+// */
+//function obj2array($obj){
+//	if (is_array($obj)) {
+//		foreach($obj as &$value) {
+//			$value = obj2array($value);
+//		}
+//		return $obj;
+//	} elseif (is_object($obj)) {
+//		$obj = get_object_vars($obj);
+//		return obj2array($obj);
+//	} else {
+//		return $obj;
+//	}
+//}
 
-// 清除多余空格和回车字符
-function strip($str){
-	return preg_replace('!\s+!', '', $str);
-} 
+///**
+// * 计算时间差
+// *
+// * @param string $pretime
+// * @return string
+// */
+//function spend_time(&$pretime){
+//	$now = microtime(1);
+//	$spend = round($now - $pretime, 5);
+//	$pretime = $now;
+//	return $spend;
+//}
 
-/**
- * 获取精确时间
- */
-function mtime(){
-	$t= explode(' ',microtime());
-	$time = $t[0]+$t[1];
-	return $time;
-}
-/**
- * 过滤HTML
- * @param $HTML
- * @param bool $br
- * @return mixed|string
- */
-function clear_html($HTML, $br = true){
-	$HTML = htmlspecialchars(trim($HTML));
-	$HTML = str_replace("\t", ' ', $HTML);
-	if ($br) {
-		return nl2br($HTML);
-	} else {
-		return str_replace("\n", '', $HTML);
-	} 
-} 
+//function check_code($code){
+//	header("Content-type: image/png");
+//	$fontsize = 18;$len = strlen($code);
+//    $width = 70;$height=27;
+//    $im = @imagecreatetruecolor($width, $height) or die("create image error!");
+//    $background_color = imagecolorallocate($im, 255, 255, 255);
+//    imagefill($im, 0, 0, $background_color);
+//    for ($i = 0; $i < 2000; $i++) {//获取随机淡色
+//        $line_color = imagecolorallocate($im, mt_rand(180,255),mt_rand(160, 255),mt_rand(100, 255));
+//        imageline($im,mt_rand(0,$width),mt_rand(0,$height), //画直线
+//            mt_rand(0,$width), mt_rand(0,$height),$line_color);
+//        imagearc($im,mt_rand(0,$width),mt_rand(0,$height), //画弧线
+//            mt_rand(0,$width), mt_rand(0,$height), $height, $width,$line_color);
+//    }
+//    $border_color = imagecolorallocate($im, 160, 160, 160);
+//    imagerectangle($im, 0, 0, $width-1, $height-1, $border_color);//画矩形，边框颜色200,200,200
+//
+//    for ($i = 0; $i < $len; $i++) {//写入随机字串
+////        $current = $str[mt_rand(0, strlen($str)-1)];
+//        $text_color = imagecolorallocate($im,mt_rand(30, 140),mt_rand(30,140),mt_rand(30,140));
+//        imagechar($im,10,$i*$fontsize+6,rand(1,$height/3),$code[$i],$text_color);
+//    }
+//    imagejpeg($im);//显示图
+//    imagedestroy($im);//销毁图片
+//}
 
-/**
- * 将obj深度转化成array
- * 
- * @param  object $obj 要转换的数据 可能是数组 也可能是个对象 还可能是一般数据类型
- * @return array || 一般数据类型
- */
-function obj2array($obj){
-	if (is_array($obj)) {
-		foreach($obj as &$value) {
-			$value = obj2array($value);
-		} 
-		return $obj;
-	} elseif (is_object($obj)) {
-		$obj = get_object_vars($obj);
-		return obj2array($obj);
-	} else {
-		return $obj;
-	} 
-} 
+///**
+// * 返回当前浮点式的时间,单位秒;主要用在调试程序程序时间时用
+// *
+// * @return float
+// */
+//function microtime_float(){
+//	list($usec, $sec) = explode(' ', microtime());
+//	return ((float)$usec + (float)$sec);
+//}
+///**
+// * 计算N次方根
+// * @param $num
+// * @param int $root
+// * @return float
+// */
+//function croot($num, $root = 3){
+//	$root = intval($root);
+//	if (!$root) {
+//		return $num;
+//	}
+//	return exp(log($num) / $root);
+//}
 
-/**
- * 计算时间差
- * 
- * @param string $pretime
- * @return string
- */
-function spend_time(&$pretime){
-	$now = microtime(1);
-	$spend = round($now - $pretime, 5);
-	$pretime = $now;
-	return $spend;
-} 
-
-function check_code($code){
-	header("Content-type: image/png");
-	$fontsize = 18;$len = strlen($code);
-    $width = 70;$height=27;
-    $im = @imagecreatetruecolor($width, $height) or die("create image error!");
-    $background_color = imagecolorallocate($im, 255, 255, 255);
-    imagefill($im, 0, 0, $background_color);  
-    for ($i = 0; $i < 2000; $i++) {//获取随机淡色            
-        $line_color = imagecolorallocate($im, mt_rand(180,255),mt_rand(160, 255),mt_rand(100, 255));
-        imageline($im,mt_rand(0,$width),mt_rand(0,$height), //画直线
-            mt_rand(0,$width), mt_rand(0,$height),$line_color);
-        imagearc($im,mt_rand(0,$width),mt_rand(0,$height), //画弧线
-            mt_rand(0,$width), mt_rand(0,$height), $height, $width,$line_color);
-    }
-    $border_color = imagecolorallocate($im, 160, 160, 160);   
-    imagerectangle($im, 0, 0, $width-1, $height-1, $border_color);//画矩形，边框颜色200,200,200
-
-    for ($i = 0; $i < $len; $i++) {//写入随机字串
-//        $current = $str[mt_rand(0, strlen($str)-1)];
-        $text_color = imagecolorallocate($im,mt_rand(30, 140),mt_rand(30,140),mt_rand(30,140));
-        imagechar($im,10,$i*$fontsize+6,rand(1,$height/3),$code[$i],$text_color);
-    }
-    imagejpeg($im);//显示图
-    imagedestroy($im);//销毁图片
-}
-
-/**
- * 返回当前浮点式的时间,单位秒;主要用在调试程序程序时间时用
- * 
- * @return float 
- */
-function microtime_float(){
-	list($usec, $sec) = explode(' ', microtime());
-	return ((float)$usec + (float)$sec);
-}
-/**
- * 计算N次方根
- * @param $num
- * @param int $root
- * @return float
- */
-function croot($num, $root = 3){
-	$root = intval($root);
-	if (!$root) {
-		return $num;
-	} 
-	return exp(log($num) / $root);
-} 
-
-function add_magic_quotes($array){
-	foreach ((array) $array as $k => $v) {
-		if (is_array($v)) {
-			$array[$k] = add_magic_quotes($v);
-		} else {
-			$array[$k] = addslashes($v);
-		} 
-	} 
-	return $array;
-} 
+//function add_magic_quotes($array){
+//	foreach ((array) $array as $k => $v) {
+//		if (is_array($v)) {
+//			$array[$k] = add_magic_quotes($v);
+//		} else {
+//			$array[$k] = addslashes($v);
+//		}
+//	}
+//	return $array;
+//}
 // 字符串加转义
-function add_slashes($string){
-	if (!$GLOBALS['magic_quotes_gpc']) {
-		if (is_array($string)) {
-			foreach($string as $key => $val) {
-				$string[$key] = add_slashes($val);
-			} 
-		} else {
-			$string = addslashes($string);
-		} 
-	} 
-	return $string;
-} 
+//function add_slashes($string){
+//	if (!$GLOBALS['magic_quotes_gpc']) {
+//		if (is_array($string)) {
+//			foreach($string as $key => $val) {
+//				$string[$key] = add_slashes($val);
+//			}
+//		} else {
+//			$string = addslashes($string);
+//		}
+//	}
+//	return $string;
+//}
 
-/**
- * hex to binary
- */
-if (!function_exists('hex2bin')) {
-	function hex2bin($hexdata)	{
-		return pack('H*', $hexdata);
-	}
-}
+///**
+// * hex to binary
+// */
+//if (!function_exists('hex2bin')) {
+//	function hex2bin($hexdata)	{
+//		return pack('H*', $hexdata);
+//	}
+//}
 
-/**
- * 二维数组按照指定的键值进行排序，
- * 
- * @param $arr
- * @param string $keys 根据键值
- * @param string $type 升序降序
- * @return array $array = array(
- * array('name'=>'手机','brand'=>'诺基亚','price'=>1050),
- * array('name'=>'手表','brand'=>'卡西欧','price'=>960)
- * );$out = array_sort($array,'price');
- */
-function array_sort($arr, $keys, $type = 'asc'){
-	$keysvalue = $new_array = array();
-	foreach ($arr as $k => $v) {
-		$keysvalue[$k] = $v[$keys];
-	} 
-	if ($type == 'asc') {
-		asort($keysvalue);
-	} else {
-		arsort($keysvalue);
-	} 
-	reset($keysvalue);
-	foreach ($keysvalue as $k => $v) {
-		$new_array[$k] = $arr[$k];
-	} 
-	return $new_array;
-} 
-/**
- * 遍历数组，对每个元素调用 $callback，假如返回值不为假值，则直接返回该返回值；
- * 假如每次 $callback 都返回假值，最终返回 false
- * 
- * @param  $array 
- * @param  $callback 
- * @return mixed 
- */
-function array_try($array, $callback){
-	if (!$array || !$callback) {
-		return false;
-	} 
-	$args = func_get_args();
-	array_shift($args);
-	array_shift($args);
-	if (!$args) {
-		$args = array();
-	} 
-	foreach($array as $v) {
-		$params = $args;
-		array_unshift($params, $v);
-		$x = call_user_func_array($callback, $params);
-		if ($x) {
-			return $x;
-		} 
-	} 
-	return false;
-} 
-// 求多个数组的并集
-function array_union(){
-	$argsCount = func_num_args();
-	if ($argsCount < 2) {
-		return false;
-	} else if (2 === $argsCount) {
-		list($arr1, $arr2) = func_get_args();
+///**
+// * 二维数组按照指定的键值进行排序，
+// *
+// * @param $arr
+// * @param string $keys 根据键值
+// * @param string $type 升序降序
+// * @return array $array = array(
+// * array('name'=>'手机','brand'=>'诺基亚','price'=>1050),
+// * array('name'=>'手表','brand'=>'卡西欧','price'=>960)
+// * );$out = array_sort($array,'price');
+// */
+//function array_sort($arr, $keys, $type = 'asc'){
+//	$keysvalue = $new_array = array();
+//	foreach ($arr as $k => $v) {
+//		$keysvalue[$k] = $v[$keys];
+//	}
+//	if ($type == 'asc') {
+//		asort($keysvalue);
+//	} else {
+//		arsort($keysvalue);
+//	}
+//	reset($keysvalue);
+//	foreach ($keysvalue as $k => $v) {
+//		$new_array[$k] = $arr[$k];
+//	}
+//	return $new_array;
+//}
+///**
+// * 遍历数组，对每个元素调用 $callback，假如返回值不为假值，则直接返回该返回值；
+// * 假如每次 $callback 都返回假值，最终返回 false
+// *
+// * @param  $array
+// * @param  $callback
+// * @return mixed
+// */
+//function array_try($array, $callback){
+//	if (!$array || !$callback) {
+//		return false;
+//	}
+//	$args = func_get_args();
+//	array_shift($args);
+//	array_shift($args);
+//	if (!$args) {
+//		$args = array();
+//	}
+//	foreach($array as $v) {
+//		$params = $args;
+//		array_unshift($params, $v);
+//		$x = call_user_func_array($callback, $params);
+//		if ($x) {
+//			return $x;
+//		}
+//	}
+//	return false;
+//}
+//// 取出数组中第n项
+//function array_get($arr,$index){
+//   foreach($arr as $k=>$v){
+//       $index--;
+//       if($index<0) return array($k,$v);
+//   }
+//   return null;
+//}
 
-		while ((list($k, $v) = each($arr2))) {
-			if (!in_array($v, $arr1)) $arr1[] = $v;
-		} 
-		return $arr1;
-	} else { // 三个以上的数组合并
-		$arg_list = func_get_args();
-		$all = call_user_func_array('array_union', $arg_list);
-		return array_union($arg_list[0], $all);
-	} 
-}
-// 取出数组中第n项
-function array_get($arr,$index){
-   foreach($arr as $k=>$v){
-       $index--;
-       if($index<0) return array($k,$v);
-   }
-   return null;
-}
-
-function show_tips($message){
+function show_tips($message,$tip='tips'){
 	echo<<<END
-<html>
-	<style>
-	#msgbox{border: 1px solid #ddd;border: 1px solid #eee;padding: 30px;border-radius: 5px;background: #f6f6f6;
-	font-family: 'Helvetica Neue', "Microsoft Yahei", "微软雅黑", "STXihei", "WenQuanYi Micro Hei", sans-serif;
-	color:888;font-size:13px;margin:0 auto;margin-top:10%;width: 400px;font-size: 16;color:#666;}
-	#msgbox #title{padding-left:20px;font-weight:800;font-size:25px;}
-	#msgbox #message{padding:20px;}
-	</style>
-	<body>
-	<div id="msgbox">
-	<div id="title">tips</div>
-	<div id="message">$message</div>
-	</body>
-</html>
+<div style="border: 1px solid #eee;padding: 30px;border-radius: 5px;background: #f6f6f6; font-family: 'Helvetica Neue', sans-serif; margin:0 auto;margin-top:10%;width: 400px;font-size: 16px;color:#666;">
+    <div style="padding-left:20px;font-weight:800;font-size:25px;">$tip</div>
+    <div style="padding:20px;">$message</div>
+</div>
 END;
 	exit;
 } 
@@ -395,42 +278,6 @@ function get_url() {
 	return $sys_protocal.(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$relate_url;
 }
 
-/**
- * 去掉HTML代码中的HTML标签，返回纯文本
- * @param string $document 待处理的字符串
- * @return string 
- */
-function html2txt($document){
-	$search = array ("'<script[^>]*?>.*?</script>'si", // 去掉 javascript
-		"'<[\/\!]*?[^<>]*?>'si", // 去掉 HTML 标记
-		"'([\r\n])[\s]+'", // 去掉空白字符
-		"'&(quot|#34);'i", // 替换 HTML 实体
-		"'&(amp|#38);'i",
-		"'&(lt|#60);'i",
-		"'&(gt|#62);'i",
-		"'&(nbsp|#160);'i",
-		"'&(iexcl|#161);'i",
-		"'&(cent|#162);'i",
-		"'&(pound|#163);'i",
-		"'&(copy|#169);'i",
-		"'&#(\d+);'e"); // 作为 PHP 代码运行
-	$replace = array ("",
-		"",
-		"",
-		"\"",
-		"&",
-		"<",
-		">",
-		" ",
-		chr(161),
-		chr(162),
-		chr(163),
-		chr(169),
-		"chr(\\1)");
-	$text = preg_replace ($search, $replace, $document);
-	return $text;
-} 
-
 // 获取内容第一条
 function match($content, $preg){
 	$preg = "/" . $preg . "/isU";
@@ -444,71 +291,70 @@ function match_all($content, $preg){
 	return $result;
 } 
 
-/**
- * 获取指定长度的 utf8 字符串
- * 
- * @param string $string 
- * @param int $length 
- * @param string $dot 
- * @return string 
- */
-function get_utf8_str($string, $length, $dot = '...'){
-	if (strlen($string) <= $length) return $string;
-
-	$strcut = '';
-	$n = $tn = $noc = 0;
-
-	while ($n < strlen($string)) {
-		$t = ord($string[$n]);
-		if ($t == 9 || $t == 10 || (32 <= $t && $t <= 126)) {
-			$tn = 1;
-			$n++;
-			$noc++;
-		} elseif (194 <= $t && $t <= 223) {
-			$tn = 2;
-			$n += 2;
-			$noc += 2;
-		} elseif (224 <= $t && $t <= 239) {
-			$tn = 3;
-			$n += 3;
-			$noc += 2;
-		} elseif (240 <= $t && $t <= 247) {
-			$tn = 4;
-			$n += 4;
-			$noc += 2;
-		} elseif (248 <= $t && $t <= 251) {
-			$tn = 5;
-			$n += 5;
-			$noc += 2;
-		} elseif ($t == 252 || $t == 253) {
-			$tn = 6;
-			$n += 6;
-			$noc += 2;
-		} else {
-			$n++;
-		} 
-		if ($noc >= $length) break;
-	} 
-	if ($noc > $length) {
-		$n -= $tn;
-	} 
-	if ($n < strlen($string)) {
-		$strcut = substr($string, 0, $n);
-		return $strcut . $dot;
-	} else {
-		return $string ;
-	} 
-} 
+///**
+// * 获取指定长度的 utf8 字符串
+// *
+// * @param string $string
+// * @param int $length
+// * @param string $dot
+// * @return string
+// */
+//function get_utf8_str($string, $length, $dot = '...'){
+//	if (strlen($string) <= $length) return $string;
+//
+//	$n = $tn = $noc = 0;
+//
+//	while ($n < strlen($string)) {
+//		$t = ord($string[$n]);
+//		if ($t == 9 || $t == 10 || (32 <= $t && $t <= 126)) {
+//			$tn = 1;
+//			$n++;
+//			$noc++;
+//		} elseif (194 <= $t && $t <= 223) {
+//			$tn = 2;
+//			$n += 2;
+//			$noc += 2;
+//		} elseif (224 <= $t && $t <= 239) {
+//			$tn = 3;
+//			$n += 3;
+//			$noc += 2;
+//		} elseif (240 <= $t && $t <= 247) {
+//			$tn = 4;
+//			$n += 4;
+//			$noc += 2;
+//		} elseif (248 <= $t && $t <= 251) {
+//			$tn = 5;
+//			$n += 5;
+//			$noc += 2;
+//		} elseif ($t == 252 || $t == 253) {
+//			$tn = 6;
+//			$n += 6;
+//			$noc += 2;
+//		} else {
+//			$n++;
+//		}
+//		if ($noc >= $length) break;
+//	}
+//	if ($noc > $length) {
+//		$n -= $tn;
+//	}
+//	if ($n < strlen($string)) {
+//		$strcut = substr($string, 0, $n);
+//		return $strcut . $dot;
+//	} else {
+//		return $string ;
+//	}
+//}
 
 /**
  * 字符串截取，支持中文和其他编码
- * 
+ *
  * @param string $str 需要转换的字符串
  * @param int $start 开始位置
  * @param string $length 截取长度
  * @param string $charset 编码格式
  * @param bool $suffix 截断显示字符
- * @return string 
+ * @return string
  */
 function msubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = true){
 	if (function_exists("mb_substr")) {
@@ -516,11 +362,11 @@ function msubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = true){
 		$s_sub_str = mb_substr($str, $start, $length, $charset);
 		if ($length >= $i_str_len) {
 			return $s_sub_str;
-		} 
+		}
 		return $s_sub_str . '...';
 	} elseif (function_exists('iconv_substr')) {
 		return iconv_substr($str, $start, $length, $charset);
-	} 
+	}
 	$re['utf-8'] = "/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xff][\x80-\xbf]{3}/";
 	$re['gb2312'] = "/[\x01-\x7f]|[\xb0-\xf7][\xa0-\xfe]/";
 	$re['gbk'] = "/[\x01-\x7f]|[\x81-\xfe][\x40-\xfe]/";
@@ -529,38 +375,7 @@ function msubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = true){
 	$slice = join("", array_slice($match[0], $start, $length));
 	if ($suffix) return $slice . "…";
 	return $slice;
-} 
-
-function web2wap(&$content){
-	$search = array ("/<img[^>]+src=\"([^\">]+)\"[^>]+>/siU",
-		"/<a[^>]+href=\"([^\">]+)\"[^>]*>(.*)<\/a>/siU",
-		"'<br[^>]*>'si",
-		"'<p>'si",
-		"'</p>'si",
-		"'<script[^>]*?>.*?</script>'si", // 去掉 javascript
-		"'<[\/\!]*?[^<>]*?>'si", // 去掉 HTML 标记
-		"'([\r\n])[\s]+'", // 去掉空白字符
-		); // 作为 PHP 代码运行
-	$replace = array ("#img#\\1#/img#",
-		"#link#\\1#\\2#/link#",
-		"[br]",
-		"",
-		"[br]",
-		"",
-		"",
-		"",
-		);
-	$text = preg_replace ($search, $replace, $content);
-	$text = str_replace("[br]", "<br/>", $text);
-	$img_start = "<img src=\"" . $publish_url . "automini.php?src=";
-	$img_end = "&amp;pixel=100*80&amp;cache=1&amp;cacheTime=1000&amp;miniType=png\" />";
-	$text = preg_replace ("/#img#(.*)#\/img#/isUe", "'$img_start'.urlencode('\\1').'$img_end'", $text);
-	$text = preg_replace ("/#link#(.*)#(.*)#\/link#/isU", "<a href=\"\\1\">\\2</a>", $text);
-	while (preg_match("/<br\/><br\/>/siU", $text)) {
-		$text = str_replace('<br/><br/>', '<br/>', $text);
-	} 
-	return $text;
-} 
+}
 
 /**
  * 获取变量的名字
@@ -572,10 +387,10 @@ function get_var_name(&$aVar){
 	foreach($GLOBALS as $key => $var) {
 		if ($aVar == $GLOBALS[$key] && $key != "argc") {
 			return $key;
-		} 
+		}
 	}
 	return null;
-} 
+}
 // -----------------变量调试-------------------
 /**
  * 格式化输出变量，或者对象
@@ -623,42 +438,42 @@ function pr($var, $exit = false){
 	if ($exit) exit; //为真则退出
 } 
 
-/**
- * 调试输出变量，对象的值。
- * 参数任意个(任意类型的变量)
- */
-function debug_out(){
-	$avg_num = func_num_args();
-	$avg_list = func_get_args();
-	ob_start();
-	for($i = 0; $i < $avg_num; $i++) {
-		pr($avg_list[$i]);
-	} 
-	$out = ob_get_clean();
-	echo $out;
-	exit;
-} 
+///**
+// * 调试输出变量，对象的值。
+// * 参数任意个(任意类型的变量)
+// */
+//function debug_out(){
+//	$avg_num = func_num_args();
+//	$avg_list = func_get_args();
+//	ob_start();
+//	for($i = 0; $i < $avg_num; $i++) {
+//		pr($avg_list[$i]);
+//	}
+//	$out = ob_get_clean();
+//	echo $out;
+//	exit;
+//}
 
-/**
- * 取$from~$to范围内的随机数
- * 
- * @param  int $from 下限
- * @param  int $to 上限
- * @return mixed
- */
-function rand_from_to($from, $to){
-	$size = $from - $to; //数值区间
-	$max = 30000; //最大
-	if ($size < $max) {
-		return $from + mt_rand(0, $size);
-	} else {
-		if ($size % $max) {
-			return $from + rand_from_to(0, $size / $max) * $max + mt_rand(0, $size % $max);
-		} else {
-			return $from + rand_from_to(0, $size / $max) * $max + mt_rand(0, $max);
-		} 
-	} 
-} 
+///**
+// * 取$from~$to范围内的随机数
+// *
+// * @param  int $from 下限
+// * @param  int $to 上限
+// * @return mixed
+// */
+//function rand_from_to($from, $to){
+//	$size = $from - $to; //数值区间
+//	$max = 30000; //最大
+//	if ($size < $max) {
+//		return $from + mt_rand(0, $size);
+//	} else {
+//		if ($size % $max) {
+//			return $from + rand_from_to(0, $size / $max) * $max + mt_rand(0, $size % $max);
+//		} else {
+//			return $from + rand_from_to(0, $size / $max) * $max + mt_rand(0, $max);
+//		}
+//	}
+//}
 
 /**
  * 产生随机字串，可用来自动生成密码 默认长度6位 字母和数字混合
@@ -704,18 +519,35 @@ function rand_string($len = 4, $type='check_code'){
 	return $str;
 } 
 
-/**
- * 生成自动密码
- */
-function make_password(){
-	$temp = '0123456789abcdefghijklmnopqrstuvwxyz'.
-			'ABCDEFGHIJKMNPQRSTUVWXYZ~!@#$^*)_+}{}[]|":;,.'.time();
-	for($i=0;$i<10;$i++){
-		$temp = str_shuffle($temp.substr($temp,-5));
-	}
-	return md5($temp);
-}
+///**
+// * 生成自动密码
+// */
+//function make_password(){
+//	$temp = '0123456789abcdefghijklmnopqrstuvwxyz'.
+//			'ABCDEFGHIJKMNPQRSTUVWXYZ~!@#$^*)_+}{}[]|":;,.'.time();
+//	for($i=0;$i<10;$i++){
+//		$temp = str_shuffle($temp.substr($temp,-5));
+//	}
+//	return md5($temp);
+//}
 
+/**
+ * 获取字符串编码
+ * @param string $str 传入字符串
+ * @return string
+ */
+function get_charset(&$str) {
+    if ($str == '') return 'utf-8';
+    //前面检测成功则，自动忽略后面
+    $charset=strtolower(mb_detect_encoding($str,$this->config['check_charset']));
+    if (substr($str,0,3)==chr(0xEF).chr(0xBB).chr(0xBF)){
+        $charset='utf-8';
+    }else if($charset=='cp936'){
+        $charset='gbk';
+    }
+    if ($charset == 'ascii') $charset = 'utf-8';
+    return strtolower($charset);
+}
 
 /**
  * php DES解密函数

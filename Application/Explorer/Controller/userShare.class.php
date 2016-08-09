@@ -1,6 +1,5 @@
 <?php
 namespace Application\Explorer\Controller;
-
 use Application\Explorer\Common\Library\FileCache;
 use Application\Explorer\Common\Library\Controller;
 class userShare extends Controller{

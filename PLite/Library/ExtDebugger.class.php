@@ -1,12 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: linzhv
- * Date: 16-8-8
- * Time: 下午5:16
- */
 
-namespace PLite\Util;
+namespace PLite\Library;
+use PLite\Utils;
 
 /**
  * Class ExtDebugger Extension for debugger
@@ -208,10 +203,10 @@ endline;
                 'trace'     => $trace,
             ];
             if(DEBUG_MODE_ON){
-                \PLite::loadTemplate('exception',$vars);
+                Utils::loadTemplate('exception',$vars);
             }
         }else{
-            \PLite::loadTemplate('user_error');
+            Utils::loadTemplate('user_error');
         }
         exit;
     }
@@ -235,9 +230,9 @@ endline;
             'trace'     => $trace, //be careful
         ];
         if(DEBUG_MODE_ON){
-            \PLite::loadTemplate('error',$vars);
+            Utils::loadTemplate('error',$vars);
         }else{
-            \PLite::loadTemplate('user_error');
+            Utils::loadTemplate('user_error');
         }
         exit;
     }

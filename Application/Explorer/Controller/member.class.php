@@ -1,6 +1,5 @@
 <?php
 namespace Application\Explorer\Controller;
-
 use Application\Explorer\Common\Library\FileCache;
 use Application\Explorer\Common\Library\Controller;
 
@@ -85,8 +84,9 @@ class member extends Controller{
 
     //============内部处理函数=============
     /**
-     *初始化用户数据和配置。
-     */    
+     * 初始化用户数据和配置。
+     * @param $name
+     */
     public function _initUser($name){
         $root = array('home','recycle','data');
         $new_user_folder = $this->config['setting_system']['new_user_folder'];

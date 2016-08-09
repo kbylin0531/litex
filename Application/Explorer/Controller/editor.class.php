@@ -100,21 +100,4 @@ class editor extends Controller{
         }
     }
 
-    //-----------------------------------------------
-	/*
-	* 获取字符串编码
-	* @param:$ext 传入字符串
-	*/
-	private function _get_charset(&$str) {
-		if ($str == '') return 'utf-8';
-		//前面检测成功则，自动忽略后面
-		$charset=strtolower(mb_detect_encoding($str,$this->config['check_charset']));
-		if (substr($str,0,3)==chr(0xEF).chr(0xBB).chr(0xBF)){
-			$charset='utf-8';
-		}else if($charset=='cp936'){
-			$charset='gbk';
-		}
-		if ($charset == 'ascii') $charset = 'utf-8';
-		return strtolower($charset);
-	}
 }

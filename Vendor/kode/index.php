@@ -1,16 +1,13 @@
 <?php
 
-    include(CORER_DIR.'Application.class.php');
-//    include(BASIC_PATH.'config/setting.php');
-    $config = include PATH_BASE.'/Application/Explorer/Common/config.php';
 
     $_COOKIE = stripslashes_deep($_COOKIE);
     $_GET	 = stripslashes_deep($_GET);
     $_POST	 = stripslashes_deep($_POST);
     $in = array_merge($_GET,$_POST);
-    $remote = array_get($in,0);
+    $remote = isset($in[0])?$in[0]:null;
     $remote = explode('/',trim($remote[0],'/'));
-    $in['URLremote'] = $remote;
+    $GLOBALS['in']['URLremote'] = $remote;
 
     if(isset($in['PHPSESSID'])){//office edit post
         session_id($in['PHPSESSID']);

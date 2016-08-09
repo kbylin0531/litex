@@ -43,6 +43,20 @@ class ClientAgent {
         else
             return self::AGENT_UNKNOWN;
     }
+
+    /**
+     * get language from client
+     * @param string $default
+     * @return string
+     */
+    public static function getClientLang($default='en'){
+        $matches = [];
+        if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
+            preg_match('/^([a-z\-]+)/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $matches);
+        }
+        return empty($matches[1])?$default:$matches[1];
+    }
+
     /**
      * 获取浏览器版本
      * @return string

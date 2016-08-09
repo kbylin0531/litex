@@ -5,6 +5,7 @@ use PLite\Debugger;
 use PLite\PLiteException;
 use PLite\Response;
 use PLite\Util\SEK;
+use PLite\Utils;
 
 /**
  * Class Controller 控制器
@@ -152,7 +153,7 @@ class Controller {
             'javascript:history.back(-1);':
             'javascript:window.close();';
 
-        \PLite::loadTemplate('jump',$vars);
+        Utils::loadTemplate('jump',$vars);
     }
 
     /**

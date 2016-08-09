@@ -15,6 +15,7 @@ namespace {
     use PLite\Router;
     use PLite\Utils;
 
+    const LITE_VERSION = 0.85;
 //---------------------------------- mode constant -------------------------------------//
     defined('DEBUG_MODE_ON') or define('DEBUG_MODE_ON', true);
     defined('PAGE_TRACE_ON') or define('PAGE_TRACE_ON', true);//在处理微信签名检查时会发生以外的错误
@@ -196,27 +197,15 @@ namespace {
             restore_exception_handler();
             restore_error_handler();
         }
-
-        /**
-         * 加载显示模板
-         * @param string $tpl template name in folder 'Tpl'
-         * @param array|null $vars vars array to extract
-         * @param bool $clean it will clean the output cache if set to true
-         * @param bool $isfile 判断是否是模板文件
-         */
-        public static function loadTemplate($tpl,array $vars=null, $clean=true, $isfile=false){
-            $clean and ob_get_level() > 0 and ob_end_clean();
-            $vars and extract($vars, EXTR_OVERWRITE);
-            $path = ($isfile or is_file($tpl))?$tpl:PATH_PLITE."/tpl/{$tpl}.php";
-            is_file($path) or $path = PATH_PLITE.'/tpl/systemerror.php';
-            include $path;
-        }
     }
 }
 
 namespace PLite {
+
     use PLite\Util\Helper\XMLHelper;
-    use PLite\Util\ExtDebugger;
+    use PLite\Library\ExtDebugger;
+
+
 //-----------------------------------------------------------------------------------------
 //---------------------------- RUNCTION OF FRAMEWOEK BEGIN --------------------------------
 //-----------------------------------------------------------------------------------------
@@ -1065,6 +1054,20 @@ namespace PLite {
      */
     class Utils {
 
+        /**
+         * 加载显示模板
+         * @param string $tpl template name in folder 'Tpl'
+         * @param array|null $vars vars array to extract
+         * @param bool $clean it will clean the output cache if set to true
+         * @param bool $isfile 判断是否是模板文件
+         */
+        public static function loadTemplate($tpl,array $vars=null, $clean=true, $isfile=false){
+            $clean and ob_get_level() > 0 and ob_end_clean();
+            $vars and extract($vars, EXTR_OVERWRITE);
+            $path = ($isfile or is_file($tpl))?$tpl:PATH_PLITE."/tpl/{$tpl}.php";
+            is_file($path) or $path = PATH_PLITE.'/tpl/systemerror.php';
+            include $path;
+        }
         /**
          * 将C风格字符串转换成JAVA风格字符串
          * C风格      如： sub_string

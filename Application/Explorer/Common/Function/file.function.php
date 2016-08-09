@@ -840,26 +840,7 @@ function upload_chunk($fileInput, $path = './',$temp_path){
  * @param string $level 日志级别
  * @return boolean
  */
-function write_log($log, $type = 'default', $level = 'log'){
-	$now_time = date('[y-m-d H:i:s]');
-	$now_day  = date('Y_m_d');
-	// 根据类型设置日志目标位置
-	$target   = LOG_PATH . strtolower($type) . '/';
-	mk_dir($target, 0777);
-	if (! is_writable($target)) exit('path can not write!');
-	switch($level){// 分级写日志
-		case 'error':	$target .= 'Error_' . $now_day . '.log';break;
-		case 'warning':	$target .= 'Warning_' . $now_day . '.log';break;
-		case 'debug':	$target .= 'Debug_' . $now_day . '.log';break;
-		case 'info':	$target .= 'Info_' . $now_day . '.log';break;
-		case 'db':		$target .= 'Db_' . $now_day . '.log';break;
-		default:		$target .= 'Log_' . $now_day . '.log';break;
-	}
-	//检测日志文件大小, 超过配置大小则重命名
-	if (file_exists($target) && get_filesize($target) <= 100000) {
-		$file_name = substr(basename($target),0,strrpos(basename($target),'.log')).'.log';
-		rename($target, dirname($target) .'/'. $file_name);
-	}
-	clearstatcache();
-	return error_log("$now_time $log\n", 3, $target);
+function write_log($log){
+    \PLite\Library\Logger::write($log);
+    return true;
 }

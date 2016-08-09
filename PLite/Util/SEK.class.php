@@ -63,7 +63,7 @@ final class SEK {
     public static function parseTemplatePath($context){
         $path = PATH_BASE."/Application/{$context['m']}/View/{$context['c']}/";
         isset($context['t']) and $path = "{$path}{$context['t']}/";
-        $path = "{$path}{$context['a']}.html";
+        $path = "{$path}{$context['a']}";
         return $path;
     }
 

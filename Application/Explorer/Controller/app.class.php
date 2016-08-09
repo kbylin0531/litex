@@ -62,7 +62,7 @@ class app extends Controller{
 
         $data = json_decode(rawurldecode($this->in['data']),true);
         unset($data['name']);unset($data['desc']);unset($data['group']);
-        $res  = file_put_contents($path, json_encode($data));
+        file_put_contents($path, json_encode($data));
         show_json($this->L['success']);
     }
 
@@ -70,7 +70,6 @@ class app extends Controller{
      * 获取列表
      */
     public function get() {
-        $list = array();
         if (!isset($this->in['group']) || $this->in['group']=='all') {
             $list = $this->sql->get();
         }else{

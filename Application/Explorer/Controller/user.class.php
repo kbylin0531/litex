@@ -76,7 +76,6 @@ class user extends Controller
 
     //临时文件访问
     public function public_link(){
-        load_class('mcrypt');
         $pass = $this->config['setting_system']['system_password'];
         $path = Mcrypt::decode($this->in['fid'],$pass);//一天内解密有效
         if (strlen($path) == 0) {
@@ -165,8 +164,7 @@ class user extends Controller
                 $msg = $this->L['user_not_exists'];
             }else if(md5($password)==$user['password']){
                 if($user['status'] == 0){//初始化app
-                    $app = init_controller('app');
-                    $app->init_app($user);
+                    (new app())->init_app($user);
                 }
                 $_SESSION['kod_login'] = true;
                 $_SESSION['kod_user']= $user;
@@ -261,6 +259,30 @@ class user extends Controller
         session_start();//re start
         $code = rand_string(4);
         $_SESSION['check_code'] = strtolower($code);
-        check_code($code);
+
+        //make code image
+        header("Content-type: image/png");
+        $fontsize = 18;$len = strlen($code);
+        $width = 70;$height=27;
+        $im = @imagecreatetruecolor($width, $height) or die("create image error!");
+        $background_color = imagecolorallocate($im, 255, 255, 255);
+        imagefill($im, 0, 0, $background_color);
+        for ($i = 0; $i < 2000; $i++) {//获取随机淡色
+            $line_color = imagecolorallocate($im, mt_rand(180,255),mt_rand(160, 255),mt_rand(100, 255));
+            imageline($im,mt_rand(0,$width),mt_rand(0,$height), //画直线
+                mt_rand(0,$width), mt_rand(0,$height),$line_color);
+            imagearc($im,mt_rand(0,$width),mt_rand(0,$height), //画弧线
+                mt_rand(0,$width), mt_rand(0,$height), $height, $width,$line_color);
+        }
+        $border_color = imagecolorallocate($im, 160, 160, 160);
+        imagerectangle($im, 0, 0, $width-1, $height-1, $border_color);//画矩形，边框颜色200,200,200
+
+        for ($i = 0; $i < $len; $i++) {//写入随机字串
+//        $current = $str[mt_rand(0, strlen($str)-1)];
+            $text_color = imagecolorallocate($im,mt_rand(30, 140),mt_rand(30,140),mt_rand(30,140));
+            imagechar($im,10,$i*$fontsize+6,rand(1,$height/3),$code[$i],$text_color);
+        }
+        imagejpeg($im);//显示图
+        imagedestroy($im);//销毁图片
     }
 }

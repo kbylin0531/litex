@@ -114,19 +114,6 @@ function checkExt($file){
 }
 
 
-function get_charset(&$str) {
-    if ($str == '') return 'utf-8';
-    //前面检测成功则，自动忽略后面
-    $charset=strtolower(mb_detect_encoding($str,$GLOBALS['config']['check_charset']));
-    if (substr($str,0,3)==chr(0xEF).chr(0xBB).chr(0xBF)){
-        $charset='utf-8';
-    }else if($charset=='cp936'){
-        $charset='gbk';
-    }
-    if ($charset == 'ascii') $charset = 'utf-8';
-    return strtolower($charset);
-}
-
 function php_env_check(){
     $L = $GLOBALS['L'];
     $error = '';
@@ -147,33 +134,6 @@ function php_env_check(){
         $error.= '<li>'.$L['php_env_error_gd'].'</li>';
     }
     return $error;
-}
-
-//语言包加载：优先级：cookie获取>自动识别
-//首次没有cookie则自动识别——存入cookie,过期时间无限
-function init_lang(){
-    if (isset($_COOKIE['kod_user_language'])) {
-        $lang = $_COOKIE['kod_user_language'];
-    }else{//没有cookie
-        preg_match('/^([a-z\-]+)/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $matches);
-        $lang = $matches[1];
-        switch (substr($lang,0,2)) {
-            case 'zh':
-                if ($lang != 'zn-TW'){
-                    $lang = 'zh-CN';
-                }
-                break;
-            case 'en':$lang = 'en';break;
-            default:$lang = 'en';break;
-        }
-        $lang = str_replace('-', '_',$lang);
-        setcookie('kod_user_language',$lang, time()+3600*24*365);
-    }
-    if ($lang == '') $lang = 'en';
-
-    $lang = str_replace(array('/','\\','..','.'),'',$lang);
-    define('LANGUAGE_TYPE', $lang);
-    $GLOBALS['L'] = include(LANGUAGE_PATH.$lang.'/main.php');
 }
 
 function init_setting(){
