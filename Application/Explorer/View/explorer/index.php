@@ -4,16 +4,16 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="renderer" content="webkit">
 	<title>{$Think.L.ui_explorer'].' - '.$L['kod_name'].$L['kod_power_by}</title>
-	<link rel="Shortcut Icon" href="<?php echo STATIC_PATH;?>images/favicon.ico">
-	<link href="<?php echo STATIC_PATH;?>js/lib/picasa/style/style.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
-	<link href="<?php echo STATIC_PATH;?>style/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
+	<link rel="Shortcut Icon" href="__PUBLIC__/images/favicon.ico">
+	<link href="__PUBLIC__/js/lib/picasa/style/style.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
+	<link href="__PUBLIC__/css/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
 	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome.css">
 	<!--[if IE 7]>
 	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome-ie7.css">
 	<![endif]-->
 
 	
-	<link href="<?php echo STATIC_PATH;?>style/skin/<?php echo $config['user']['theme}app_explorer.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet" id='link_css_list'/>
+	<link href="__PUBLIC__/css/skin/<?php echo $config['user']['theme}app_explorer.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet" id='link_css_list'/>
 	
 </head>
 
@@ -163,12 +163,12 @@
 		</div><!-- / frame-right end-->
 	</div><!-- / frame-main end-->
 <?php include(TEMPLATE.'common/footer.html');?>
-<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="index.php?user/common_js&type=explorer&id=<?php echo rand_string(8);?>"></script>
+<script src="__PUBLIC__/js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
+<script src="__PUBLIC__/index.php?user/common_js&type=explorer&id=<?php echo rand_string(8);?>"></script>
 <script type="text/javascript">
 	G.this_path = "<?php echo $dir;?>";
 	seajs.config({
-		base: "<?php echo STATIC_PATH;?>js/",
+		base: "__PUBLIC__/js/",
 		preload: ["lib/jquery-1.8.0.min"],
 		map:[
 			[ /^(.*\.(?:css|js))(.*)$/i,'$1$2?ver='+G.version]

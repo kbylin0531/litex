@@ -5,10 +5,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>{$Think.L.kod_name'].$L['kod_power_by}</title>
 	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-	<link href="<?php echo STATIC_PATH;?>images/favicon.ico" rel="Shortcut Icon" >
-	<link href="<?php echo STATIC_PATH;?>style/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
+	<link href="__PUBLIC__/images/favicon.ico" rel="Shortcut Icon" >
+	<link href="__PUBLIC__/css/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
 	<link href="./static/style/font-awesome/css/font-awesome.css" rel="stylesheet" >
-	<link rel="stylesheet" type="text/css" href="<?php echo STATIC_PATH;?>style/wap/login.css">
+	<link rel="stylesheet" type="text/css" href="__PUBLIC__/css/wap/login.css">
 </head>
 
 <body>
@@ -44,10 +44,10 @@
 	</div>
 <div class="common_footer">{$Think.L.copyright_pre'].' v'.KOD_VERSION.' | '.$L['copyright_info}</div>
 <script src="./index.php?share/common_js#id=<?php echo rand_string(8);?>"></script>
-<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
+<script src="__PUBLIC__/js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
 <script type="text/javascript">
 	seajs.config({
-		base: "<?php echo STATIC_PATH;?>js/",
+		base: "__PUBLIC__/js/",
 		preload: ["lib/jquery-1.8.0.min"],
 		map:[
 			[ /^(.*\.(?:css|js))(.*)$/i,'$1$2?ver='+G.version]
