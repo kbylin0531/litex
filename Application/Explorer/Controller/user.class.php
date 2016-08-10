@@ -65,7 +65,7 @@ class user extends Controller
             'is_root'       => $GLOBALS['is_root'],
             'user_name'     => $this->user['name'],
             'web_root'      => $GLOBALS['web_root'],
-            'web_host'      => HOST,
+            'web_host'      => HTTP_HOST,
             'static_path'   => STATIC_PATH,
             'basic_path'    => $basic_path,
             'app_host'      => APPHOST,
@@ -124,7 +124,7 @@ class user extends Controller
                 // pr($_SESSION['check_code'].'--'.strtolower($this->in['check_code']));exit;
                 $this->login($this->L['code_error']);
             }
-            $member = new FileCache(USER_SYSTEM.'member.php');
+            $member = new FileCache(DATA_USER_SYSTEM.'member.php');
             $user = $member->get($name);
             if ($user ===false){
                 $msg = $this->L['user_not_exists'];
@@ -156,8 +156,8 @@ class user extends Controller
         $password_new=$this->in['password_new'];
         if (!$password_now && !$password_new)show_json($this->L['password_not_null'],false);
         if ($this->user['password']==md5($password_now)){
-//            $member_file = USER_SYSTEM.'member.php';
-            $sql=new FileCache(USER_SYSTEM.'member.php');
+//            $member_file = DATA_USER_SYSTEM.'member.php';
+            $sql=new FileCache(DATA_USER_SYSTEM.'member.php');
             $this->user['password'] = md5($password_new);
             $sql->update($this->user['name'],$this->user);
             setcookie('kod_token',md5(md5($password_new)),time()+3600*24*365);
@@ -179,7 +179,7 @@ class user extends Controller
 
         //有权限限制的函数
         $key = ST.':'.ACT;
-        $group  = new FileCache(USER_SYSTEM.'group.php');
+        $group  = new FileCache(DATA_USER_SYSTEM.'group.php');
         $auth= $group->get($this->user['role']);
         
         //向下版本兼容处理

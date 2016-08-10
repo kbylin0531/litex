@@ -8,7 +8,7 @@ class member extends Controller{
     function __construct()    {
         parent::__construct();
         $this->tpl = TEMPLATE.'member/';
-        $this->sql=new FileCache(USER_SYSTEM.'member.php');
+        $this->sql=new FileCache(DATA_USER_SYSTEM.'member.php');
     }
     
     /**

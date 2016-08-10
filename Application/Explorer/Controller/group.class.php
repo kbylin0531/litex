@@ -7,7 +7,7 @@ class group extends Controller{
     private $sql;
     function __construct()    {
         parent::__construct();
-        $this->sql=new FileCache(USER_SYSTEM.'group.php');
+        $this->sql=new FileCache(DATA_USER_SYSTEM.'group.php');
     }
     
     public function get() {
@@ -34,7 +34,7 @@ class group extends Controller{
         if ($role_old == 'root') show_json($this->L['default_group_can_not_do'],false);
 
         if ($this->sql->replace_update($role_old,$this->in['role'],$group)){
-            $member = new FileCache(USER_SYSTEM.'member.php');
+            $member = new FileCache(DATA_USER_SYSTEM.'member.php');
             if ($member -> update('role',$this->in['role'],$role_old)) {
                 show_json($this->L['success']);
             }
@@ -51,7 +51,7 @@ class group extends Controller{
         if (!$role) show_json($this->L["groupname_can_not_null"],false);
         if ($role == 'root') show_json($this->L['default_group_can_not_do'],false);
         if($this->sql->delete($role)){
-            $member = new FileCache(USER_SYSTEM.'member.php');
+            $member = new FileCache(DATA_USER_SYSTEM.'member.php');
             $member -> update('role','',$role);//改组用户设置为空
             show_json($this->L['success']);
         }

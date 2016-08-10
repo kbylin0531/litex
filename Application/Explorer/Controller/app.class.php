@@ -12,7 +12,7 @@ use Application\Explorer\Common\Library\Controller;
 class app extends Controller{
     function __construct()    {
         parent::__construct();
-        $this->sql=new FileCache(USER_SYSTEM.'apps.php');
+        $this->sql=new FileCache(DATA_USER_SYSTEM.'apps.php');
     }
 
     /**
@@ -43,7 +43,7 @@ class app extends Controller{
             file_put_contents($path, json_encode($data));
         }
         $user_info['status'] = 1;
-        $member = new FileCache(USER_SYSTEM.'member.php');
+        $member = new FileCache(DATA_USER_SYSTEM.'member.php');
         $member->update($user_info['name'],$user_info);
     }
 

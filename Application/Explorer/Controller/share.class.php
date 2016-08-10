@@ -81,7 +81,7 @@ class share extends Controller{
     }
     private function _init_info(){
         //获取用户组，根据是否为root 定义前缀
-        $member = new FileCache(USER_SYSTEM.'member.php');
+        $member = new FileCache(DATA_USER_SYSTEM.'member.php');
         $user = $member->get($this->in['user']);
         if (!is_array($user) || !isset($user['password'])) {
             $this->showError($this->L['share_error_user']);
@@ -196,7 +196,7 @@ class share extends Controller{
             'lang'          => LANGUAGE_TYPE,
             'is_root'       => 0,
             'web_root'      => '/',
-            'web_host'      => HOST,
+            'web_host'      => HTTP_HOST,
             'static_path'   => STATIC_PATH,
             'basic_path'    => BASIC_PATH,
             'version'       => KOD_VERSION,
@@ -453,12 +453,12 @@ class share extends Controller{
             file_put_out($this->path);
         }
         $image= $this->path;
-        $image_thum = DATA_THUMB.md5($image).'.png';
-        if (!is_dir(DATA_THUMB)){
-            mkdir(DATA_THUMB,"0777");
+        $image_thum = DATA_IMAGE_THUMB.md5($image).'.png';
+        if (!is_dir(DATA_IMAGE_THUMB)){
+            mkdir(DATA_IMAGE_THUMB,"0777");
         }
         if (!file_exists($image_thum)){//如果拼装成的url不存在则没有生成过
-            if ($_SESSION['this_path']==DATA_THUMB){//当前目录则不生成缩略图
+            if ($_SESSION['this_path']==DATA_IMAGE_THUMB){//当前目录则不生成缩略图
                 $image_thum=$this->path;
             }else {
                 $cm=new CreatMiniature();

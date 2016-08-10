@@ -557,12 +557,12 @@ class explorer extends Controller{
             $image_md5 = md5($image);
         }
         
-        $image_thum = DATA_THUMB.$image_md5.'.png';
-        if (!is_dir(DATA_THUMB)){
-            mkdir(DATA_THUMB,"0777");
+        $image_thum = DATA_IMAGE_THUMB.$image_md5.'.png';
+        if (!is_dir(DATA_IMAGE_THUMB)){
+            mkdir(DATA_IMAGE_THUMB,"0777");
         }
         if (!file_exists($image_thum)){//如果拼装成的url不存在则没有生成过
-            if ($_SESSION['this_path']==DATA_THUMB){//当前目录则不生成缩略图
+            if ($_SESSION['this_path']==DATA_IMAGE_THUMB){//当前目录则不生成缩略图
                 $image_thum=$this->path;
             }else {
                 $cm=new CreatMiniature();

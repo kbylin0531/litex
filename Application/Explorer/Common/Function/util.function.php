@@ -137,7 +137,7 @@ function php_env_check(){
 }
 
 function init_setting(){
-    $setting_file = USER_SYSTEM.'system_setting.php';
+    $setting_file = DATA_USER_SYSTEM.'system_setting.php';
     if (!file_exists($setting_file)){//不存在则建立
         $setting = $GLOBALS['config']['setting_system_default'];
         $setting['menu'] = $GLOBALS['config']['setting_menu_default'];

@@ -39,7 +39,7 @@ class setting extends Controller{
 
     //管理员  系统设置全局数据
     public function system_setting(){
-        $setting_file = USER_SYSTEM.'system_setting.php';
+        $setting_file = DATA_USER_SYSTEM.'system_setting.php';
         $data = json_decode($this->in['data'],true);
         if (!$data) {
             show_json($this->L['error'],false);

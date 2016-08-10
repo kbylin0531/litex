@@ -4,12 +4,58 @@ use PLite\Core\URL;
 use PLite\Library\FileCache;
 use PLite\Response;
 use PLite\Storage;
+use PLite\Util\Helper\ClientAgent;
+use PLite\Utils;
 
 class ExplorerUtils {
 
-    private static $noCheck = [
-        'loginFirst','common_js','login','logout','loginSubmit','checkCode','public_link'
+    private static $_config = [
+        'noCheck'   => ['login'],
     ];
+
+    /**
+     * @param array $config
+     */
+    public static function init(array $config){
+        self::$_config = Utils::merge(self::$_config,$config);
+    }
+
+
+    /**
+     * 语言包加载：优先级：cookie获取>自动识别
+     * 首次没有cookie则自动识别——存入cookie,过期时间无限
+     * @return array
+     */
+    public static function &getLangConfig(){
+        if (isset($_COOKIE['kod_user_language'])) {
+            $lang = $_COOKIE['kod_user_language'];
+        }else{//没有cookie
+            $lang = ClientAgent::getClientLang();
+            switch (substr($lang,0,2)) {
+                case 'zh':
+                    if ($lang != 'zn-TW'){
+                        $lang = 'zh-CN';
+                    }
+                    break;
+                case 'en':$lang = 'en';break;
+                default:$lang = 'en';break;
+            }
+            $lang = str_replace('-', '_',$lang);
+            setcookie('kod_user_language',$lang, time()+3600*24*365);
+        }
+        if ($lang == '') $lang = 'en';
+
+        $lang = str_replace(array('/','\\','..','.'),'',$lang);
+        define('LANGUAGE_TYPE', $lang);
+        return $GLOBALS['L'] = include(LANGUAGE_PATH.LANGUAGE_TYPE.'/main.php');
+    }
+
+    /**
+     * @return array
+     */
+    public static function &getComein(){
+        return $GLOBALS['in'] = [REQUEST_MODULE,REQUEST_ACTION,];
+    }
 
     public static function &getAppConfig(){
         if(isset($GLOBALS['config'])){
@@ -103,7 +149,7 @@ class ExplorerUtils {
      * redirect to login page
      */
     public static function goLogin(){
-        touch(USER_SYSTEM.'install.lock');
+        touch(DATA_USER_SYSTEM.'install.lock');
         URL::redirect(__PUBLIC__.'/index.php?user/login');
         exit;
     }
@@ -114,7 +160,7 @@ class ExplorerUtils {
      */
     public static function checkLogin(){
         //共享页面
-        if(REQUEST_CONTROLLER === 'share' or in_array(REQUEST_ACTION,self::$noCheck)) return true;
+        if(REQUEST_CONTROLLER === 'share' or in_array(REQUEST_ACTION,self::$_config['noCheck'])) return true;
 
         if($_SESSION['kod_login']===true and !empty($_SESSION['kod_user']['name'])){
             define('USER',USER_PATH.$_SESSION['kod_user']['name'].'/');//personal dir
@@ -144,7 +190,7 @@ class ExplorerUtils {
             }
         }else if($_COOKIE['kod_name']!='' && $_COOKIE['kod_token']!=''){
             //cookie未过期
-            $member = new FileCache(USER_SYSTEM.'member.json');
+            $member = new FileCache(DATA_USER_SYSTEM.'member.json');
             $user = $member->get($_COOKIE['kod_name']);
             if (is_array($user) and isset($user['password'])) {
                 if(md5($user['password'].get_client_ip()) == $_COOKIE['kod_token']){
@@ -161,7 +207,7 @@ class ExplorerUtils {
                 }
             }
         }else{
-            file_exists(USER_SYSTEM.'install.lock') or URL::redirect(__PUBLIC__.'/index.php/app/install');
+            file_exists(DATA_USER_SYSTEM.'install.lock') or URL::redirect(__PUBLIC__.'/index.php/app/install');
         }
         return false;
     }
