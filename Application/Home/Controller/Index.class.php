@@ -12,8 +12,14 @@ use PLite\Library\Session;
 class Index {
 
     public function index(){
-        $href = __PUBLIC__.'index.php/Admin/Index/index';
+        $href = __PUBLIC__.'/index.php/Admin/Index/index';
         echo "<a href='{$href}'>Click to background</a>";
+    }
+
+
+    public function test(){
+        echo false || true ?'its true':'its false';
+        \PLite\dumpout(isset($_SERVER['SSSSSS']),empty($_SERVER['SSSSSS']),is_null($_SERVER['SSSSSS']));
     }
 
     public function memcache(){

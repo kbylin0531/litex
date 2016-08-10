@@ -40,7 +40,6 @@ class Verify extends Lite{
      * @return bool 用户验证码是否正确
      */
     public function check($code, $id = '') {
-        self::checkInit(true);
         $key = $this->authcode(self::$config['seKey']).$id;
         // 验证码不能为空
         $secode = Session::get($key);
@@ -69,7 +68,6 @@ class Verify extends Lite{
      * @return void
      */
     public function entry($id = '') {
-        self::checkInit(true);
         // 图片宽(px)
         self::$config['imageW'] || self::$config['imageW'] = self::$config['length']*self::$config['fontSize']*1.5 + self::$config['length']*self::$config['fontSize']/2;
         // 图片高(px)

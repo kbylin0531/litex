@@ -1,27 +1,6 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="description" content="webpage"> 
-<meta name="keywords" content="kalcaddle">
-<meta name="author" content="kalcaddle.">
-  <head>
-	<title><?php echo $share_info['name'].' - '.$L['share_title'].' - '.$L['kod_name'].$L['kod_power_by}</title>
-<<<<<<< HEAD:Application/Explorer/View/share/edit.html
-  	<link href="__PUBLIC__/css/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
-=======
-  	<link href="<?php echo STATIC_PATH;?>style/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
->>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/share/edit.php
-	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome.css">
-	<!--[if IE 7]>
-	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome-ie7.css">
-	<![endif]-->
-	
-	<link href="__PUBLIC__/css/skin/<?php echo $config_theme;?>app_code_edit.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet" id='link_css_list'/>
-	
-  </head>
+<extend file="../basic/general.html"/>
+<block name="body">
 
-  <body>
 	<div class="edit_main" style="height: 100%;" oncontextmenu="return core.contextmenu();">
 		<div class="tools">
 			<div class="left">
@@ -53,7 +32,7 @@
 					<div style="clear:both"></div>
 				</div>
 				<div class="tabs"></div>
-			</div>			
+			</div>
 		</div>
 		<!-- 预览 -->
 		<div class="frame_right">
@@ -62,8 +41,8 @@
 				<div class="function_list" style="display:none;">
 					<div class="function_list_tool">
 						<div class="box">
-						<span> <i class="icon-code"></i> {$Think.L.function_list}</span>
-						<a action="close_preview" href="javascript:preview.close();"><i class="font-icon icon-remove"></i></a>
+							<span> <i class="icon-code"></i> {$Think.L.function_list}</span>
+							<a action="close_preview" href="javascript:preview.close();"><i class="font-icon icon-remove"></i></a>
 						</div>
 					</div>
 					<div class="function_list_parent">
@@ -86,34 +65,31 @@
 			</div>
 		</div>
 	</div>
+</block>
+<block name="style">
+	<link href="__PUBLIC__/css/skin/default/app_code_edit.css" rel="stylesheet" id='link_css_list'/>
+</block>
+<block name="script">
 
-<<<<<<< HEAD:Application/Explorer/View/share/edit.html
-<script src="./index.php?share/common_js&user=<?php echo $_GET['user}&sid=<?php echo $_GET['sid}&#=<?php echo rand_string(8);?>"></script>
-<script src="__PUBLIC__/js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="__PUBLIC__/js/lib/ace/src-min-noconflict/ace.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="__PUBLIC__/js/lib/ace/src-min-noconflict/ext-language_tools.js?ver=<?php echo KOD_VERSION;?>"></script>
-=======
-<script src="__PUBLIC__/index.php?share/common_js&user=<?php echo $_GET['user}&sid=<?php echo $_GET['sid}&#=<?php echo rand_string(8);?>"></script>
-<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="<?php echo STATIC_PATH;?>js/lib/ace/src-min-noconflict/ace.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="<?php echo STATIC_PATH;?>js/lib/ace/src-min-noconflict/ext-language_tools.js?ver=<?php echo KOD_VERSION;?>"></script>
->>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/share/edit.php
-<script type="text/javascript">
-	AUTH  = {'explorer:fileDownload':<?php echo $can_download;?>};
-	G.frist_file = "<?php echo (isset($_GET['filename'])?$_GET['filename']:'') ;?>";
-	G.user = "<?php echo $_GET['user}";
-	G.sid = "<?php echo $_GET['sid}";
-	G.code_config = <?php echo json_encode($editor_config);?>;
-	G.code_theme_all = "<?php echo $config['setting_all']['codethemeall']?>";
-	G.theme = "<?php echo $config_theme;?>";
-	seajs.config({
-		base: "__PUBLIC__/js/",
-		preload: ["lib/jquery-1.8.0.min"],
-		map:[
-			[ /^(.*\.(?:css|js))(.*)$/i,'$1$2?ver='+G.version]
-		]
-	});
-	seajs.use("app/src/edit/main");	
-</script>
-</body>
-</html>
+	<script src="__PUBLIC__/index.php?share/common_js&user={$Think.get.user}&sid={$Think.get.sid}"></script>
+	<script src="__PUBLIC__/js/lib/seajs/sea.js"></script>
+	<script src="__PUBLIC__/js/lib/ace/src-min-noconflict/ace.js"></script>
+	<script src="__PUBLIC__/js/lib/ace/src-min-noconflict/ext-language_tools.js"></script>
+	<script type="text/javascript">
+		AUTH  = {'explorer:fileDownload':<?php echo $can_download;?>};
+		G.frist_file = "<?php echo (isset($_GET['filename'])?$_GET['filename']:'') ;?>";
+		G.user = "<?php echo $_GET['user}";
+		G.sid = "<?php echo $_GET['sid}";
+		G.code_config = <?php echo json_encode($editor_config);?>;
+		G.code_theme_all = "{$Think.L.config.setting_all']['codethemeall']?>";
+		G.theme = "<?php echo $config_theme;?>";
+		seajs.config({
+			base: "__PUBLIC__/js/",
+			preload: ["lib/jquery-1.8.0.min"],
+			map:[
+				[ /^(.*\.(?:css|js))(.*)$/i,'$1$2?ver='+G.version]
+			]
+		});
+		seajs.use("app/src/edit/main");
+	</script>
+</block>

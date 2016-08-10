@@ -1,13 +1,13 @@
 <?php
 	function check_first_in($value){
-		if ($value == $GLOBALS['config']['setting_system']['first_in']) {
+		if ($value == $GLOBALS['config.setting_system.first_in']) {
 			echo 'checked="checked"';
 		}
 	}
 ?>
 <div class='h1'><i class="font-icon icon-user"></i>{$Think.L.system_setting}</div>
 <div class="nav">
-    <a href="javascript:;"  class="this" data-page="setting">{$Think.L.system_setting}</a>
+    <a href="javascript:;" class="this" data-page="setting">{$Think.L.system_setting}</a>
     <a href="javascript:;" class="" data-page="setting_menu">{$Think.L.system_setting_menu}</a>
     <div style="clear:both;"></div>
 </div>
@@ -15,35 +15,35 @@
 <div class="section setting system_setting">
 	<div class="box_line">
 	    <span class='infotitle'>{$Think.L.system_name}:</span><input type="text" name="system_name" 
-      value="<?php echo $config['setting_system']['system_name}" />
+      value="{$Think.L.config.setting_system.system_name}" />
 	    <i>{$Think.L.system_name_desc}</i>
 	</div>
 	<div class="box_line">
 		<span class='infotitle'>{$Think.L.system_desc}:</span><input type="text" name="system_desc" 
-    value="<?php echo $config['setting_system']['system_desc}" />
+    value="{$Think.L.config.setting_system.system_desc}" />
 		<i>{$Think.L.system_desc}</i>
 	</div>
 	<div class="box_line">
 		<span class='infotitle'>{$Think.L.path_hidden}:</span><input type="text" name="path_hidden" 
-      value="<?php echo $config['setting_system']['path_hidden}" />
+      value="{$Think.L.config.setting_system.path_hidden}" />
 		<i>{$Think.L.path_hidden_desc}</i>
 	</div>
 	<div class="box_line">
 		<span class='infotitle'>{$Think.L.new_user_folder}:</span>
-		<input type="text" name="new_user_folder" value="<?php echo $config['setting_system']['new_user_folder}" />
+		<input type="text" name="new_user_folder" value="{$Think.L.config.setting_system.new_user_folder}" />
 		<i>{$Think.L.new_user_folder_desc}</i>
 	</div>
 	<div class="box_line">
 		<span class='infotitle'>{$Think.L.new_user_app}:</span>
 		<input type="text" name="new_user_app" 
-			value="<?php echo $config['setting_system']['new_user_app}"/>
+			value="{$Think.L.config.setting_system.new_user_app}"/>
         <i>{$Think.L.new_user_app_desc}</i>
 	</div>
 	<div class="box_line">
 		<span class='infotitle'>{$Think.L.auto_login}:</span>
 			<label>
 			<input type="checkbox" name="auto_login" 
-		      <?php if($config['setting_system']['auto_login']=="1") echo 'checked="checked"';?> />
+		      <?php if($config['setting_system.auto_login']=="1") echo 'checked="checked"';?> />
 		    <i>{$Think.L.auto_login_desc}</i>
 		    </label>		
 	</div>
@@ -64,8 +64,8 @@
     <table id="list" align="center" border="0" cellspacing="0" cellpadding="0">
 	    <tbody><tr class="title"><td width="10%">{$Think.L.menu_name}</td><td>{$Think.L.url_path}<span>({$Think.L.url_path_desc})</span></td><td>{$Think.L.action}</td></tr>
         <?php 
-         $config['setting_system']['menu'][] = array('name'=>'','type'=>'','url'=>'','target'=>'_blank','use'=>'1');
-         foreach($config['setting_system']['menu'] as $key => $menu) { 
+         $config['setting_system.menu'][] = array('name'=>'','type'=>'','url'=>'','target'=>'_blank','use'=>'1');
+         foreach($config['setting_system.menu'] as $key => $menu) { 
               $the_type = $menu['type']=='system'?' menu_system ':'';
               $the_use = $menu['use']=='1'?' menu_show ':'menu_hidden';
               $the_null = $menu['name']==''?' menu_default hidden ':'';

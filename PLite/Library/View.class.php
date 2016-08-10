@@ -79,7 +79,7 @@ class View extends Lite {
      * @return void
      */
     public static function assign($tpl_var,$value=null,$nocache=false){
-        self::$_driver or self::$_driver = self::getDriver();
+        self::$_driver or self::$_driver = self::driver();
         self::$_driver->assign($tpl_var,$value,$nocache);
     }
 
@@ -91,7 +91,7 @@ class View extends Lite {
      * @return void
      */
     public static function registerParsingString($str,$replacement){
-        self::$_driver or self::$_driver = self::getDriver();
+        self::$_driver or self::$_driver = self::driver();
         if(is_array($str)){
             foreach ($str as $key=>$val){
                 self::$_driver->registerParsingString($key,$val);
@@ -109,7 +109,7 @@ class View extends Lite {
      * @return void
      */
     public static function display(array $context, $cache_id = null, $compile_id = null,$parent = null){
-        self::$_driver or self::$_driver = self::getDriver();
+        self::$_driver or self::$_driver = self::driver();
         $template = SEK::parseTemplatePath($context);
         self::$_driver->setContext($context)->display($template,$cache_id,$compile_id,$parent);
     }

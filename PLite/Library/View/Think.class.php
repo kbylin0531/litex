@@ -88,7 +88,7 @@ class Think implements ViewInterface{
         'L_DELIM'          =>  '{',            // 模板引擎普通标签开始标记
         'R_DELIM'          =>  '}',            // 模板引擎普通标签结束标记
         'DENY_PHP'         =>  false, // 默认模板引擎是否禁用PHP原生代码
-        'DENY_FUNC_LIST'   =>  'echo,exit',    // 模板引擎禁用函数
+//        'DENY_FUNC_LIST'   =>  'echo,exit',    // 模板引擎禁用函数
         'VAR_IDENTIFY'     =>  'array',     // 模板变量识别。留空自动判断,参数为'obj'则表示对象
 
         'TMPL_PARSE_STRING'=> [],//用户自定义的字符替换
@@ -659,7 +659,7 @@ class Think implements ViewInterface{
         //对变量使用函数
         $length = count($varArray);
         //取得模板禁止使用函数列表
-        $template_deny_funs = explode(',',$this->config['DENY_FUNC_LIST']);
+//        $template_deny_funs = explode(',',$this->config['DENY_FUNC_LIST']);
         for($i=0;$i<$length ;$i++ ){
             $args = explode('=',$varArray[$i],2);
             //模板函数过滤
@@ -669,18 +669,18 @@ class Think implements ViewInterface{
                     $name = '(isset('.$name.') && ('.$name.' !== ""))?('.$name.'):'.$args[1];
                     break;
                 default:  // 通用模板函数
-                    if(!in_array($fun,$template_deny_funs)){
-                        if(isset($args[1])){
-                            if(strstr($args[1],'###')){
-                                $args[1] = str_replace('###',$name,$args[1]);
-                                $name = "$fun($args[1])";
-                            }else{
-                                $name = "$fun($name,$args[1])";
-                            }
-                        }else if(!empty($args[0])){
-                            $name = "$fun($name)";
+//                    if(!in_array($fun,$template_deny_funs)){
+                    if(isset($args[1])){
+                        if(strstr($args[1],'###')){
+                            $args[1] = str_replace('###',$name,$args[1]);
+                            $name = "$fun($args[1])";
+                        }else{
+                            $name = "$fun($name,$args[1])";
                         }
+                    }else if(!empty($args[0])){
+                        $name = "$fun($name)";
                     }
+//                    }
             }
         }
         return $name;
@@ -1507,8 +1507,6 @@ $mod = ($'.$key.' % '.$mod.' );
         return $parseStr;
     }
 
-//----------------------------------------- EXT -----------------------------------------------------------------------//
-//----------------------------------------- TODO -----------------------------------------------------------------------//
 //----------------------------------------- EXT -----------------------------------------------------------------------//
 
     /**

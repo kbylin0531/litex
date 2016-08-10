@@ -98,7 +98,7 @@ class Logger extends Lite{
      * @Exception FileWriteFailedException
      */
     public static function write($content,$level=self::LOG_LEVEL_DEBUG){
-        return self::getDriver()->write(self::fetchLogUID($level),$content);
+        return self::driver()->write(self::fetchLogUID($level),$content);
     }
 
     /**
@@ -109,7 +109,7 @@ class Logger extends Lite{
      * @return string|array 如果按小时写入，则返回数组
      */
     public static function read($datetime, $level=self::LOG_LEVEL_DEBUG){
-        return self::getDriver()->read(self::fetchLogUID($level,$datetime));
+        return self::driver()->read(self::fetchLogUID($level,$datetime));
     }
 
     /**

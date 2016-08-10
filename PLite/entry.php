@@ -24,28 +24,31 @@ namespace {
 
     defined('FS_ENCODING')  or define('FS_ENCODING','GB2312');//file system encoding
 
-    const EXCEPTION_CLEAN = false;
+    const EXCEPTION_CLEAN = false;//it will clean the output before if error or exception occur
+    const DRIVER_KEY_WITH_PARAM = false;//for trait 'PLite\D' ,if set to true,it will serialize the parameters of contructor which may use a lot of resource
+
 
 //---------------------------------- environment constant -------------------------------------//
     //It is different to thinkphp that the beginning time is the time of request comming
     //and ThinkPHP is just using the time of calling 'microtime(true)' which ignore the loading and parsing of "ThinkPHP.php" and its include files.
     //It could always keeped in 10ms from request beginning to script shutdown.
-    defined('REQUEST_MICROTIME')  or define('REQUEST_MICROTIME', isset($_SERVER['REQUEST_TIME_FLOAT'])? $_SERVER['REQUEST_TIME_FLOAT']:microtime(true));//(int)($_SERVER['REQUEST_TIME_FLOAT']*1000)
+    define('REQUEST_MICROTIME', isset($_SERVER['REQUEST_TIME_FLOAT'])? $_SERVER['REQUEST_TIME_FLOAT']:microtime(true));//(int)($_SERVER['REQUEST_TIME_FLOAT']*1000)
+    define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
+
+    //record status at the beginning
     DEBUG_MODE_ON and $GLOBALS['_status_begin'] = [
         REQUEST_MICROTIME,
         memory_get_usage(),
     ];
     const IS_CLIENT = PHP_SAPI === 'cli';
-    define('IS_WINDOWS',false !== stripos(PHP_OS, 'WIN'));
+    define('IS_WINDOWS',false !== stripos(PHP_OS, 'WIN'));//const IS_WINDOWS = PHP_OS === 'WINNT';
     define('IS_REQUEST_AJAX', ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ));
     define('IS_METHOD_POST',$_SERVER['REQUEST_METHOD'] === 'POST');//“GET”, “HEAD”，“POST”，“PUT”
 
-    define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
     define('HTTP_PREFIX', (isset ($_SERVER ['HTTPS']) and $_SERVER ['HTTPS'] === 'on') ? 'https://' : 'http://' );
-//    define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
     define('__PUBLIC__',rtrim(empty($_SERVER['SERVER_PORT']) || 80 === $_SERVER['SERVER_PORT']?
         HTTP_PREFIX.$_SERVER['SERVER_NAME']:
-        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':80'.dirname($_SERVER['SCRIPT_NAME']),'/'));
+        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':80'.dirname($_SERVER['SCRIPT_NAME']),'/'));//define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
 
 //---------------------------------- variable type constant ------------------------------//
     const TYPE_BOOL     = 'boolean';
@@ -66,8 +69,6 @@ namespace {
     const PATH_CONFIG   = PATH_BASE.'/Config';
     const PATH_RUNTIME  = PATH_BASE.'/Runtime';
     const PATH_PUBLIC   = PATH_BASE.'/Public';
-
-    require __DIR__.'/Common/function.php';
 
     /**
      * Class PLite
@@ -113,9 +114,10 @@ namespace {
          */
         public static function init(array $config=null){
             DEBUG_MODE_ON and Debugger::import('app_begin',$GLOBALS['_status_begin']);
-            Debugger::status('app_init_begin');
+            DEBUG_MODE_ON and Debugger::status('app_init_begin');
             $config and self::$_config = Utils::merge(self::$_config,$config);
 
+            //environment
             version_compare(PHP_VERSION,'5.4.0','<') and die('Require php >= 5.4 !');
             date_default_timezone_set(self::$_config['ZONE']) or die('Date default timezone set failed!');
 
@@ -123,15 +125,19 @@ namespace {
             error_reporting(DEBUG_MODE_ON?-1:E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);//php5.3version use code: error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_USER_NOTICE);
             ini_set('display_errors',DEBUG_MODE_ON?1:0);
 
+            //behavior
             spl_autoload_register([AutoLoader::class,'load']) or die('Faile to register class autoloader!');
             self::registerErrorHandler(self::$_config['ERROR_HANDLER']);
             self::registerExceptionHandler(self::$_config['EXCEPTION_HANDLER']);
             register_shutdown_function(function (){/* called when script shut down */
                 PAGE_TRACE_ON and !IS_REQUEST_AJAX and Debugger::showTrace();//show the trace info
                 Response::flushOutput();
-                Debugger::status('script_shutdown');
+
+//                $gap = microtime(true) - $GLOBALS['_status_begin'][0];//begin to end
+                DEBUG_MODE_ON and Debugger::status('script_shutdown');
             });
 
+            //function pack
             if(self::$_config['FUNCTION_PACK']){
                 if(is_string(self::$_config['FUNCTION_PACK'])){
                     include PATH_BASE.self::$_config['FUNCTION_PACK'];
@@ -144,15 +150,19 @@ namespace {
                 }
             }
 
-            Debugger::status('app_init_done');
+            DEBUG_MODE_ON and Debugger::status('app_init_done');
+            self::$_app_need_inited = false;
         }
+
+        private static $_app_need_inited = true;
 
         /**
          * start application
          * @param array|null $config
          */
         public static function start(array $config=null){
-            self::init($config);
+            self::$_app_need_inited and self::init($config);
+            DEBUG_MODE_ON and Debugger::status('app_start');
 
             Configger::init(self::$_config['CONFIGGER']);
             Router::init(self::$_config['ROUTER']);
@@ -163,7 +173,7 @@ namespace {
             //URL中解析结果合并到$_GET中，$_GET的其他参数不能和之前的一样，否则会被解析结果覆盖,注意到$_GET和$_REQUEST并不同步，当动态添加元素到$_GET中后，$_REQUEST中不会自动添加
             empty($result['p']) or $_GET = array_merge($_GET,$result['p']);
 
-            Debugger::status('dispatch_begin');
+            DEBUG_MODE_ON and Debugger::status('dispatch_begin');
 
             Dispatcher::init(self::$_config['DISPATCHER']);
             //dispatch
@@ -207,12 +217,10 @@ namespace {
         }
     }
 }
-
 namespace PLite {
 
     use PLite\Util\Helper\XMLHelper;
     use PLite\Library\ExtDebugger;
-
 
 //-----------------------------------------------------------------------------------------
 //---------------------------- RUNCTION OF FRAMEWOEK BEGIN --------------------------------
@@ -334,7 +342,7 @@ namespace PLite {
                 }
             }
             //auto init class
-            $funcname = '_init_class_';
+            $funcname = 'initializationize';
             is_callable("{$clsnm}::{$funcname}") and $clsnm::$funcname();
         }
     }
@@ -390,210 +398,6 @@ namespace PLite {
         }
     }
 
-    /**
-     * Class Lite
-     * @package PLite
-     */
-    abstract class Lite {
-        /**
-         * 类实例库
-         * @var array
-         */
-        private static $_instances = [];
-        /**
-         * 类的静态配置
-         * @var array
-         */
-        private static $_configs = [
-            /************************************
-            'sample class' => [
-            'PRIOR_INDEX' => 0,//默认驱动ID，类型限定为int或者string
-            'DRIVER_CLASS_LIST' => [],//驱动类的列表
-            'DRIVER_CONFIG_LIST' => [],//驱动类列表参数
-            ]
-             ************************************/
-        ];
-        /**
-         * 类实例的驱动
-         * @var object
-         */
-        private static $_drivers = [
-            /************************************
-            'sample class' => Object
-             ************************************/
-        ];
-
-
-//------------------------------------ single instance mode -------------------------------------------------------------------------------//
-        /**
-         * 获取指定标识符的实例
-         * @param string|null $identify 驱动ID，为null时表示获取默认值
-         * @return object
-         */
-        public static function getInstance($identify=null){
-            $clsnm = static::class;
-            isset(self::$_instances[$clsnm]) or self::$_instances[$clsnm] = [];
-            if(!isset(self::$_instances[$clsnm][$identify])){
-                self::$_instances[$clsnm][$identify] = new $clsnm($identify);
-            }
-            return self::$_instances[$clsnm][$identify];
-        }
-
-        /**
-         * it maybe a waste of performance
-         * @param string|int|null $identify it will get the default index if set to null
-         * @return null|object
-         */
-        protected static function getDriver($identify=null){
-            $clsnm = static::class;
-            isset(self::$_drivers[$clsnm]) or self::$_drivers[$clsnm] = [];
-            $config = null;
-            //get default identify
-            if(!isset($identify)) {
-                $config = static::getConfig();
-                if(isset($config['PRIOR_INDEX'])){
-                    $identify = $config['PRIOR_INDEX'];
-                }else{
-                    return null;
-                }
-            }
-
-            if(!isset(self::$_drivers[$clsnm][$identify])){
-                isset($config) or $config = static::getConfig();
-                if(isset($config['DRIVER_CLASS_LIST'][$identify])){
-                    //获取驱动类名称
-                    $driver = $config['DRIVER_CLASS_LIST'][$identify];
-
-                    //设置实例驱动
-                    self::$_drivers[$clsnm][$identify] = isset($config['DRIVER_CONFIG_LIST'][$identify])?
-                            new $driver($config['DRIVER_CONFIG_LIST'][$identify]) : new $driver();
-                }else{
-                    PLiteException::throwing('No driver!', $clsnm, $identify);
-                }
-            }
-
-            return self::$_drivers[$clsnm][$identify];
-        }
-
-        /**
-         * 初始化类的配置
-         * @param null|string $clsnm 类名称
-         * @return void
-         */
-        public static function _init_class_($clsnm=null){
-            $clsnm or $clsnm = static::class;
-            if(!isset(self::$_configs[$clsnm])){
-                //get convention
-                self::$_configs[$clsnm] = Utils::constant($clsnm,'CONF_CONVENTION',[]);
-
-                //load the outer config
-                $conf = Configger::load($clsnm);
-                $conf and is_array($conf) and self::$_configs[$clsnm] = Utils::merge(self::$_configs[$clsnm],$conf,true);
-            }
-        }
-
-        /**
-         * 获取该类的配置（经过用户自定义后）
-         * @param string|null $key 配置项名称
-         * @param mixed $replacement 如果参数一指定的配置项不存在时默认代替的配置项
-         * @return array
-         */
-        protected static function getConfig($key=null,$replacement=null){
-            isset(self::$_configs[static::class]) or self::$_configs[static::class] = [];
-            if(null !== $key){
-                $static_config = &self::$_configs[static::class];
-                if(strpos($key,'.')){//存在且在大于0的位置
-                    $keys = explode('.',$key);
-                    $len = count($keys);
-                    for($i = 0; $i < $len; $i++){
-                        if(isset($static_config[$key])){
-                            if($i === $len - 1){//最后一项
-                                return isset($static_config[$key])?$static_config[$key]:$replacement;
-                            }
-                        }else{
-                            return $replacement;
-                        }
-                        $static_config = & $static_config[$key];
-                    }
-                }else{
-                    return isset($static_config[$key])?$static_config[$key]:$replacement;
-                }
-            }
-            return self::$_configs[static::class];
-        }
-
-        /**
-         * 设置临时配置，下次请求将会清空
-         * @param string $key
-         * @param mixed $value
-         * @return bool
-         */
-        protected static function setConfig($key, $value){
-            isset(self::$_configs[static::class]) or self::$_configs[static::class] = [];
-            if(strpos($key,'.')){//存在且在大于0的位置
-                $keys = explode('.',$key);
-                $len = count($keys);
-                $conf = &self::$_configs[static::class];
-                for($i = 0; $i < $len; $i++){
-                    if(!isset($conf[$key])){
-                        if($i === $len - 1){
-                            //最后一项
-                            $conf[$key] = $value;
-                        }else{
-                            $conf[$key] = [];
-                        }
-                    }
-                    $conf = & $conf[$key];
-                }
-            }else{
-                self::$_configs[static::class][$key] = $value;
-            }
-        }
-
-        /**
-         * 检查类的初始化
-         * @param bool $do 未初始化时是否自动初始化
-         * @return bool 是否初始化
-         */
-        protected static function checkInit($do=true){
-            if(!isset(self::$_configs[static::class])){
-                if($do) {
-                    static::_init_class_();
-                }else{
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /**
-         * 读取用户配置
-         * @param string|array $name config item name,mapping to filename(not include suffix,and be careful with '.',it will replace with '/')
-         * @return array 返回配置数组，配置文件不存在是返回空数组
-         */
-        public static function load($name) {
-            $result = [];
-
-            $type = gettype($name);
-            switch ($type){
-                case 'array'://for multiple config
-                    foreach($name as $item){
-                        $temp = self::load($item);
-                        $temp and $result = Utils::merge($result,$temp);
-                    }
-                    break;
-                case 'string':
-                    if(false !== strpos('.', $name)){//if == 0,it will worked nice
-                        $name = str_replace('.', '/' ,$name);
-                    }
-                    $path = PATH_CONFIG."/{$name}.php";
-                    is_file($path) and $result = include $path;
-                    break;
-                default:
-            }
-            return $result;
-        }
-    }
     class Configger {
         /**
          * 配置类型
@@ -623,7 +427,7 @@ namespace PLite {
                 'PLite\\Core\\Dao',
                 'PLite\\Library\\View',
             ],
-            'USER_CONFIG_PATH'  => PATH_RUNTIME.'/Config/',
+            'USER_CONFIG_PATH'  => PATH_RUNTIME.'/DynamicConfig/',
         ];
         /**
          * @var array
@@ -676,47 +480,7 @@ namespace PLite {
         }
 
         /**
-         * read the user-defined config
-         * @param string $identify config identify
-         * @return array|null 返回配置数组，不存在指定配置时候返回null
-         */
-        public static function read($identify){
-            static $_cache = [];
-            if(!isset($_cache[$identify])) {
-                $path = self::id2path($identify,true);
-                if(null === $path) return null;//文件不存在，返回null
-                $content = file_get_contents($path);
-                if(null === $content) return null;
-                $config = @unserialize($content);//无法反序列化的内容会抛出错误E_NOTICE，使用@进行忽略，但是不要忽略返回值
-                $_cache[$identify] = false === $config ? null : $config;
-            }
-            return $_cache[$identify];
-        }
-
-        /**
-         * write user-config to file
-         */
-        public static function write(){
-
-        }
-
-        /**
-         * 将配置项转换成配置文件路径
-         * @param string $item 配置项
-         * @param mixed $check 检查文件是否存在
-         * @return null|string 返回配置文件路径，参数二位true并且文件不存在时返回null
-         */
-        protected static function id2path($item,$check=true){
-            $dir = self::$_config['USER_CONFIG_PATH'];
-            if(!is_dir($dir) or !(is_readable($dir) and is_writable($dir))) mkdir($dir,0744,true);
-            $path = "{$dir}/{$item}.php";
-            return ($check and !is_file($path))?null:$path;
-        }
-
-        public static function cache(){}
-
-        /**
-         * 加载配置文件
+         * parse config file into php array
          * @param string $path 配置文件的路径
          * @param string|null $type 配置文件的类型,参数为null时根据文件名称后缀自动获取
          * @param callable $parser 配置解析方法 有些格式需要用户自己解析
@@ -740,6 +504,71 @@ namespace PLite {
             }
         }
 
+        /**
+         * read static config in path PATH_CONFIG
+         * which config name like 'a.b'(no suffix)
+         * @param string|array $name config item name,mapping to filename(not include suffix,and be careful with '.',it will replace with '/')
+         * @return array it will return the config in file and will return empty array if not exit config file
+         */
+        public static function readStatic($name) {
+            $result = [];
+            if(is_array($name)){ //for multiple config,behinder will cover aheader
+                foreach($name as $item){
+                    $temp = self::load($item);
+                    $temp and $result = Utils::merge($result,$temp);
+                }
+            }elseif(is_string($name)){
+                false === strpos('.', $name) and $name = str_replace('.', '/' ,$name);//it will worked nice if position is 0
+                $path = PATH_CONFIG."/{$name}.php";
+                Storage::exits($path) and $result = self::parse($path);
+            }else{
+                PLiteException::throwing('Invalid param ,expect string or array',$name);
+            }
+            return $result;
+        }
+
+        /**
+         * read the user-defined config in PATH_RUNTIME
+         * @param string $identify config identify
+         * @return array
+         */
+        public static function readDynamic($identify){
+            static $_cache = [];
+            if(!isset($_cache[$identify])) {
+                $path = self::id2path($identify,true);
+                if(null === $path) return [];//文件不存在，返回null
+                $content = file_get_contents($path);//get false in failure
+                if(false === $content) return [];
+                $config = @unserialize($content);//无法反序列化的内容会抛出错误E_NOTICE，使用@进行忽略，但是不要忽略返回值
+                $_cache[$identify] = false === $config ? [] : $config;
+            }
+            return $_cache[$identify];
+        }
+
+        /**
+         * write user-config to file
+         * @param string $identify
+         * @param array $config
+         */
+        public static function writeDynamic($identify,array $config){
+            $path = self::id2path($identify,false);
+            Storage::write($path,serialize($config));
+        }
+
+        /**
+         * 将配置项转换成配置文件路径
+         * @param string $item 配置项
+         * @param mixed $check 检查文件是否存在
+         * @return false|string 返回配置文件路径，参数二位true并且文件不存在时返回null
+         */
+        private static function id2path($item,$check=true){
+            $dir = self::$_config['USER_CONFIG_PATH'];
+            if(is_readable($dir) and is_writable($dir)){
+                $path = "{$dir}/{$item}.php";
+                return $check || is_file($path)?$path:false;
+            }
+            return false;
+        }
     }
 
     /**
@@ -1096,6 +925,40 @@ namespace PLite {
         }
 
         /**
+         * 将参数序列装换成参数数组，应用Router模块的配置
+         * @param string $params 参数字符串
+         * @param string $ppb
+         * @param string $pkvb
+         * @return array
+         */
+        public static function fetchKeyValuePair($params,$ppb='/',$pkvb='/'){//解析字符串成数组
+            $pc = [];
+            if($ppb !== $pkvb){//使用不同的分割符
+                $parampairs = explode($ppb,$params);
+                foreach($parampairs as $val){
+                    $pos = strpos($val,$pkvb);
+                    if(false === $pos){
+                        //非键值对，赋值数字键
+                    }else{
+                        $key = substr($val,0,$pos);
+                        $val = substr($val,$pos+strlen($pkvb));
+                        $pc[$key] = $val;
+                    }
+                }
+            }else{//使用相同的分隔符
+                $elements = explode($ppb,$params);
+                $count = count($elements);
+                for($i=0; $i<$count; $i += 2){
+                    if(isset($elements[$i+1])){
+                        $pc[$elements[$i]] = $elements[$i+1];
+                    }else{
+                        //单个将被投入匿名参数,先废弃
+                    }
+                }
+            }
+            return $pc;
+        }
+        /**
          * 自动从运行环境中获取URI
          * 直接访问：
          *  http://www.xor.com:8056/                => '/'
@@ -1230,102 +1093,6 @@ namespace PLite {
             return (IS_WINDOWS ? stripos($path, $scope) : strpos($path, $scope)) === 0;
         }
 
-        //-------------------------------------------------------------------------------------
-        //--------------------------- For Router and url Creater ----------------------------------------------
-        //-------------------------------------------------------------------------------------
-        /**
-         * 模块序列转换成数组形式
-         * 且数组形式的都是大写字母开头的单词形式
-         * @param string|array $modules 模块序列
-         * @param string $mmbridge 模块之间的分隔符
-         * @return array
-         * @throws \Exception
-         */
-        public static function toModulesArray($modules, $mmbridge='/'){
-            if(is_string($modules)){
-                if(false === stripos($modules,$mmbridge)){
-                    $modules = [$modules];
-                }else{
-                    $modules = explode($mmbridge,$modules);
-                }
-            }
-            is_array($modules) or PLiteException::throwing('Parameter should be an array!');
-            return array_map(function ($val) {
-                return Utils::styleStr($val,1);
-            }, $modules);
-        }
-
-        /**
-         * 模块学列数组转换成模块序列字符串
-         * 模块名称全部小写化
-         * @param array|string $modules 模块序列
-         * @param string $mmb
-         * @return string
-         * @throws PLiteException
-         */
-        public static function toModulesString($modules,$mmb='/'){
-            if(is_array($modules)){
-                $modules = implode($mmb,$modules);
-            }
-            is_string($modules) or PLiteException::throwing('Invalid Parameters!');
-            return trim($modules,' /');
-        }
-        /**
-         * 将参数序列装换成参数数组，应用Router模块的配置
-         * @param string $params 参数字符串
-         * @param string $ppb
-         * @param string $pkvb
-         * @return array
-         */
-        public static function toParametersArray($params,$ppb='/',$pkvb='/'){//解析字符串成数组
-            $pc = [];
-            if($ppb !== $pkvb){//使用不同的分割符
-                $parampairs = explode($ppb,$params);
-                foreach($parampairs as $val){
-                    $pos = strpos($val,$pkvb);
-                    if(false === $pos){
-                        //非键值对，赋值数字键
-                    }else{
-                        $key = substr($val,0,$pos);
-                        $val = substr($val,$pos+strlen($pkvb));
-                        $pc[$key] = $val;
-                    }
-                }
-            }else{//使用相同的分隔符
-                $elements = explode($ppb,$params);
-                $count = count($elements);
-                for($i=0; $i<$count; $i += 2){
-                    if(isset($elements[$i+1])){
-                        $pc[$elements[$i]] = $elements[$i+1];
-                    }else{
-                        //单个将被投入匿名参数,先废弃
-                    }
-                }
-            }
-            return $pc;
-        }
-
-        /**
-         * 将参数数组转换成参数序列，应用Router模块的配置
-         * @param array $params 参数数组
-         * @param string $ppb
-         * @param string $pkvb
-         * @return string
-         */
-        public static function toParametersString(array $params=null,$ppb='/',$pkvb='/'){
-            //希望返回的是字符串是，返回值是void，直接修改自$params
-            if(empty($params)) return '';
-            $temp = '';
-            if($params){
-                foreach($params as $key => $val){
-                    $temp .= "{$key}{$pkvb}{$val}{$ppb}";
-                }
-                return substr($temp,0,strlen($temp) - strlen($ppb));
-            }else{
-                return $temp;
-            }
-        }
-
     }
 
     /**
@@ -1393,7 +1160,7 @@ namespace PLite {
             null === $ctrler    and $ctrler = self::$_controller;
             null === $action    and $action = self::$_action;
 
-            Debugger::trace($modules,$ctrler,$action);
+            DEBUG_MODE_ON and Debugger::trace($modules,$ctrler,$action);
 
             $modulepath = PATH_BASE."/Application/{$modules}";//linux 不识别 \\
 
@@ -1424,7 +1191,7 @@ namespace PLite {
                 PLiteException::throwing($className, $action);
             }
 
-            Debugger::status('execute_end');
+            DEBUG_MODE_ON and Debugger::status('execute_end');
             return $result;
         }
 
@@ -1501,82 +1268,6 @@ namespace PLite {
         const MESSAGE_TYPE_SUCCESS = 1;
         const MESSAGE_TYPE_WARNING = -1;
         const MESSAGE_TYPE_FAILURE = 0;
-
-        /**
-         * 向浏览器客户端发送不缓存命令
-         * @param bool $clean clean the output before,important and default to true
-         * @return void
-         */
-        public static function sendNocache($clean=true){
-            $clean and self::cleanOutput();
-            header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-            header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-            header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-            header( 'Cache-Control: post-check=0, pre-check=0', false );
-            header( 'Pragma: no-cache' );
-        }
-
-        /**
-         * HTTP Protocol defined status codes
-         * @param int $code
-         */
-        public static function sendHttpStatus($code) {
-            static $_status = array(
-                // Informational 1xx
-                100 => 'Continue',
-                101 => 'Switching Protocols',
-
-                // Success 2xx
-                200 => 'OK',
-                201 => 'Created',
-                202 => 'Accepted',
-                203 => 'Non-Authoritative Information',
-                204 => 'No Content',
-                205 => 'Reset Content',
-                206 => 'Partial Content',
-
-                // Redirection 3xx
-                300 => 'Multiple Choices',
-                301 => 'Moved Permanently',
-                302 => 'Found',  // 1.1
-                303 => 'See Other',
-                304 => 'Not Modified',
-                305 => 'Use Proxy',
-                // 306 is deprecated but reserved
-                307 => 'Temporary Redirect',
-
-                // Client Error 4xx
-                400 => 'Bad Request',
-                401 => 'Unauthorized',
-                402 => 'Payment Required',
-                403 => 'Forbidden',
-                404 => 'Not Found',
-                405 => 'Method Not Allowed',
-                406 => 'Not Acceptable',
-                407 => 'Proxy Authentication Required',
-                408 => 'Request Timeout',
-                409 => 'Conflict',
-                410 => 'Gone',
-                411 => 'Length Required',
-                412 => 'Precondition Failed',
-                413 => 'Request Entity Too Large',
-                414 => 'Request-URI Too Long',
-                415 => 'Unsupported Media Type',
-                416 => 'Requested Range Not Satisfiable',
-                417 => 'Expectation Failed',
-
-                // Server Error 5xx
-                500 => 'Internal Server Error',
-                501 => 'Not Implemented',
-                502 => 'Bad Gateway',
-                503 => 'Service Unavailable',
-                504 => 'Gateway Timeout',
-                505 => 'HTTP Version Not Supported',
-                509 => 'Bandwidth Limit Exceeded'
-            );
-            self::cleanOutput();
-            isset($_status[$code]) and header('HTTP/1.1 '.$code.' '.$_status[$code]);
-        }
 
         /**
          * 清空输出缓存
@@ -1822,7 +1513,7 @@ namespace PLite {
          * @return void
          */
         private static function parseInAPI(){
-            Debugger::status('fetchurl_in_topspeed_begin');
+            DEBUG_MODE_ON and Debugger::status('fetchurl_in_topspeed_begin');
             $vars = [
                 self::$_config['API_MODULES_VARIABLE'],
                 self::$_config['API_CONTROLLER_VARIABLE'],
@@ -1838,7 +1529,7 @@ namespace PLite {
             unset($_GET[$vars[0]],$_GET[$vars[1]],$_GET[$vars[2]]);
             self::$result['p'] = $_GET;
 
-            Debugger::status('fetchurl_in_topspeed_end');
+            DEBUG_MODE_ON and Debugger::status('fetchurl_in_topspeed_end');
         }
 
         /**
@@ -1847,7 +1538,7 @@ namespace PLite {
          * @return void
          */
         private static function parseInCommon($uri){
-            Debugger::status('parseurl_in_common_begin');
+            DEBUG_MODE_ON and Debugger::status('parseurl_in_common_begin');
             $bridges = [
                 'mm'  => self::$_config['MM_BRIDGE'],
                 'mc'  => self::$_config['MC_BRIDGE'],
@@ -1876,8 +1567,10 @@ namespace PLite {
             self::$result = array_merge(self::$result,$mcaparsed);
 
             //-- 解析参数部分 --//
-            self::$result['p'] = Utils::toParametersArray($pparts,$bridges['pp'],$bridges['pkv']);
-            Debugger::status('parseurl_in_common_end');
+
+
+            self::$result['p'] = Utils::fetchKeyValuePair($pparts,$bridges['pp'],$bridges['pkv']);
+            DEBUG_MODE_ON and Debugger::status('parseurl_in_common_end');
         }
 
         /**
@@ -1977,6 +1670,218 @@ namespace PLite {
                 //伪装的后缀存在且只出现在最后的位置时
                 $uri = substr($uri,0,$position);
             }
+        }
+    }
+
+
+    /**
+     * Class D
+     * Making library driver based
+     * @package PLite
+     */
+    trait D{
+        /**
+         * @var array drivers
+         */
+        protected static $_ds= [];
+
+        /**
+         * set or get the current driver in use
+         * @param string|null $driver it will get paticular driver if param 1 is set
+         * @param mixed $params parameters for driver construct
+         * @return array|null it will resturn null if no driver exist
+         */
+        public static function using($driver=null, $params=null){
+            $clsnm = static::class;
+            isset(self::$_ds[$clsnm]) or self::$_ds[$clsnm] = [];
+            if(null === $driver){
+                //get the first element
+                $driver = end(self::$_ds[$clsnm]);
+                return  false === $driver?null:$driver;
+            }
+            $key = DRIVER_KEY_WITH_PARAM?md5($driver.serialize($params)):$driver;
+            if(isset(self::$_ds[$clsnm][$key])){
+                //put in the tail without constructor
+                $temp = self::$_ds[$clsnm][$key];
+                unset(self::$_ds[$clsnm][$key]);
+                self::$_ds[$clsnm][$key] = $temp;
+            }else{
+                //set element which will be in the end
+                self::$_ds[$clsnm][$key] = new $driver($params);
+            }
+            return self::$_ds[$clsnm][$key];
+        }
+    }
+
+    /**
+     * Class C
+     * Make the library config to be configured
+     * @package PLite
+     */
+    trait C {
+        /**
+         * 类的静态配置
+         * @var array
+         */
+        protected static $_cs = [];
+
+        /**
+         * initialize the class with config
+         * :eg the name of this method is much special to make class initialize automaticlly
+         * @param null|string $clsnm class-name
+         * @return void
+         */
+        final public static function initializationize($clsnm=null){
+            $clsnm or $clsnm = static::class;
+            if(!isset(self::$_cs[$clsnm])){
+                //get convention
+                self::$_cs[$clsnm] = Utils::constant($clsnm,'CONF_CONVENTION',[]);
+
+                //load the outer config
+                $conf = Configger::load($clsnm);
+                $conf and is_array($conf) and self::$_cs[$clsnm] = Utils::merge(self::$_cs[$clsnm],$conf,true);
+            }
+        }
+
+        /**
+         * @param string $names
+         * @param mixed $replacement 如果参数一指定的配置项不存在时默认代替的配置项
+         * @return mixed|null
+         */
+        private static function &_search_position($names,$replacement=null){
+            $static_config = &self::$_cs[static::class];
+            if(strpos($names,'.')) {//exist and the position great than  0
+                $names = explode('.', $names);
+                $len = count($names);
+                for ($i = 0; $i < $len; $i++) {
+                    $name = $names[$i];
+                    if (isset($static_config[$name])) {
+                        //it will return if is the last one
+                        if ($i === $len - 1) {
+                            $names = $name;
+                            break;
+                        }
+                    } else {
+                        return $replacement;
+                    }
+                    $static_config = &$static_config[$name];
+                }
+            }
+            return isset($static_config[$names])?$static_config[$names]:$replacement;
+        }
+
+        /**
+         * 获取该类的配置（经过用户自定义后）
+         * @param string|null $names 配置项名称
+         * @param mixed $replacement 如果参数一指定的配置项不存在时默认代替的配置项
+         * @return array
+         */
+        final protected static function getConfig($names=null, $replacement=null){
+            $clsnm = static::class;
+            isset(self::$_cs[$clsnm]) or self::$_cs[$clsnm] = [];
+            if(null !== $names){
+                return self::_search_position($names,$replacement);
+            }
+            return self::$_cs[$clsnm];
+        }
+
+        /**
+         * set template
+         * @param string $names
+         * @param mixed $value
+         * @return bool|mixed return the value what is set
+         */
+        final protected static function setConfig($names, $value){
+            $clsnm = static::class;
+            isset(self::$_cs[$clsnm]) or self::$_cs[$clsnm] = [];
+            $place = &self::_search_position($names);
+            return $place !== null?($place = $value):false;
+        }
+
+    }
+
+    /**
+     * Class I
+     * Make single instance or identify-based instance possible
+     * @package PLite
+     */
+    trait I {
+
+        protected static $_is = [];
+
+        /**
+         * Get instance by identify
+         * @param string|int $identify
+         * @return \stdClass
+         */
+        public static function getInstance($identify=0){
+            $clsnm = static::class;
+            isset(self::$_is[$clsnm]) or self::$_is[$clsnm] = [];
+            if(!isset(self::$_is[$clsnm][$identify])){
+                self::$_is[$clsnm][$identify] = new $clsnm($identify);
+            }
+            return self::$_is[$clsnm][$identify];
+        }
+
+    }
+
+    /**
+     * Class Lite
+     * @property array $config
+     *  'sample class' => [
+     *      'PRIOR_INDEX' => 0,//默认驱动ID，类型限定为int或者string
+     *      'DRIVER_CLASS_LIST' => [],//驱动类的列表
+     *      'DRIVER_CONFIG_LIST' => [],//驱动类列表参数
+     *  ]
+     * @package PLite
+     */
+    abstract class Lite {
+        use C , I ;
+        /**
+         * 类实例的驱动
+         * @var object
+         */
+        private static $_drivers = [
+            /************************************
+            'sample class' => Object
+             ************************************/
+        ];
+
+        /**
+         * it maybe a waste of performance
+         * @param string|int|null $identify it will get the default index if set to null
+         * @return null|object
+         */
+        protected static function driver($identify=null){
+            $clsnm = static::class;
+            isset(self::$_drivers[$clsnm]) or self::$_drivers[$clsnm] = [];
+            $config = null;
+
+            //get default identify
+            if(null === $identify) {
+                $config = static::getConfig();
+                if(isset($config['PRIOR_INDEX'])){
+                    $identify = $config['PRIOR_INDEX'];
+                }else{
+                    PLiteException::throwing('No driver identify been specified !');
+                }
+            }
+
+            //instance a driver for this identify
+            if(!isset(self::$_drivers[$clsnm][$identify])){
+                $config or $config = static::getConfig();
+                if(isset($config['DRIVER_CLASS_LIST'][$identify])){
+                    //获取驱动类名称
+                    $driver = $config['DRIVER_CLASS_LIST'][$identify];
+                    $param  = empty($config['DRIVER_CONFIG_LIST'][$identify])?null:$config['DRIVER_CONFIG_LIST'][$identify];
+                    //设置实例驱动
+                    self::$_drivers[$clsnm][$identify] = $param? new $driver($param): new $driver($param);
+                }else{
+                    PLiteException::throwing("No driver for identify '$identify'!");
+                }
+            }
+
+            return self::$_drivers[$clsnm][$identify];
         }
     }
 }

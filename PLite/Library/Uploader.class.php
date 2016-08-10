@@ -64,7 +64,7 @@ class Uploader extends Lite{
     public function __construct($identify=null){
         $this->config = self::getConfig();
         $this->apply();
-        $this->_driver = self::getDriver();
+        $this->_driver = self::driver();
     }
 
     private function apply($config=null){

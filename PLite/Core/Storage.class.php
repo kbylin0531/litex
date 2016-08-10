@@ -59,7 +59,7 @@ class Storage extends Lite {
      * @return string|array|false|null 返回文件时间内容;返回null表示在访问的范围之外
      */
     public static function read($filepath, $fileEncoding=null,$recursion=false){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->read($filepath,$fileEncoding,$recursion);
     }
 
@@ -72,7 +72,7 @@ class Storage extends Lite {
      * @return bool 是否成功写入|返回null表示在访问的范围之外
      */
     public static function write($filepath,$content,$write_encode='UTF-8',$text_encode='UTF-8') {
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->write($filepath,$content,$write_encode,$text_encode);
     }
 
@@ -85,7 +85,7 @@ class Storage extends Lite {
      * @return bool|null 是否成功写入,返回null表示无法访问该范围的文件
      */
     public static function append($filename,$content,$write_encode='UTF-8'){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->append($filename,$content,$write_encode);
     }
 
@@ -95,7 +95,7 @@ class Storage extends Lite {
      * @return int 0表示目录不存在,<0表示是目录 >0表示是文件,可以用Storage的三个常量判断
      */
     public static function has($filename){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->has($filename);
     }
 
@@ -108,7 +108,7 @@ class Storage extends Lite {
      * @return bool 是否成功|返回null表示在访问的范围之外
      */
     public static function touch($filename, $mtime = null, $atime = null){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->touch($filename,$mtime,$atime);
     }
 
@@ -119,7 +119,7 @@ class Storage extends Lite {
      * @return bool 是否成功删除|返回null表示在访问的范围之外
      */
     public static function unlink($filename,$recursion=false){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->unlink($filename,$recursion);
     }
 
@@ -130,7 +130,7 @@ class Storage extends Lite {
      * @return int|bool|null 如果是修改时间的操作返回的bool;如果是获取修改时间,则返回Unix时间戳;返回null表示在访问的范围之外
      */
     public static function mtime($filepath,$mtime=null){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->mtime($filepath,$mtime);
     }
 
@@ -140,7 +140,7 @@ class Storage extends Lite {
      * @return int|false|null 按照字节计算的单位;返回null表示在访问的范围之外
      */
     public static function size($filename){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->size($filename);
     }
 
@@ -152,7 +152,7 @@ class Storage extends Lite {
      * @return bool|null 返回null表示在访问的范围之外
      */
     public static function mkdir($fullpath,$auth = 0755){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->mkdir($fullpath,$auth);
     }
 
@@ -163,7 +163,7 @@ class Storage extends Lite {
      * @return bool 是否成功修改了该文件|返回null表示在访问的范围之外
      */
     public static function chmod($filepath,$auth = 0755){
-        self::$driver or self::$driver = self::getDriver();
+        self::$driver or self::$driver = self::driver();
         return self::$driver->chmod($filepath,$auth);
     }
 

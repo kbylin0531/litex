@@ -103,7 +103,7 @@ class Session extends Lite{
             self::cacheLimiter($config['LIMITER_TYPE']);
         }
         self::begin();
-        self::$driver = self::getDriver();
+        self::$driver = self::driver();
     }
 
     /**

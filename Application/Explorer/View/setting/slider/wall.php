@@ -13,7 +13,7 @@
     {$Think.L.setting_wall_diy} <input id="wall_url" type="text" style="width: 60%;" 
     <?php $w=$config['user']['wall']; if(strlen($w)>3){echo 'value="'.$w.'"';} ?>
     /> 
-    <a onclick="Setting.tools();" href="javascript:void(0);"class="button" style="padding:5px 1.5em;margin-left:20px;">
+    <a onclick="Setting.tools();" href="javascript:void(0);" class="button" style="padding:5px 1.5em;margin-left:20px;">
     {$Think.L.button_set}</a> 
     <div style="font-size: 12px;color:#aaa;">{$Think.L.setting_wall_info}</div>
 </div>

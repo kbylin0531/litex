@@ -64,7 +64,6 @@ class Configger extends Lite{
      */
     public static function setGlobalCache(array $cachedata=null, $expire=null){
         if(!isset($cachedata,$expire)){
-            self::checkInit(true);
             $config = self::getConfig();
             if(!isset($config['CONFIG_CACHE_LIST'],$config['CONFIG_CACHE_EXPIRE'])){
                 //检验获取的配置项是否合理

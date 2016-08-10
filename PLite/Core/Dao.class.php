@@ -109,7 +109,7 @@ class Dao extends Lite {
      * @param string|int $index
      */
     private function __construct($index){
-        $this->_driver = self::getDriver($index);
+        $this->_driver = self::driver($index);
     }
 
     /**

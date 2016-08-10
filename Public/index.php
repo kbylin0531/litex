@@ -6,10 +6,10 @@ const LITE_ON = false;
 const INSPECT_ON = false;
 
 include '../PLite/entry.php';
+//include '../PLite/entry.lite.php';
 
 function wechat($id){
     $wechat = new \Application\System\Library\Service\MessageService($id);
-    \PLite\Util\ExtDebugger::closeTrace();
     if(isset($_GET['echostr'])){//valid
         if($wechat->checkSignature()){
             exit($_GET['echostr']);

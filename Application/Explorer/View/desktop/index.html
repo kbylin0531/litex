@@ -64,23 +64,22 @@
 
 </block>
 <block name="script">
-	<script src="__PUBLIC__/index.php?user/common_js&type=desktop"></script>
+	<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
+	<script src="index.php?user/common_js&type=desktop&id=<?php echo rand_string(8);?>"></script>
+	<script type="text/javascript">
+		G.this_path = "<?php echo MYHOME.'desktop/';?>";
+		seajs.config({
+			base: "<?php echo STATIC_PATH;?>js/",
+			preload: ["lib/jquery-1.8.0.min"],
+			map:[
+				[ /^(.*\.(?:css|js))(.*)$/i,'$1$2?ver='+G.version]
+			]
+		});
+		seajs.use("app/src/desktop/main");
+	</script>
 </block>
 <block name="style">
 	<link href="__PUBLIC__/js/lib/picasa/style/style.css" rel="stylesheet"/>
-	<link href="__PUBLIC__/css/skin/<?php echo $config['user']['theme}app_desktop.css" rel="stylesheet" id='link_css_list'/>
+	<link href="__PUBLIC__/css/skin/{$Think.L.config.user']['theme}app_desktop.css" rel="stylesheet" id='link_css_list'/>
 </block>
-
-<script src="__PUBLIC__/js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script type="text/javascript">
-	G.this_path = "<?php echo MYHOME.'desktop/';?>";
-	seajs.config({
-		base: "__PUBLIC__/js/",
-		preload: ["lib/jquery-1.8.0.min"],
-		map:[
-			[ /^(.*\.(?:css|js))(.*)$/i,'$1$2?ver='+G.version]
-		]
-	});
-	seajs.use("app/src/desktop/main");
-</script>
 

@@ -67,6 +67,102 @@ final class SEK {
         return $path;
     }
 
+    //-------------------------------------------------------------------------------------
+    //--------------------------- For Router and url Creater ----------------------------------------------
+    //-------------------------------------------------------------------------------------
+    /**
+     * 模块序列转换成数组形式
+     * 且数组形式的都是大写字母开头的单词形式
+     * @param string|array $modules 模块序列
+     * @param string $mmbridge 模块之间的分隔符
+     * @return array
+     * @throws \Exception
+     */
+    public static function toModulesArray($modules, $mmbridge='/'){
+        if(is_string($modules)){
+            if(false === stripos($modules,$mmbridge)){
+                $modules = [$modules];
+            }else{
+                $modules = explode($mmbridge,$modules);
+            }
+        }
+        is_array($modules) or PLiteException::throwing('Parameter should be an array!');
+        return array_map(function ($val) {
+            return Utils::styleStr($val,1);
+        }, $modules);
+    }
+
+    /**
+     * 模块学列数组转换成模块序列字符串
+     * 模块名称全部小写化
+     * @param array|string $modules 模块序列
+     * @param string $mmb
+     * @return string
+     * @throws PLiteException
+     */
+    public static function toModulesString($modules,$mmb='/'){
+        if(is_array($modules)){
+            $modules = implode($mmb,$modules);
+        }
+        is_string($modules) or PLiteException::throwing('Invalid Parameters!');
+        return trim($modules,' /');
+    }
+    /**
+     * 将参数序列装换成参数数组，应用Router模块的配置
+     * @param string $params 参数字符串
+     * @param string $ppb
+     * @param string $pkvb
+     * @return array
+     */
+    public static function toParametersArray($params,$ppb='/',$pkvb='/'){//解析字符串成数组
+        $pc = [];
+        if($ppb !== $pkvb){//使用不同的分割符
+            $parampairs = explode($ppb,$params);
+            foreach($parampairs as $val){
+                $pos = strpos($val,$pkvb);
+                if(false === $pos){
+                    //非键值对，赋值数字键
+                }else{
+                    $key = substr($val,0,$pos);
+                    $val = substr($val,$pos+strlen($pkvb));
+                    $pc[$key] = $val;
+                }
+            }
+        }else{//使用相同的分隔符
+            $elements = explode($ppb,$params);
+            $count = count($elements);
+            for($i=0; $i<$count; $i += 2){
+                if(isset($elements[$i+1])){
+                    $pc[$elements[$i]] = $elements[$i+1];
+                }else{
+                    //单个将被投入匿名参数,先废弃
+                }
+            }
+        }
+        return $pc;
+    }
+
+    /**
+     * 将参数数组转换成参数序列，应用Router模块的配置
+     * @param array $params 参数数组
+     * @param string $ppb
+     * @param string $pkvb
+     * @return string
+     */
+    public static function toParametersString(array $params=null,$ppb='/',$pkvb='/'){
+        //希望返回的是字符串是，返回值是void，直接修改自$params
+        if(empty($params)) return '';
+        $temp = '';
+        if($params){
+            foreach($params as $key => $val){
+                $temp .= "{$key}{$pkvb}{$val}{$ppb}";
+            }
+            return substr($temp,0,strlen($temp) - strlen($ppb));
+        }else{
+            return $temp;
+        }
+    }
+
     /**
      * 调用位置
      */
