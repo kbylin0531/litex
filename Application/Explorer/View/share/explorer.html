@@ -1,37 +1,8 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" scroll="no">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="renderer" content="webkit">
-	<title><?php echo $share_info['name'].' - '.$L['share_title'].' - '.$L['kod_name'].$L['kod_power_by}</title>
-<<<<<<< HEAD:Application/Explorer/View/share/explorer.html
-	<link rel="Shortcut Icon" href="__PUBLIC__/images/favicon.ico">
-	<link href="__PUBLIC__/js/lib/picasa/style/style.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
-	<link href="__PUBLIC__/css/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
-=======
-	<link rel="Shortcut Icon" href="<?php echo STATIC_PATH;?>images/favicon.ico">
-	<link href="<?php echo STATIC_PATH;?>js/lib/picasa/style/style.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
-	<link href="<?php echo STATIC_PATH;?>style/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
->>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/share/explorer.php
-	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome.css">
-	<!--[if IE 7]>
-	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome-ie7.css">
-	<![endif]-->
+<extend file="../basic/general.html"/>
+<block name="body">
 
-	
-	<link href="__PUBLIC__/css/skin/<?php echo $config_theme;?>app_explorer.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet" id='link_css_list'/>
-	
-</head>
-<style>
-.frame-main .frame-left {bottom: 0px;}
-<?php if(isset($_GET['type'])){
-	echo '.topbar{display: none;}.frame-header{top:0;}.frame-main{top:50px;}';
-} ?>
-</style>
+	<include file="../common/navbar_share.html"/>
 
-
-<body style="overflow:hidden;" oncontextmenu="return core.contextmenu();">
-	<?php include(TEMPLATE.'common/navbar_share.html');?>
 	<div class="frame-header">
 		<div class="header-content">
 			<div class="header-left">
@@ -47,7 +18,7 @@
 					</button>
 				</div>
 			</div><!-- /header left -->
-			
+
 			<div class='header-middle'>
 				<button class="btn btn-default" id='home' title='{$Think.L.root_path}'>
 					<i class="font-icon icon-home"></i>
@@ -80,34 +51,34 @@
 					<div class="tools-left">
 						<!-- 文件功能 -->
 						<div class="btn-group btn-group-sm kod_path_tool">
-					        <button id='selectAll' class="btn btn-default" type="button">
-					        	<i class="font-icon icon-refresh"></i>{$Think.L.selectAll}
-					        </button> 
+							<button id='selectAll' class="btn btn-default" type="button">
+								<i class="font-icon icon-refresh"></i>{$Think.L.selectAll}
+							</button>
 							<button id='down' class="btn btn-default" type="button">
-					        	<i class="font-icon icon-download"></i>{$Think.L.download}
-					        </button>					        				        
+								<i class="font-icon icon-download"></i>{$Think.L.download}
+							</button>
 						</div>
 						<span class='msg'>{$Think.L.path_loading}</span>
 					</div>
 					<div class="tools-right tools_list">
 						<div class="btn-group btn-group-sm">
-						  <button id='set_icon' title="{$Think.L.list_icon}" type="button" class="btn btn-default">
-						  	<i class="font-icon icon-th"></i>
-						  </button>
-						  <button id='set_list' title="{$Think.L.list_list}" type="button" class="btn btn-default">
-						  	<i class="font-icon icon-list"></i>
-						  </button>
-						  <div class="btn-group btn-group-sm">
-						    <button id="set_theme" title="{$Think.L.setting_theme}" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
-						      <i class="font-icon icon-dashboard"></i>&nbsp;&nbsp;<span class="caret"></span>
-						    </button>
-						    <ul class="dropdown-menu pull-right dropdown-menu-theme fadein">
-							    <?php 
+							<button id='set_icon' title="{$Think.L.list_icon}" type="button" class="btn btn-default">
+								<i class="font-icon icon-th"></i>
+							</button>
+							<button id='set_list' title="{$Think.L.list_list}" type="button" class="btn btn-default">
+								<i class="font-icon icon-list"></i>
+							</button>
+							<div class="btn-group btn-group-sm">
+								<button id="set_theme" title="{$Think.L.setting_theme}" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+									<i class="font-icon icon-dashboard"></i>&nbsp;&nbsp;<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu pull-right dropdown-menu-theme fadein">
+									<?php
 									$tpl="<li class='list {this}' theme='{0}'><a href='javascript:void(0);'>{1}</a></li>\n";
 									echo getTplList(',',':',$config['setting_all']['themeall'],$tpl,$config['user']['theme'],'this');
-								?>
-						    </ul>
-						  </div>
+									?>
+								</ul>
+							</div>
 						</div>
 					</div>
 					<div style="clear:both"></div>
@@ -119,29 +90,25 @@
 			</div>
 		</div><!-- / frame-right end-->
 	</div><!-- / frame-main end-->
-<?php include(TEMPLATE.'common/footer.html');?>
-<<<<<<< HEAD:Application/Explorer/View/share/explorer.html
-<script src="__PUBLIC__/js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="./index.php?share/common_js&user=<?php echo $_GET['user}&sid=<?php echo $_GET['sid}&#=<?php echo rand_string(8);?>"></script>
-=======
-<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
-<script src="__PUBLIC__/index.php?share/common_js&user=<?php echo $_GET['user}&sid=<?php echo $_GET['sid}&#=<?php echo rand_string(8);?>"></script>
->>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/share/explorer.php
-<script type="text/javascript">
-	AUTH  = {'explorer:fileDownload':<?php echo $can_download;?>};
-	G.this_path = "<?php echo $dir;?>";
-	G.user = "<?php echo $_GET['user}";
-	G.sid = "<?php echo $_GET['sid}";
-	G.share_info = <?php echo json_encode($share_info);?>;
-	G.theme = "<?php echo $config_theme;?>";
-	seajs.config({
-		base: "__PUBLIC__/js/",
-		preload: ["lib/jquery-1.8.0.min"],
-		map:[
-			[ /^(.*\.(?:css|js))(.*)$/i,'$1$2?ver='+G.version]
-		]
-	});
-	seajs.use("app/src/share_explorer/main");
-</script>
-</body>
-</html>
+	<include file="../common/footer.html"/>
+</block>
+<block name="style">
+	<link href="__PUBLIC__/css/skin/simple/app_explorer.css" rel="stylesheet" id='link_css_list'/>
+
+	<style type="text/css">
+		.frame-main .frame-left {bottom: 0px;}
+		/*<?php if(isset($_GET['type'])){*/
+		.topbar{display: none;}.frame-header{top:0;}.frame-main{top:50px;}
+		<!--} ?>-->
+	</style>
+</block>
+<block name="script">
+	<script>
+		AUTH  = {'explorer:fileDownload':1};
+		G.this_path = "<?php echo $dir;?>";
+		G.user = "<?php echo $_GET['user}";
+		G.sid = "<?php echo $_GET['sid}";
+		//	G.share_info = <?php echo json_encode();?>;
+		G.theme = "<?php echo $config_theme;?>";
+	</script>
+</block>
