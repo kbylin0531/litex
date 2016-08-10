@@ -24,6 +24,8 @@ namespace {
 
     defined('FS_ENCODING')  or define('FS_ENCODING','GB2312');//file system encoding
 
+    const EXCEPTION_CLEAN = false;
+
 //---------------------------------- environment constant -------------------------------------//
     //It is different to thinkphp that the beginning time is the time of request comming
     //and ThinkPHP is just using the time of calling 'microtime(true)' which ignore the loading and parsing of "ThinkPHP.php" and its include files.
@@ -41,9 +43,9 @@ namespace {
     define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
     define('HTTP_PREFIX', (isset ($_SERVER ['HTTPS']) and $_SERVER ['HTTPS'] === 'on') ? 'https://' : 'http://' );
 //    define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
-    define('__PUBLIC__',empty($_SERVER['SERVER_PORT']) || 80 === $_SERVER['SERVER_PORT']?
+    define('__PUBLIC__',rtrim(empty($_SERVER['SERVER_PORT']) || 80 === $_SERVER['SERVER_PORT']?
         HTTP_PREFIX.$_SERVER['SERVER_NAME']:
-        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':80'.dirname($_SERVER['SCRIPT_NAME']));
+        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':80'.dirname($_SERVER['SCRIPT_NAME']),'/'));
 
 //---------------------------------- variable type constant ------------------------------//
     const TYPE_BOOL     = 'boolean';
@@ -165,7 +167,13 @@ namespace {
 
             Dispatcher::init(self::$_config['DISPATCHER']);
             //dispatch
-            Dispatcher::checkDefault($result['m'],$result['c'],$result['a']);
+            $ckres = Dispatcher::checkDefault($result['m'],$result['c'],$result['a']);
+
+            //在执行方法之前定义常量,为了能在控制器的构造函数中使用这三个常量
+            define('REQUEST_MODULE',$ckres['m']);//请求的模块
+            define('REQUEST_CONTROLLER',$ckres['c']);//请求的控制器
+            define('REQUEST_ACTION',$ckres['a']);//请求的操作
+
             Dispatcher::exec();
         }
 
@@ -1222,8 +1230,6 @@ namespace PLite {
             return (IS_WINDOWS ? stripos($path, $scope) : strpos($path, $scope)) === 0;
         }
 
-
-
         //-------------------------------------------------------------------------------------
         //--------------------------- For Router and url Creater ----------------------------------------------
         //-------------------------------------------------------------------------------------
@@ -1354,7 +1360,7 @@ namespace PLite {
          * @param string|array $modules
          * @param string $ctrler
          * @param string $action
-         * @return void
+         * @return array
          */
         public static function checkDefault($modules,$ctrler,$action){
             self::$_module      = $modules?$modules:self::$_config['INDEX_MODULE'];
@@ -1362,6 +1368,12 @@ namespace PLite {
             self::$_action      = $action?$action:self::$_config['INDEX_ACTION'];
 
             self::$_module and is_array(self::$_module) and self::$_module = implode('/',self::$_module);
+
+            return [
+                'm' => self::$_module,
+                'c' => self::$_controller,
+                'a' => self::$_action,
+            ];
         }
 
         public static function checkCache($modules=null,$ctrler=null,$action=null){
@@ -1389,11 +1401,6 @@ namespace PLite {
 
             //模块检测
             is_dir($modulepath) or PLiteException::throwing("Module '{$modules}' not found!");
-
-            //在执行方法之前定义常量,为了能在控制器的构造函数中使用这三个常量
-            define('REQUEST_MODULE',$modules);//请求的模块
-            define('REQUEST_CONTROLLER',$ctrler);//请求的控制器
-            define('REQUEST_ACTION',$action);//请求的操作
 
             //控制器名称及存实性检测
             $className = "Application\\{$modules}\\Controller\\{$ctrler}";
@@ -1701,6 +1708,11 @@ namespace PLite {
          */
         public static function parseRoute($url=null){
             $url or $url = $_SERVER['REQUEST_URI'];
+
+            if(strpos($url,'//') !== false){
+                //it may exist much more '/' in uri,remove it
+                $url = str_replace('//','/',$url);
+            }
 
             //静态路由
             if(self::$_config['STATIC_ROUTE_ON'] and self::$_config['STATIC_ROUTE_RULES']){

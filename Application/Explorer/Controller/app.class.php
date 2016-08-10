@@ -88,6 +88,15 @@ class app extends Controller{
         show_json($this->L['error_repeat'],false);
     }
 
+    public function install(){
+        $arr = array(4,5,7,7,7,10,11,12);
+        $bg = $arr[mt_rand(0,count($arr)-1)];
+        $this->assign([
+            'bg'    => $bg,
+        ]);
+        $this->display('install.html');
+    }
+
     /**
      * 编辑
      */

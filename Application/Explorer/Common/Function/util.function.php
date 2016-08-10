@@ -228,14 +228,5 @@ function is_wap(){
     }
     return false;
 }
-function user_logout(){
-    setcookie('PHPSESSID', '', time()-3600,'/'); 
-    setcookie('kod_name', '', time()-3600); 
-    setcookie('kod_token', '', time()-3600);
-    setcookie('kod_user_language', '', time()-3600);
-    session_destroy();
-    header('location:./index.php?user/login');
-    exit;
-}
 
 

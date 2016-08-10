@@ -3,15 +3,24 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>{$Think.L.ui_editor'].' - '.$L['kod_name'].$L['kod_power_by}</title>
+<<<<<<< HEAD:Application/Explorer/View/editor/editor.html
 	<link rel="Shortcut Icon" href="__PUBLIC__/images/favicon.ico">
 	<link href="__PUBLIC__/css/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/><link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome.css">
+=======
+	<link rel="Shortcut Icon" href="<?php echo STATIC_PATH;?>images/favicon.ico">
+	<link href="<?php echo STATIC_PATH;?>style/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/><link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome.css">
+>>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/editor/editor.php
 	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome.css">
 	<!--[if IE 7]>
 	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome-ie7.css">
 	<![endif]-->
 	
 	
+<<<<<<< HEAD:Application/Explorer/View/editor/editor.html
 	<link href="__PUBLIC__/css/skin/<?php echo $config['user']['theme}app_editor.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet" id='link_css_list'/>
+=======
+	<link href="<?php echo STATIC_PATH;?>style/skin/<?php echo $config['user']['theme}app_editor.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet" id='link_css_list'/>
+>>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/editor/editor.php
 	
 </head>
 
@@ -41,14 +50,19 @@
 				<div class="menuTreeFolder"></div>
 				<div class="menuTreeFile"></div>				
 				<div class ='frame'>
-					 <iframe name="OpenopenEditor" src="./index.php?editor/edit" style="width:100%;height:100%;border:0;" frameborder=0></iframe>
+					 <iframe name="OpenopenEditor" src="__PUBLIC__/index.php?editor/edit" style="width:100%;height:100%;border:0;" frameborder=0></iframe>
 				</div>	
 			</div>
 		</div><!-- / frame-right end-->
 	</div><!-- / frame-main end-->
 <?php include(TEMPLATE.'common/footer.html');?>
+<<<<<<< HEAD:Application/Explorer/View/editor/editor.html
 <script src="__PUBLIC__/js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
 <script src="./index.php?user/common_js#id=<?php echo rand_string(8);?>"></script>
+=======
+<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
+<script src="__PUBLIC__/index.php?user/common_js#id=<?php echo rand_string(8);?>"></script>
+>>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/editor/editor.php
 <script type="text/javascript">
 	G.project = "<?php echo (isset($_GET['project'])?$_GET['project']:'') ;?>";
 	seajs.config({

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!--user login-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -57,3 +58,44 @@
 </script>
 </body>
 </html>
+=======
+<extend file="../basic/mobile.html"/>
+<block name="body">
+    <div class="loginbox">
+        <div class="title">
+            <div class="logo"><i class="icon-cloud"></i>{$Think.L.kod_name}</div>
+            <div class='info'>{$Think.L.kod_name_desc}</div>
+        </div>
+        <div class="form">
+            <div class="inputs">
+                <div><span>{$Think.L.username}：</span><input id="username" name='name' type="text"
+                                                             placeholder="{$Think.L.username}" required/></div>
+                <div><span>{$Think.L.password}：</span><input id="password" name='password' type="password"
+                                                             placeholder="{$Think.L.password}" required/></div>
+
+                <if condition="isset($_SESSION['code_error_time']) and intval($_SESSION['code_error_time']) egt 3">
+                    <div class='check_code'>
+                        <span>{$Think.L.login_code}：</span>
+                        <input name='check_code' class="check_code" type="text" placeholder="{$Think.L.login_code}"
+                               required/>
+                        <img src='__PUBLIC__/index.php?user/checkCode'
+                             onclick="this.src='__PUBLIC__/index.php?user/checkCode'"/>
+                        <div style="clear:both;"></div>
+                    </div>
+                </if>
+            </div>
+            <div class="actions">
+                <input type="submit" id="submit" value="{$Think.L.login}"/>
+                <input type="checkbox" class="checkbox" name="rember_password" id='rm' checked='checked'/>
+                <label for='rm'>{$Think.L.login_rember_password}</label>
+            </div>
+            <div class="msg">{$msg}</div>
+            <div style="clear:both;"></div>
+            <div class='guest'>
+                <a href="__PUBLIC__/index.php?user/loginSubmit&name=guest&password=guest">{$Think.L.guest_login}<i
+                        class=' icon-arrow-right'></i></a>
+            </div>
+        </div>
+    </div>
+</block>
+>>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e

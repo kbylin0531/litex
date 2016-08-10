@@ -7,13 +7,21 @@
 <meta name="author" content="kalcaddle.">
   <head>
   	<title>{$Think.L.kod_name'].$L['kod_power_by}</title>
+<<<<<<< HEAD:Application/Explorer/View/editor/edit.html
   	<link href="__PUBLIC__/css/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
+=======
+  	<link href="<?php echo STATIC_PATH;?>style/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
+>>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/editor/edit.php
 	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome.css">
 	<!--[if IE 7]>
 	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome-ie7.css">
 	<![endif]-->
 	
+<<<<<<< HEAD:Application/Explorer/View/editor/edit.html
 	<link href="__PUBLIC__/css/skin/<?php echo $config['user']['theme}app_code_edit.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet" id='link_css_list'/>
+=======
+	<link href="<?php echo STATIC_PATH;?>style/skin/<?php echo $config['user']['theme}app_code_edit.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet" id='link_css_list'/>
+>>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/editor/edit.php
 	
   </head>
 
@@ -83,10 +91,17 @@
 		</div>
 	</div>
 
+<<<<<<< HEAD:Application/Explorer/View/editor/edit.html
 <script src="./index.php?user/common_js#id=<?php echo rand_string(8);?>"></script>
 <script src="__PUBLIC__/js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
 <script src="__PUBLIC__/js/lib/ace/src-min-noconflict/ace.js?ver=<?php echo KOD_VERSION;?>"></script>
 <script src="__PUBLIC__/js/lib/ace/src-min-noconflict/ext-language_tools.js?ver=<?php echo KOD_VERSION;?>"></script>
+=======
+<script src="__PUBLIC__/index.php?user/common_js#id=<?php echo rand_string(8);?>"></script>
+<script src="<?php echo STATIC_PATH;?>js/lib/seajs/sea.js?ver=<?php echo KOD_VERSION;?>"></script>
+<script src="<?php echo STATIC_PATH;?>js/lib/ace/src-min-noconflict/ace.js?ver=<?php echo KOD_VERSION;?>"></script>
+<script src="<?php echo STATIC_PATH;?>js/lib/ace/src-min-noconflict/ext-language_tools.js?ver=<?php echo KOD_VERSION;?>"></script>
+>>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e:Application/Explorer/View/editor/edit.php
 <script type="text/javascript">
 	G.frist_file = "<?php echo (isset($_GET['filename']) ? $_GET['filename'] :'') ;?>";
 	G.code_config = <?php echo $editor_config;?>;

@@ -2,8 +2,10 @@
 
 namespace Application\Explorer\Controller;
 use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\ExplorerUtils;
 use Application\Explorer\Common\Library\FileCache;
 use Application\Explorer\Common\Library\Mcrypt;
+use PLite\Response;
 
 class user extends Controller
 {
@@ -24,6 +26,10 @@ class user extends Controller
         if (is_wap()) {
             $this->display('login_wap.html');
         }else{
+            $arr = array(4,5,7,7,7,10,11,12);
+            $bg = $arr[mt_rand(0,count($arr)-1)];
+            $this->assign('bg',$bg);
+            $this->assign('auto_login',$this->config['setting_system']['auto_login']);
             $this->display('login.html');
         }
         exit;
@@ -33,61 +39,7 @@ class user extends Controller
      * @return bool|void
      */
     public function loginCheck(){
-        if (ST == 'share') return true;//共享页面
-        if(in_array(ACT,$this->notCheck)){//不需要判断的action
-
-        }else if($_SESSION['kod_login']===true && $_SESSION['kod_user']['name']!=''){
-            define('USER',USER_PATH.$this->user['name'].'/');
-            define('USER_TEMP',USER.'data/temp/');
-            define('USER_RECYCLE',USER.'recycle/');
-            if (!file_exists(USER)) {
-                $this->logout();
-            }
-            if ($this->user['role'] == 'root') {
-                define('MYHOME',USER.'home/');
-                define('HOME','');
-                $GLOBALS['web_root'] = WEB_ROOT;//服务器目录
-                $GLOBALS['is_root'] = 1;
-            }else{
-                define('MYHOME','/');
-                define('HOME',USER.'home/');
-                $GLOBALS['web_root'] = str_replace(WEB_ROOT,'',HOME);//从服务器开始到用户目录
-                $GLOBALS['is_root'] = 0;
-            }
-            $this->config['user_share_file']   = USER.'data/share.php';    // 收藏夹文件存放地址.
-            $this->config['user_fav_file']     = USER.'data/fav.php';    // 收藏夹文件存放地址.
-            $this->config['user_seting_file']  = USER.'data/config.php'; //用户配置文件
-            $this->config['user']  = FileCache::load($this->config['user_seting_file']);
-            if($this->config['user']['theme']==''){
-                $this->config['user'] = $this->config['setting_default'];
-            }
-        }else if($_COOKIE['kod_name']!='' && $_COOKIE['kod_token']!=''){
-            $member = new FileCache(USER_SYSTEM.'member.php');
-            $user = $member->get($_COOKIE['kod_name']);
-            if (!is_array($user) || !isset($user['password'])) {
-                $this->logout();
-            }
-            if(md5($user['password'].get_client_ip()) == $_COOKIE['kod_token']){
-                session_start();//re start
-                $_SESSION['kod_login'] = true;
-                $_SESSION['kod_user']= $user;
-                setcookie('kod_name', $_COOKIE['kod_name'], time()+3600*24*365);
-                setcookie('kod_token',$_COOKIE['kod_token'],time()+3600*24*365); //密码的MD5值再次md5
-                header('location:'.get_url());
-                exit;
-            }
-            $this->logout();//session user数据不存在
-        }else{
-            if ($this->config['setting_system']['auto_login'] != '1') {
-                $this->logout();//不自动登录
-            }else{
-                if (!file_exists(USER_SYSTEM.'install.lock')) {
-                    $this->display('install.html');exit;
-                }
-                header('location:./index.php?user/loginSubmit&name=guest&password=guest');
-            }
-        }
-        return false;
+        return ExplorerUtils::checkLogin();
     }
 
     //临时文件访问
@@ -103,6 +55,7 @@ class user extends Controller
         file_put_out($path);
     }
     public function common_js(){
+        Response::cleanOutput();
         $basic_path = BASIC_PATH;
         if (!$GLOBALS['is_root']) {
             $basic_path = '/';//对非root用户隐藏所有地址
@@ -144,16 +97,13 @@ class user extends Controller
      * 首次登录
      */
     public function loginFirst(){
-        touch(USER_SYSTEM.'install.lock');
-        header('location:./index.php?user/login');
-        exit;
+        ExplorerUtils::goLogin();
     }
     /**
      * 退出处理
      */
     public function logout(){
-        session_start();
-        user_logout();
+        ExplorerUtils::logout();
     }
     
     /**
@@ -188,7 +138,7 @@ class user extends Controller
                 if ($this->in['rember_password'] == '1') {
                     setcookie('kod_token',md5($user['password'].get_client_ip()),time()+3600*24*365);
                 }
-                header('location:./index.php');
+                header('location:__PUBLIC__/index.php');
                 return;
             }else{
                 $msg = $this->L['password_error'];

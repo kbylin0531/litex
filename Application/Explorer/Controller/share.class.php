@@ -5,12 +5,9 @@ use Application\Explorer\Common\Library\CreatMiniature;
 use Application\Explorer\Common\Library\FileCache;
 use Application\Explorer\Common\Library\Controller;
 use Application\Explorer\Common\Library\PclZip;
+use PLite\Library\ExtDebugger;
 
 class share extends Controller{
-    /**
-     * @var FileCache
-     */
-    private $sql;
     private $share_info;
     private $share_path;
     private $path;
@@ -34,23 +31,23 @@ class share extends Controller{
         }
         //禁止下载后；也会无法预览 'fileProxy','fileGet'
         if (ACT == 'file' && $this->share_info['not_download']=='1') {
-            $this->error($this->L['share_not_download_tips']);
+            $this->showError($this->L['share_not_download_tips']);
         }
     }
     //======//
     private function _check_share(){
         if (!isset($this->in['user']) || !isset($this->in['sid'])) {
-            $this->error($this->L['share_error_param']);
+            $this->showError($this->L['share_error_param']);
         }
         //储存该共享基础信息
         $share_data = USER_PATH.$this->in['user'].'/data/share.php';
         if (!file_exists($share_data)) {
-            $this->error($this->L['share_error_user']);
+            $this->showError($this->L['share_error_user']);
         }
         $this->sql=new FileCache($share_data);
         $list = $this->sql->get();
         if (!isset($list[$this->in['sid']])){
-            $this->error($this->L['share_error_sid']);
+            $this->showError($this->L['share_error_sid']);
         }
 
         $this->share_info = $list[$this->in['sid']];
@@ -59,7 +56,7 @@ class share extends Controller{
         if (isset($share_info['time'])&& $share_info['time']) {
             $date = date_create_from_format('y/m/d',$share_info['time_to']);
             if (time() > $date) {
-                $this->error($this->L['share_error_time']);
+                $this->showError($this->L['share_error_time']);
             }
         }
         
@@ -71,7 +68,7 @@ class share extends Controller{
         if (!isset($this->in['password'])){
             //输入密码
             if ($_SESSION['password_'.$this->in['sid']]==$share_info['share_password']) return;
-            $this->error('password');
+            $this->showError('password');
         }else{
             if ($this->in['password'] == $share_info['share_password']) {
                 session_start();
@@ -87,7 +84,7 @@ class share extends Controller{
         $member = new FileCache(USER_SYSTEM.'member.php');
         $user = $member->get($this->in['user']);
         if (!is_array($user) || !isset($user['password'])) {
-            $this->error($this->L['share_error_user']);
+            $this->showError($this->L['share_error_user']);
         }        
         define('USER',USER_PATH.$user['name'].'/');
         define('USER_TEMP',USER.'data/share_temp/');
@@ -110,7 +107,7 @@ class share extends Controller{
 
         $share_path = iconv_system($share_path);
         if (!file_exists($share_path)) {
-            $this->error($this->L['share_error_path']);
+            $this->showError($this->L['share_error_path']);
         }
         $this->share_path = $share_path;
         $path_full = isset($this->in['path'])?$this->in['path']:'';
@@ -119,7 +116,7 @@ class share extends Controller{
     private function _clear($path){
         return  iconv_system(_DIR_CLEAR(rawurldecode($path)));
     }
-    public function error($msg){
+    public function showError($msg){
         $this->assign('msg',$msg);
         $this->display('tips.php');
         exit;
@@ -193,6 +190,7 @@ class share extends Controller{
         $this->sql->update($this->in['sid'],$this->share_info);
     }
     public function common_js(){
+        ExtDebugger::closeTrace();
         $config = $GLOBALS['config']['setting_default'];
         $the_config = array(
             'lang'          => LANGUAGE_TYPE,

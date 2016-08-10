@@ -4,8 +4,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 	<title>{$Think.L.ui_explorer'].' - '.$L['kod_name'].$L['kod_power_by}</title>
+<<<<<<< HEAD
 	<link rel="Shortcut Icon" href="__PUBLIC__/images/favicon.ico">
 	<link href="__PUBLIC__/css/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
+=======
+	<link rel="Shortcut Icon" href="<?php echo STATIC_PATH;?>images/favicon.ico">
+	<link href="<?php echo STATIC_PATH;?>style/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
+>>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e
 	<link rel="stylesheet" href="./static/style/font-awesome/css/font-awesome.css">
 	<link rel="stylesheet" href="__PUBLIC__/css/wap/app_explorer.css"/>
 </head>

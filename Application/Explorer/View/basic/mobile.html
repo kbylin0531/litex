@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>{$Think.L.kod_name}</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <link href="__PUBLIC__/images/favicon.ico" rel="Shortcut Icon" >
-    <link href="__PUBLIC__/css/bootstrap.css" rel="stylesheet"/>
+    <link href="__PUBLIC__/css/bootstrap.css?ver=<?php echo KOD_VERSION;?>" rel="stylesheet"/>
     <link href="__PUBLIC__/css/font-awesome/css/font-awesome.css" rel="stylesheet" >
-    <!--[if IE 7]>
-    <link rel="stylesheet" href="__PUBLIC__/css/font-awesome/css/font-awesome-ie7.css">
-    <![endif]-->
-    <block name="style"></block>
 </head>
 <body>
+
 <!-- body -->
 <block name="body"></block>
 <!-- footer -->
@@ -19,10 +17,5 @@
     <div class="common_footer">{$Think.L.copyright_pre} v{$Think.const.LITE_VERSION} {$Think.L.copyright_info}</div>
 </block>
 <script src="__PUBLIC__/index.php?share/common_js"></script>
-<<<<<<< HEAD
-<block name="script"></block>
-=======
-<block name="block"></block>
->>>>>>> 0ec62d7fce884c7b39209a1fcd99813d3d14be8e
 </body>
 </html>
