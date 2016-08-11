@@ -3,11 +3,11 @@ namespace Application\Explorer\Controller;
 
 use Application\Explorer\Common\Library\CreatMiniature;
 use Application\Explorer\Common\Library\FileCache;
-use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\ExplorerController;
 use Application\Explorer\Common\Library\PclZip;
 use PLite\Library\ExtDebugger;
 
-class share extends Controller{
+class share extends ExplorerController{
     private $share_info;
     private $share_path;
     private $path;

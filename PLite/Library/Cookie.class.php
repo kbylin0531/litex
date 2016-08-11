@@ -7,6 +7,7 @@
  */
 namespace PLite\Library;
 use PLite\Lite;
+use PLite\PLiteException;
 
 /**
  * Class Cookie Cookie操作类
@@ -18,20 +19,39 @@ use PLite\Lite;
 class Cookie extends Lite{
     const CONF_NAME = 'cookie';
     const CONF_CONVENTION = [
-        'PREFIX'    => '',// COOKIE 名称前缀
-        'EXPIRE'    => 0,// COOKIE 保存时间
-        'PATH'      => '/',// COOKIE 保存路径
-        'DOMAIN'    => '',// COOKIE 有效域名
-        'SECURE'    => false,//  COOKIE 启用安全传输
-        'HTTPONLY'  => '',// HTTPONLY设置
-        'SETCOOKIE' => true,// 是否使用 SETCOOKIE
+        // cookie 名称前缀
+        'prefix'    => '',
+        // cookie 保存时间
+        'expire'    => 0,
+        // cookie 保存路径
+        'path'      => '/',
+        // cookie 有效域名
+        'domain'    => '',
+        //  cookie 启用安全传输
+        'secure'    => false,
+        // httponly设置
+        'httponly'  => '',
+        // 是否使用 setcookie
+        'setcookie' => true,
     ];
 
-    private static $config = [];
+    public static function initializationize($clsnm = null, $conf = null){
+        parent::initializationize($clsnm);
+        self::getConfig('httponly') and ini_set('session.cookie_httponly', 1);
+    }
 
-    public static function _init_class_($clsnm = null, $conf = null){
-        parent::_init_class_($clsnm, $conf);
-        self::$config = self::getConfig();
+
+
+    /**
+     * 判断Cookie数据
+     * @param string        $name cookie名称
+     * @param string|null   $prefix cookie前缀
+     * @return bool
+     */
+    public static function has($name, $prefix = null) {
+        $prefix = !is_null($prefix) ? $prefix : self::getConfig('prefix');
+        $name   = $prefix . $name;
+        return isset($_COOKIE[$name]);
     }
 
     /**
@@ -41,11 +61,10 @@ class Cookie extends Lite{
      */
     public static function prefix($prefix = null) {
         if(null === $prefix){
-            return self::$config['PREFIX'];
+            return self::getConfig('prefix');
         }else{
             //修改默认的配置
-            self::setConfig('PREFIX',$prefix);
-            return $prefix;
+            return self::setConfig('prefix',$prefix)?$prefix:PLiteException::throwing('update failed!');
         }
     }
 
@@ -58,23 +77,26 @@ class Cookie extends Lite{
      */
     public static function set($name, $value = '', $option = null){
         // 参数设置(会覆盖黙认设置)
-        if (!is_null($option)) {
+        $config  = &self::getConfig();
+        if (isset($option)) {
             if (is_numeric($option)) {
-                $option = ['EXPIRE' => $option];
+                $option = ['expire' => $option];
             } elseif (is_string($option)) {
                 parse_str($option, $option);
             }
-            self::$config = array_merge(self::$config, array_change_key_case($option));
+            $config = array_merge($config, array_change_key_case($option));
         }
-        $name = self::$config['PREFIX'] . $name;
+        $name = $config['prefix'] . $name;
         // 设置cookie
         if (is_array($value)) {
-            array_walk_recursive($value, 'json_format_protect', 'encode');
+            array_walk($value,function (&$val){
+                empty($val) or $val = urlencode($val);
+            });
             $value = 'think:' . json_encode($value);
         }
-        $expire = !empty(self::$config['EXPIRE']) ? time() + intval(self::$config['EXPIRE']) : 0;
-        if (self::$config['SETCOOKIE']) {
-            setcookie($name, $value, $expire, self::$config['PATH'], self::$config['DOMAIN'], self::$config['SECURE'], self::$config['HTTPONLY']);
+        $expire = !empty($config['expire']) ? $_SERVER['REQUEST_TIME'] + intval($config['expire']) : 0;
+        if ($config['setcookie']) {
+            setcookie($name, $value, $expire, $config['path'], $config['domain'], $config['secure'], $config['httponly']);
         }
         $_COOKIE[$name] = $value;
     }
@@ -86,14 +108,16 @@ class Cookie extends Lite{
      * @return mixed
      */
     public static function get($name, $prefix = null) {
-        $prefix = !is_null($prefix) ? $prefix : self::$config['PREFIX'];
+        $prefix = isset($prefix) ? $prefix : self::getConfig('prefix');
         $name   = $prefix . $name;
         if (isset($_COOKIE[$name])) {
             $value = $_COOKIE[$name];
             if (0 === strpos($value, 'think:')) {
                 $value = substr($value, 6);
                 $value = json_decode($value, true);
-                array_walk_recursive($value, 'json_format_protect', 'decode');
+                array_walk($value,function (&$val){
+                    empty($val) or $val = urldecode($val);
+                });
             }
             return $value;
         } else {
@@ -108,10 +132,11 @@ class Cookie extends Lite{
      * @return mixed
      */
     public static function delete($name, $prefix = null){
-        $prefix = !is_null($prefix) ? $prefix : self::$config['PREFIX'];
+        $config = self::getConfig();
+        $prefix = isset($prefix) ? $prefix : $config['prefix'];
         $name   = $prefix . $name;
-        if (self::$config['SETCOOKIE']) {
-            setcookie($name, '', time() - 3600, self::$config['PATH'], self::$config['DOMAIN'], self::$config['SECURE'], self::$config['HTTPONLY']);
+        if ($config['setcookie']) {
+            setcookie($name, '', REQUEST_TIME - 3600, $config['path'], $config['domain'], $config['secure'], $config['httponly']);
         }
         // 删除指定cookie
         unset($_COOKIE[$name]);
@@ -124,24 +149,21 @@ class Cookie extends Lite{
      */
     public static function clear($prefix = null) {
         // 清除指定前缀的所有cookie
-        if (empty($_COOKIE)) {
-            return;
-        }
-
-        // 要删除的cookie前缀，不指定则删除config设置的指定前缀
-        $prefix = !is_null($prefix) ? $prefix : self::$config['PREFIX'];
-        if ($prefix) {
-            // 如果前缀为空字符串将不作处理直接返回
-            foreach ($_COOKIE as $key => $val) {
-                if (0 === strpos($key, $prefix)) {
-                    if (self::$config['SETCOOKIE']) {
-                        setcookie($key, '', time() - 3600, self::$config['PATH'], self::$config['DOMAIN'], self::$config['SECURE'], self::$config['HTTPONLY']);
+        if($_COOKIE){
+            $config = self::getConfig();
+            $prefix = isset($prefix) ? $prefix : $config['prefix'];
+            if ($prefix) {
+                // 如果前缀为空字符串将不作处理直接返回
+                foreach ($_COOKIE as $key => $val) {
+                    if (0 === strpos($key, $prefix)) {
+                        if ($config['setcookie']) {
+                            setcookie($key, '', $_SERVER['REQUEST_TIME'] - 3600, $config['path'], $config['domain'], $config['secure'], $config['httponly']);
+                        }
+                        unset($_COOKIE[$key]);
                     }
-                    unset($_COOKIE[$key]);
                 }
             }
         }
-        return;
     }
 
 }

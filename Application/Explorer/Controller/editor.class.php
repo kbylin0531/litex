@@ -1,9 +1,9 @@
 <?php 
 namespace Application\Explorer\Controller;
 use Application\Explorer\Common\Library\FileCache;
-use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\ExplorerController;
 
-class editor extends Controller{
+class editor extends ExplorerController{
 	function __construct()    {
 		parent::__construct();
 		$this->tpl = TEMPLATE . 'editor/';

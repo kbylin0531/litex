@@ -2,8 +2,8 @@
 namespace Application\Explorer\Controller;
 use Application\Explorer\Common\Library\FileCache;
 
-use Application\Explorer\Common\Library\Controller;
-class group extends Controller{
+use Application\Explorer\Common\Library\ExplorerController;
+class group extends ExplorerController{
     private $sql;
     function __construct()    {
         parent::__construct();

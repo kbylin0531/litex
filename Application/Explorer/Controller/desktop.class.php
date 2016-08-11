@@ -1,8 +1,8 @@
 <?php 
 namespace Application\Explorer\Controller;
 
-use Application\Explorer\Common\Library\Controller;
-class desktop extends Controller{
+use Application\Explorer\Common\Library\ExplorerController;
+class desktop extends ExplorerController{
     function __construct() {
         parent::__construct();
         $this->tpl = TEMPLATE.'desktop/';	

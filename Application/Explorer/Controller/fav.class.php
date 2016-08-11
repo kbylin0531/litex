@@ -3,8 +3,8 @@
 namespace Application\Explorer\Controller;
 use Application\Explorer\Common\Library\FileCache;
 
-use Application\Explorer\Common\Library\Controller;
-class fav extends Controller{
+use Application\Explorer\Common\Library\ExplorerController;
+class fav extends ExplorerController{
     private $sql;
     function __construct(){
         parent::__construct();

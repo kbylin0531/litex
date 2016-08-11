@@ -89,8 +89,8 @@ class Session extends Lite{
         return parent::getInstance($identify);
     }
 
-    public static function _init_class_($clsnm = null, $conf = null){
-        parent::_init_class_($clsnm, $conf);
+    public static function initializationize($clsnm = null){
+        parent::initializationize($clsnm);
 
         $config = self::getConfig();
         //设置session保存路径
@@ -399,6 +399,11 @@ class Session extends Lite{
             return true;
         }
     }
+
+
+
+
+
 
 
 }

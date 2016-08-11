@@ -1,13 +1,13 @@
 <?php
 namespace Application\Explorer\Controller;
-use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\ExplorerController;
 use Application\Explorer\Common\Library\CreatMiniature;
 use Application\Explorer\Common\Library\FileCache;
 use Application\Explorer\Common\Library\History;
 use Application\Explorer\Common\Library\Mcrypt;
 use Application\Explorer\Common\Library\PclZip;
 
-class explorer extends Controller{
+class explorer extends ExplorerController{
     public $path;
     public function __construct(){
         parent::__construct();

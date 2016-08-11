@@ -31,4 +31,6 @@ interface ConfiggerInterface {
      */
     public function write($item,array $config,$cover=false);
 
+    public function parse($config);
+
 }

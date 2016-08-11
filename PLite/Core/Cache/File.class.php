@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lnzhv
- * Date: 7/13/16
- * Time: 9:50 PM
- */
-
 namespace PLite\Core\Cache;
+use PLite\Storage;
 
 /**
  * 文件类型缓存类
@@ -20,8 +14,9 @@ class File implements CacheInterface {
         'path_level'    => 1,
         'prefix'        => '',
         'length'        => 0,
-        'path'          => PATH_RUNTIME.'Cache/File/',
         'data_compress' => false,
+
+        'path'          => PATH_RUNTIME.'Cache/File/',
     ];
 
     /**
@@ -34,8 +29,8 @@ class File implements CacheInterface {
         if (!empty($options)) {
             $this->options = array_merge($this->options, $options);
         }
-        if (substr($this->options['path'], -1) != '/') {
-            $this->options['path'] .= '/';
+        if (substr($this->options['path'], -1) != DIRECTORY_SEPARATOR) {
+            $this->options['path'] .= DIRECTORY_SEPARATOR;
         }
         $this->init();
     }
@@ -45,7 +40,7 @@ class File implements CacheInterface {
      * @return bool
      */
     public function available(){
-        file_exists($this->options['path']) or mkdir($this->options['path'],0777,true);
+        is_dir($this->options['path']) or mkdir($this->options['path'],0777,true);
         return is_writeable($this->options['path']);
     }
 
@@ -56,12 +51,7 @@ class File implements CacheInterface {
      */
     private function init(){
         // 创建项目缓存目录
-        if (!is_dir($this->options['path'])) {
-            if (!mkdir($this->options['path'], 0755, true)) {
-                return false;
-            }
-        }
-        return true;
+        return $this->available();
     }
 
     /**
@@ -75,39 +65,47 @@ class File implements CacheInterface {
         $name = md5($name);
         if ($this->options['cache_subdir']) {
             // 使用子目录
-            $dir = '';
-            $len = $this->options['path_level'];
-            for ($i = 0; $i < $len; $i++) {
-                $dir .= $name{$i} . '/';
-            }
-            if (!is_dir($this->options['path'] . $dir)) {
-                mkdir($this->options['path'] . $dir, 0755, true);
-            }
-            $filename = $dir . $this->options['prefix'] . $name . '.php';
-        } else {
-            $filename = $this->options['prefix'] . $name . '.php';
+            $name = substr($name, 0, 2) . DIRECTORY_SEPARATOR . substr($name, 2);
         }
-        return $this->options['path'] . $filename;
+        if ($this->options['prefix']) {
+            $name = $this->options['prefix'] . DIRECTORY_SEPARATOR . $name;
+        }
+        $filename = $this->options['path'] . $name . '.php';
+        Storage::checkAndMakeSubdir($filename);
+        return $filename;
+    }
+
+    /**
+     * 判断缓存是否存在
+     * @access public
+     * @param string $name 缓存变量名
+     * @return bool
+     */
+    public function has($name)
+    {
+        $filename = $this->filename($name);
+        return is_file($filename);
     }
 
     /**
      * 读取缓存
      * @access public
      * @param string $name 缓存变量名
-     * @return mixed|null 缓存不存在时返回null
+     * @param mixed  $default 默认值
+     * @return mixed
      */
-    public function get($name){
+    public function get($name, $default = false){
         $filename = $this->filename($name);
         if (!is_file($filename)) {
-            return null;//缓存文件不存在
+            return $default;
         }
         $content = file_get_contents($filename);
         if (false !== $content) {
             $expire = (int) substr($content, 8, 12);
-            if (0 != $expire && time() > filemtime($filename) + $expire) {
+            if (0 != $expire && REQUEST_TIME > filemtime($filename) + $expire) {
                 //缓存过期删除缓存文件
-                unlink($filename);
-                return null;//缓存过期
+                $this->delete($filename);
+                return $default;
             }
             $content = substr($content, 20, -3);
             if ($this->options['data_compress'] && function_exists('gzcompress')) {
@@ -115,9 +113,9 @@ class File implements CacheInterface {
                 $content = gzuncompress($content);
             }
             $content = unserialize($content);
-            return $content===false? null:$content;
+            return $content;
         } else {
-            return null;
+            return $default;
         }
     }
 
@@ -131,7 +129,8 @@ class File implements CacheInterface {
      */
     public function set($name, $value, $expire = null)
     {
-        if (is_null($expire)) {
+
+        if (!isset($expire)) {
             $expire = $this->options['expire'];
         }
         $filename = $this->filename($name);
@@ -170,14 +169,61 @@ class File implements CacheInterface {
     }
 
     /**
+     * 自增缓存（针对数值缓存）
+     * @access public
+     * @param string    $name 缓存变量名
+     * @param int       $step 步长
+     * @return false|int
+     */
+    public function inc($name, $step = 1)
+    {
+        if ($this->has($name)) {
+            $value = $this->get($name) + $step;
+        } else {
+            $value = $step;
+        }
+        return $this->set($name, $value, 0) ? $value : false;
+    }
+
+
+    /**
+     * 自减缓存（针对数值缓存）
+     * @access public
+     * @param string    $name 缓存变量名
+     * @param int       $step 步长
+     * @return false|int
+     */
+    public function dec($name, $step = 1)
+    {
+        if ($this->has($name)) {
+            $value = $this->get($name) - $step;
+        } else {
+            $value = $step;
+        }
+        return $this->set($name, $value, 0) ? $value : false;
+    }
+    /**
      * 删除缓存
      * @access public
      * @param string $name 缓存变量名
-     * @return bool 缓存文件不存在时执行删除操作返回false，文件存在时的返回值是unlink的返回值
+     * @return bool 缓存文件不存在时执行删除操作返回true，文件存在时的返回值是unlink的返回值
      */
     public function delete($name){
         $name = $this->filename($name);
-        return is_file($name)? unlink($name) : false;
+        return is_file($name)? unlink($name) : true;
+    }
+    /**
+     * 清除缓存
+     * @access public
+     * @return boolean
+     */
+    public function clear()
+    {
+        $fileLsit = (array) glob($this->options['path'] . '*');
+        foreach ($fileLsit as $path) {
+            is_file($path) && unlink($path);
+        }
+        return true;
     }
 
     /**

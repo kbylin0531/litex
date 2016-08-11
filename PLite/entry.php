@@ -342,7 +342,7 @@ namespace PLite {
                 }
             }
             //auto init class
-            $funcname = 'initializationize';
+            $funcname = '__initializationize';
             is_callable("{$clsnm}::{$funcname}") and $clsnm::$funcname();
         }
     }
@@ -851,11 +851,13 @@ namespace PLite {
          * 文件父目录检测
          * @param string $path the path must be encode with file system
          * @param int $auth
+         * @return bool
          */
-        private static function checkAndMakeSubdir($path, $auth = 0744){
+        public static function checkAndMakeSubdir($path, $auth = 0755){
             $path = dirname($path);
-            if(!is_dir($path)) self::mkdir($path,$auth);
-            if(!is_writeable($path)) self::chmod($path,$auth);
+            if(!is_dir($path)) return self::mkdir($path,$auth);
+            if(!is_writeable($path)) return self::chmod($path,$auth);
+            return true;
         }
 
         /**
@@ -1683,47 +1685,51 @@ namespace PLite {
         /**
          * @var array drivers
          */
-        protected static $_ds= [];
+        private static $_ds= [];
 
         /**
          * set or get the current driver in use
-         * @param string|null $driver it will get paticular driver if param 1 is set
+         * @param string|null $dname driver class name
          * @param mixed $params parameters for driver construct
          * @return array|null it will resturn null if no driver exist
          */
-        public static function using($driver=null, $params=null){
+        public static function using($dname=null, $params=null){
             $clsnm = static::class;
             isset(self::$_ds[$clsnm]) or self::$_ds[$clsnm] = [];
-            if(null === $driver){
+
+            if(null === $dname){
                 //get the first element
                 $driver = end(self::$_ds[$clsnm]);
                 return  false === $driver?null:$driver;
             }
-            $key = DRIVER_KEY_WITH_PARAM?md5($driver.serialize($params)):$driver;
-            if(isset(self::$_ds[$clsnm][$key])){
+
+            $drivers = &self::$_ds[$clsnm];
+            $key = DRIVER_KEY_WITH_PARAM?md5($dname.serialize($params)):$dname;
+            if(isset($drivers[$key])){
                 //put in the tail without constructor
-                $temp = self::$_ds[$clsnm][$key];
-                unset(self::$_ds[$clsnm][$key]);
-                self::$_ds[$clsnm][$key] = $temp;
+                $temp = $drivers[$key];
+                unset($drivers[$key]);
+                $drivers[$key] = $temp;
             }else{
                 //set element which will be in the end
-                self::$_ds[$clsnm][$key] = new $driver($params);
+                $drivers[$key] = new $dname($params);
             }
-            return self::$_ds[$clsnm][$key];
+            return $drivers[$key];
         }
+
     }
 
     /**
-     * Class C
+     * Class AutoConfig
      * Make the library config to be configured
      * @package PLite
      */
-    trait C {
+    trait AutoConfig {
         /**
          * 类的静态配置
          * @var array
          */
-        protected static $_cs = [];
+        private static $_cs = [];
 
         /**
          * initialize the class with config
@@ -1731,7 +1737,7 @@ namespace PLite {
          * @param null|string $clsnm class-name
          * @return void
          */
-        final public static function initializationize($clsnm=null){
+        final public static function __initializationize($clsnm=null){
             $clsnm or $clsnm = static::class;
             if(!isset(self::$_cs[$clsnm])){
                 //get convention
@@ -1776,7 +1782,7 @@ namespace PLite {
          * @param mixed $replacement 如果参数一指定的配置项不存在时默认代替的配置项
          * @return array
          */
-        final protected static function getConfig($names=null, $replacement=null){
+        final protected static function &getConfig($names=null, $replacement=null){
             $clsnm = static::class;
             isset(self::$_cs[$clsnm]) or self::$_cs[$clsnm] = [];
             if(null !== $names){
@@ -1836,7 +1842,8 @@ namespace PLite {
      * @package PLite
      */
     abstract class Lite {
-        use C , I ;
+        use AutoConfig , I ;
+
         /**
          * 类实例的驱动
          * @var object

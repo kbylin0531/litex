@@ -31,6 +31,11 @@ final class SEK {
         }
     }
 
+    public static function arrayRandom(array $arr){
+        return $arr[mt_rand(0,count($arr)-1)];
+    }
+
+
     /**
      * Returns the MIME types array from config/mimes.php
      *

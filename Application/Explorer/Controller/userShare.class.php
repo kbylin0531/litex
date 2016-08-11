@@ -1,8 +1,8 @@
 <?php
 namespace Application\Explorer\Controller;
 use Application\Explorer\Common\Library\FileCache;
-use Application\Explorer\Common\Library\Controller;
-class userShare extends Controller{
+use Application\Explorer\Common\Library\ExplorerController;
+class userShare extends ExplorerController{
 
     function __construct(){
         parent::__construct();

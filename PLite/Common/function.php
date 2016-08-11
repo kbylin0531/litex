@@ -9,7 +9,6 @@ namespace PLite;
 
 use PLite\Util\SEK;
 
-
 /**
  * session管理函数
  * @param string|array $name session名称 如果为数组则表示进行session设置

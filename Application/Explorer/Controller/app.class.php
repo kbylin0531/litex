@@ -7,9 +7,9 @@
 */
 namespace Application\Explorer\Controller;
 use Application\Explorer\Common\Library\FileCache;
-use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\ExplorerController;
 
-class app extends Controller{
+class app extends ExplorerController{
     function __construct()    {
         parent::__construct();
         $this->sql=new FileCache(DATA_USER_SYSTEM.'apps.php');

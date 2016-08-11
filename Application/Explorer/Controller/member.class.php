@@ -1,9 +1,9 @@
 <?php
 namespace Application\Explorer\Controller;
 use Application\Explorer\Common\Library\FileCache;
-use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\ExplorerController;
 
-class member extends Controller{
+class member extends ExplorerController{
     private $sql;
     function __construct()    {
         parent::__construct();

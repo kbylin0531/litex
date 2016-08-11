@@ -1,17 +1,15 @@
 <?php
 
 namespace Application\Explorer\Controller;
-use Application\Explorer\Common\Library\Controller;
+use Application\Explorer\Common\Library\ExplorerController;
 use Application\Explorer\Common\Library\ExplorerUtils;
 use Application\Explorer\Common\Library\FileCache;
 use Application\Explorer\Common\Library\Mcrypt;
 use PLite\Response;
+use PLite\Util\SEK;
 
-class user extends Controller
+class user extends ExplorerController
 {
-    function __construct(){
-        parent::__construct();
-    }
 
     /**
      * 登录view
@@ -23,17 +21,13 @@ class user extends Controller
             $this->display('install.html');
         }
         $this->assign('msg',$msg);
-        if (is_wap()) {
-            $this->display('login_wap.html');
-        }else{
-            $arr = array(4,5,7,7,7,10,11,12);
-            $bg = $arr[mt_rand(0,count($arr)-1)];
-            $this->assign('bg',$bg);
-            $this->assign('auto_login',$this->config['setting_system']['auto_login']);
-            $this->display('login.html');
-        }
-        exit;
+
+        is_wap() and  $this->display('login_wap.html');
+
+        $this->assign('bg',SEK::arrayRandom(array(4,5,7,7,7,10,11,12)));
+        $this->display('login.html');
     }
+
     /**
      * 登录状态检测;并初始化数据状态
      * @return bool|void

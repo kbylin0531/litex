@@ -1,5 +1,6 @@
 <?php
 namespace Application\Explorer\Common\Library;
+use PLite\Library\Controller;
 
 include_once PATH_APP.'/Explorer/Common/Function/web.function.php';
 include_once PATH_APP.'/Explorer/Common/Function/file.function.php';
@@ -10,7 +11,7 @@ include_once PATH_APP.'/Explorer/Common/Function/common.function.php';
  * Class Controller
  * @package Application\Explorer\Common
  */
-abstract class Controller extends \PLite\Library\Controller{
+abstract class ExplorerController extends Controller{
 
     public $in;
     public $db;
@@ -53,7 +54,7 @@ abstract class Controller extends \PLite\Library\Controller{
         $this -> in     = &ExplorerUtils::getComein();
         $this->assign([
             'config'  => &$this -> config,
-            'in'  => &$this -> in,
+            'in'      => &$this -> in,
         ]);
 
     }
