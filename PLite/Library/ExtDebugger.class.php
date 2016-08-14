@@ -1,33 +1,14 @@
 <?php
 
 namespace PLite\Library;
+use PLite\Debugger;
 use PLite\Utils;
 
 /**
  * Class ExtDebugger Extension for debugger
  * @package PLite\Util
  */
-class ExtDebugger {
-    /**
-     * @var bool
-     */
-    private static $_allowTrace = true;
-
-    /**
-     * 开启Trace
-     * @return void
-     */
-    public static function openTrace(){
-        self::$_allowTrace = true;
-    }
-
-    /**
-     * 关闭trace
-     * @return void
-     */
-    public static function closeTrace(){
-        self::$_allowTrace = false;
-    }
+class ExtDebugger extends Debugger{
 
     /**
      * 显示trace页面

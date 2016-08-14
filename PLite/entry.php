@@ -130,7 +130,7 @@ namespace {
             self::registerErrorHandler(self::$_config['ERROR_HANDLER']);
             self::registerExceptionHandler(self::$_config['EXCEPTION_HANDLER']);
             register_shutdown_function(function (){/* called when script shut down */
-                PAGE_TRACE_ON and !IS_REQUEST_AJAX and Debugger::showTrace();//show the trace info
+                PAGE_TRACE_ON and !IS_REQUEST_AJAX and Debugger::trace();//show the trace info
                 Response::flushOutput();
 
 //                $gap = microtime(true) - $GLOBALS['_status_begin'][0];//begin to end
@@ -262,6 +262,10 @@ namespace PLite {
      */
     class Debugger {
         /**
+         * @var bool
+         */
+        protected static $_allowTrace = true;
+        /**
          * 运行时的内存和时间状态
          * @var array
          */
@@ -271,6 +275,22 @@ namespace PLite {
          * @var array
          */
         private static $_traces = [];
+
+        /**
+         * 开启Trace
+         * @return void
+         */
+        public static function openTrace(){
+            self::$_allowTrace = true;
+        }
+
+        /**
+         * 关闭trace
+         * @return void
+         */
+        public static function closeTrace(){
+            self::$_allowTrace = false;
+        }
 
         /**
          * 记录运行时的内存和时间状态
@@ -297,23 +317,20 @@ namespace PLite {
          * 记录下跟踪信息
          * @param string|mixed $message
          * @param ...
-         * @return string
+         * @return string|bool
          */
-        public static function trace($message){
-            $location = debug_backtrace();
-            $location = "{$location[0]['file']}:{$location[0]['line']}";
-            if(func_num_args() > 1) $message = var_export(func_get_args(),true);
-            if(!is_string($message)) $message = var_export($message,true);
-            return self::$_traces[$location] = $message;
+        public static function trace($message=null){
+            if(null === $message){
+                return ExtDebugger::showTrace(self::$_status,self::$_traces);
+            }else{
+                $location = debug_backtrace();
+                $location = "{$location[0]['file']}:{$location[0]['line']}";
+                if(func_num_args() > 1) $message = var_export(func_get_args(),true);
+                if(!is_string($message)) $message = var_export($message,true);
+                return self::$_traces[$location] = $message;
+            }
         }
 
-        /**
-         * show trace
-         * @return true
-         */
-        public static function showTrace(){
-            ExtDebugger::showTrace(self::$_status,self::$_traces);
-        }
     }
 
     /**
@@ -394,6 +411,7 @@ namespace PLite {
          * @return void
          */
         final public static function handleError($errno,$errstr,$errfile,$errline){
+//            dumpout(debug_backtrace());
             ExtDebugger::handleError($errno,$errstr,$errfile,$errline);
         }
     }
@@ -755,7 +773,7 @@ namespace PLite {
          * @param int $auth 文件夹权限
          * @return bool 文件夹已经存在的时候返回false,成功创建返回true
          */
-        public static function mkdir($dir, $auth = 0744){
+        public static function mkdir($dir, $auth = 0766){
             if(!self::checkWritableWithRevise($dir)) return false;
             return is_dir($dir)?chmod($dir,$auth):mkdir($dir,$auth,true);
         }
@@ -766,10 +784,11 @@ namespace PLite {
          * @param int $auth 文件权限
          * @return bool 是否成功修改了该文件|返回null表示在访问的范围之外
          */
-        public static function chmod($path, $auth = 0755){
+        public static function chmod($path, $auth = 0766){
             if(!self::checkWritableWithRevise($path)) return null;
             return file_exists($path)?chmod($path,$auth):false;
         }
+
         /**
          * 设定文件的访问和修改时间
          * 注意的是:内置函数touch在文件不存在的情况下会创建新的文件,此时创建时间可能大于修改时间和访问时间
@@ -781,7 +800,7 @@ namespace PLite {
          */
         public static function touch($filepath, $mtime = null, $atime = null){
             if(!self::checkWritableWithRevise($filepath)) return null;
-            self::checkAndMakeSubdir($filepath);
+            self::checkAndMakeSubdir($filepath) or PLiteException::throwing("Check path '$filepath' failed");
             return touch($filepath, $mtime,$atime);
         }
 
@@ -810,7 +829,7 @@ namespace PLite {
          */
         public static function write($filepath,$content,$write_encode='UTF-8',$text_encode='UTF-8'){
             if(!self::checkWritableWithRevise($filepath)) return null;
-            self::checkAndMakeSubdir($filepath);
+            self::checkAndMakeSubdir($filepath) or PLiteException::throwing("Check path '$filepath' failed");
             //文本编码检测
             if($write_encode !== $text_encode){//写入的编码并非是文本的编码时进行转化
                 $content = iconv($text_encode,"{$write_encode}//IGNORE",$content);
@@ -853,7 +872,7 @@ namespace PLite {
          * @param int $auth
          * @return bool
          */
-        public static function checkAndMakeSubdir($path, $auth = 0755){
+        public static function checkAndMakeSubdir($path, $auth = 0766){
             $path = dirname($path);
             if(!is_dir($path)) return self::mkdir($path,$auth);
             if(!is_writeable($path)) return self::chmod($path,$auth);
@@ -1298,6 +1317,7 @@ namespace PLite {
          */
         public static function ajaxBack($data, $type = self::AJAX_JSON, $options = 0){
             self::cleanOutput();
+            Debugger::closeTrace();
             switch (strtoupper($type)) {
                 case self::AJAX_JSON :// 返回JSON数据格式到客户端 包含状态信息
                     header('Content-Type:application/json; charset=utf-8');

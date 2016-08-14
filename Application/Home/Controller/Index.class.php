@@ -8,14 +8,15 @@ namespace Application\Home\Controller;
 
 use PLite\Extension\Sphinx\SphinxClient;
 use PLite\Library\Session;
+use PLite\Response;
 
 class Index {
+
 
     public function index(){
         $href = __PUBLIC__.'/index.php/Admin/Index/index';
         echo "<a href='{$href}'>Click to background</a>";
     }
-
 
     public function test(){
         echo false || true ?'its true':'its false';
