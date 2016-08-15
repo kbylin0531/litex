@@ -7,7 +7,6 @@
  */
 namespace PLite\Library;
 use PLite\PLiteException;
-use PLite\Library\Session\SessionInterface;
 use PLite\Lite;
 
 
@@ -31,11 +30,6 @@ class Session extends Lite{
 
     const CONF_NAME = 'session';
     const CONF_CONVENTION = [
-        'PRIOR_INDEX' => null,//默认驱动ID，类型限定为int或者string
-        'DRIVER_CLASS_LIST' => [],//驱动类的列表
-        'DRIVER_CONFIG_LIST' => [],//驱动类列表参数
-
-
         'CACHE_EXPIRE'  => 180,//默认session到期时间
         'SESSION_NAME'  => '_shf_',//会话名称
         'SAVEPATH'      => null,//null表示不进行额外的设置，也可以是一个带权限的目录
@@ -76,22 +70,7 @@ class Session extends Lite{
      */
     const LIMITER_PRIVATE_WITHOUT_EXPIRE = 'private_no_expire';
 
-    /**
-     * @var SessionInterface
-     */
-    private static $driver = null;
-
-    /**
-     * @param null $identify
-     * @return Session
-     */
-    public static function getInstance($identify = null){
-        return parent::getInstance($identify);
-    }
-
-    public static function initializationize($clsnm = null){
-        parent::initializationize($clsnm);
-
+    public static function __init(){
         $config = self::getConfig();
         //设置session保存路径
         if(isset($config['SAVEPATH']) and is_dir($config['SAVEPATH'])){
@@ -103,7 +82,6 @@ class Session extends Lite{
             self::cacheLimiter($config['LIMITER_TYPE']);
         }
         self::begin();
-        self::$driver = self::driver();
     }
 
     /**
@@ -243,12 +221,10 @@ class Session extends Lite{
     /**
      * 销毁会话中全部数据
      * 要想重新使用session，需要重新调用session_start函数
+     * 注意：unset($_SESSION)会导致$_SESSION数组彻底地不能使用,调用session_unset可以释放所有的注册的session变量
      * @return bool
      */
     public static function destroy(){
-//        $_SESSION =  array();
-        //unset($_SESSION)会导致$_SESSION数组彻底地不能使用
-        //调用session_unset可以释放所有的注册的session变量
         session_unset();
         return session_destroy();
     }
@@ -313,15 +289,11 @@ class Session extends Lite{
      * @return void
      */
     public static function set($name,$value){
-        if(self::$driver){
-            self::$driver->set($name,$value);
+        if(strpos($name,'.')){
+            list($name1,$name2) =   explode('.',$name,2);
+            $_SESSION[$name1][$name2] = $value;
         }else{
-            if(strpos($name,'.')){
-                list($name1,$name2) =   explode('.',$name,2);
-                $_SESSION[$name1][$name2] = $value;
-            }else{
-                $_SESSION[$name] = $value;
-            }
+            $_SESSION[$name] = $value;
         }
     }
 
@@ -331,19 +303,15 @@ class Session extends Lite{
      * @return mixed return null if not set
      */
     public static function get($name=null){
-        if(self::$driver) {
-            return self::$driver->get($name);
-        }else{
-            if(isset($name)){
-                if(strpos($name,'.')){
-                    list($name1,$name2) =   explode('.',$name);
-                    return isset($_SESSION[$name1][$name2])?$_SESSION[$name1][$name2]:null;
-                }else{
-                    return isset($_SESSION[$name])?$_SESSION[$name]:null;
-                }
+        if(isset($name)){
+            if(strpos($name,'.')){
+                list($name1,$name2) =   explode('.',$name);
+                return isset($_SESSION[$name1][$name2])?$_SESSION[$name1][$name2]:null;
+            }else{
+                return isset($_SESSION[$name])?$_SESSION[$name]:null;
             }
-            return $_SESSION;
         }
+        return $_SESSION;
     }
 
     /**
@@ -352,15 +320,11 @@ class Session extends Lite{
      * @return bool
      */
     public static function has($name){
-        if(self::$driver) {
-            return self::$driver->has($name);
+        if(strpos($name,'.')){ // 支持数组
+            list($name1,$name2) =   explode('.',$name);
+            return isset($_SESSION[$name1][$name2]);
         }else{
-            if(strpos($name,'.')){ // 支持数组
-                list($name1,$name2) =   explode('.',$name);
-                return isset($_SESSION[$name1][$name2]);
-            }else{
-                return isset($_SESSION[$name]);
-            }
+            return isset($_SESSION[$name]);
         }
     }
 
@@ -370,7 +334,7 @@ class Session extends Lite{
      * @return void
      */
     public static function clear(){
-        self::$driver?self::$driver->clear():($_SESSION = []);
+        $_SESSION = [];
     }
 
     /**
@@ -379,31 +343,21 @@ class Session extends Lite{
      * @return bool
      */
     public static function delete($name){
-        if(self::$driver) {
-            return self::$driver->delete($name);
-        }else{
-            if(is_string($name)){
-                if(strpos($name,'.')){
-                    list($name1,$name2) =   explode('.',$name);
-                    unset($_SESSION[$name1][$name2]);
-                }else{
-                    unset($_SESSION[$name]);
-                }
-            }elseif(is_array($name)){
-                foreach($name as $val){
-                    self::delete($val);
-                }
+        if(is_string($name)){
+            if(strpos($name,'.')){
+                list($name1,$name2) =   explode('.',$name);
+                unset($_SESSION[$name1][$name2]);
             }else{
-                PLiteException::throwing($name);
+                unset($_SESSION[$name]);
             }
-            return true;
+        }elseif(is_array($name)){
+            foreach($name as $val){
+                self::delete($val);
+            }
+        }else{
+            PLiteException::throwing($name);
         }
+        return true;
     }
-
-
-
-
-
-
 
 }

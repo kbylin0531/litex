@@ -1,5 +1,7 @@
 <?php
 namespace PLite\Library;
+use PLite\PLiteException;
+
 /**
  * Class FileCache
  * 数据的缓存存储类；key=>value 模式；value可以是任意类型数据。
@@ -239,7 +241,7 @@ class FileCache {
     public static function save($file,$data){//10000次需要6s
         if (!$file) return;
         if (file_exists($file) && !is_writable($file)) {
-            show_json("the path '{$file}' can not write!",false);
+            PLiteException::throwing("the path '{$file}' can not write!");
         }
         if($fp = fopen($file, "w")){
             if (flock($fp, LOCK_EX)) {  // 进行排它型锁定

@@ -8,7 +8,6 @@
 namespace PLite\Library;
 use PLite\Core\Dao;
 use PLite\PLiteException as Exception;
-use PLite\Util\SEK;
 use PLite\Utils;
 
 /**

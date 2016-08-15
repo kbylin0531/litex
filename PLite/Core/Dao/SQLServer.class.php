@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by linzhv@outlook.com.
- * User: linzh
- * Date: 2016/6/21
- * Time: 20:34
- */
-
 namespace PLite\Core\Dao;
 
 

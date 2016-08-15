@@ -1,7 +1,7 @@
 <?php
 namespace PLite\Core;
+use PLite\AutoConfig;
 use PLite\Debugger;
-use PLite\Lite;
 use PLite\Util\SEK;
 use PLite\Utils;
 
@@ -9,7 +9,8 @@ use PLite\Utils;
  * Class Router
  * @package PLite\Core
  */
-class Router extends Lite{
+class Router {
+    use AutoConfig;
 
     const CONF_NAME = 'route';
     const CONF_CONVENTION = [
@@ -113,7 +114,40 @@ class Router extends Lite{
         return null;
     }
 
-
+    /**
+     * 将参数序列装换成参数数组，应用Router模块的配置
+     * @param string $params 参数字符串
+     * @param string $ppb
+     * @param string $pkvb
+     * @return array
+     */
+    public static function fetchKeyValuePair($params,$ppb='/',$pkvb='/'){//解析字符串成数组
+        $pc = [];
+        if($ppb !== $pkvb){//使用不同的分割符
+            $parampairs = explode($ppb,$params);
+            foreach($parampairs as $val){
+                $pos = strpos($val,$pkvb);
+                if(false === $pos){
+                    //非键值对，赋值数字键
+                }else{
+                    $key = substr($val,0,$pos);
+                    $val = substr($val,$pos+strlen($pkvb));
+                    $pc[$key] = $val;
+                }
+            }
+        }else{//使用相同的分隔符
+            $elements = explode($ppb,$params);
+            $count = count($elements);
+            for($i=0; $i<$count; $i += 2){
+                if(isset($elements[$i+1])){
+                    $pc[$elements[$i]] = $elements[$i+1];
+                }else{
+                    //单个将被投入匿名参数,先废弃
+                }
+            }
+        }
+        return $pc;
+    }
 
     /**
      * 使用正则表达式匹配uri
@@ -253,7 +287,7 @@ class Router extends Lite{
         //-- 解析参数部分 --//
 
 
-        self::$result['p'] = Utils::fetchKeyValuePair($pparts,$bridges['pp'],$bridges['pkv']);
+        self::$result['p'] = self::fetchKeyValuePair($pparts,$bridges['pp'],$bridges['pkv']);
         DEBUG_MODE_ON and Debugger::status('parseurl_in_common_end');
     }
 

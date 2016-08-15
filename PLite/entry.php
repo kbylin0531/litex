@@ -3,7 +3,6 @@
 namespace {
     use PLite\AutoLoader;
     use PLite\Core\Cache;
-    use PLite\Core\Configger;
     use PLite\Debugger;
     use PLite\PLiteException;
     use PLite\Response;
@@ -74,7 +73,6 @@ namespace {
     const PATH_RUNTIME  = PATH_BASE.'/Runtime';
     const PATH_PUBLIC   = PATH_BASE.'/Public';
 
-
     /**
      * Class PLite
      */
@@ -106,10 +104,6 @@ namespace {
             //string
             'FUNCTION_PACK' => null,
 
-            //core config
-            'CONFIGGER'     => null,
-            'ROUTER'        => null,
-            'DISPATCHER'    => null,
         ];
 
         /**
@@ -177,9 +171,6 @@ namespace {
                 //打开输出控制缓冲
                 ob_start();
 
-                Configger::init(self::$_config['CONFIGGER']);
-                Router::init(self::$_config['ROUTER']);
-
                 //parse uri
                 $result = self::$_config['ROUTE_ON']?Router::parseRoute():null;
                 $result or $result = Router::parseURL();
@@ -187,8 +178,6 @@ namespace {
                 empty($result['p']) or $_GET = array_merge($_GET,$result['p']);
 
                 Debugger::status('dispatch_begin');
-
-                Dispatcher::init(self::$_config['DISPATCHER']);
                 //dispatch
                 $ckres = Dispatcher::checkDefault($result['m'],$result['c'],$result['a']);
 
@@ -380,9 +369,8 @@ namespace PLite {
                     if(is_file($path)) include_once self::$_classes[$clsnm] = $path;
                 }
             }
-            //auto init class
-            $funcname = '__initializationize';
-            is_callable("{$clsnm}::{$funcname}") and $clsnm::$funcname();
+            //auto config class,defined by commoon
+            Utils::callStatic($clsnm,'__initializationize');
         }
     }
 
@@ -512,40 +500,6 @@ namespace PLite {
         }
 
         /**
-         * 将参数序列装换成参数数组，应用Router模块的配置
-         * @param string $params 参数字符串
-         * @param string $ppb
-         * @param string $pkvb
-         * @return array
-         */
-        public static function fetchKeyValuePair($params,$ppb='/',$pkvb='/'){//解析字符串成数组
-            $pc = [];
-            if($ppb !== $pkvb){//使用不同的分割符
-                $parampairs = explode($ppb,$params);
-                foreach($parampairs as $val){
-                    $pos = strpos($val,$pkvb);
-                    if(false === $pos){
-                        //非键值对，赋值数字键
-                    }else{
-                        $key = substr($val,0,$pos);
-                        $val = substr($val,$pos+strlen($pkvb));
-                        $pc[$key] = $val;
-                    }
-                }
-            }else{//使用相同的分隔符
-                $elements = explode($ppb,$params);
-                $count = count($elements);
-                for($i=0; $i<$count; $i += 2){
-                    if(isset($elements[$i+1])){
-                        $pc[$elements[$i]] = $elements[$i+1];
-                    }else{
-                        //单个将被投入匿名参数,先废弃
-                    }
-                }
-            }
-            return $pc;
-        }
-        /**
          * 自动从运行环境中获取URI
          * 直接访问：
          *  http://www.xor.com:8056/                => '/'
@@ -577,6 +531,24 @@ namespace PLite {
                 }
             }
             return $uri;
+        }
+
+        /**
+         * @param string $clsnm class name
+         * @param string $method method name
+         * @param null|array $args
+         * @return mixed|null
+         */
+        public static function callStatic($clsnm,$method,$args=null){
+            $callable = "{$clsnm}::{$method}()";
+            if(is_callable($callable)){
+                try{
+                    return $args?call_user_func_array($callable,$args):$clsnm::$method();
+                }catch (\Exception $e){
+                    Debugger::trace($e->getMessage());
+                }
+            }
+            return null;
         }
 
         /**
@@ -873,7 +845,6 @@ namespace PLite {
             }
             return $drivers[$key];
         }
-
     }
 
     /**
@@ -904,6 +875,8 @@ namespace PLite {
                 $conf = Configger::load($clsnm);
                 $conf and is_array($conf) and self::$_cs[$clsnm] = Utils::merge(self::$_cs[$clsnm],$conf,true);
             }
+            //auto init
+            Utils::callStatic($clsnm,'__init');
         }
 
         /**
@@ -975,7 +948,7 @@ namespace PLite {
         /**
          * Get instance by identify
          * @param string|int $identify
-         * @return \stdClass
+         * @return object
          */
         public static function getInstance($identify=0){
             $clsnm = static::class;
@@ -1027,7 +1000,7 @@ namespace PLite {
                 if(isset($config[PRIOR_INDEX])){
                     $identify = $config[PRIOR_INDEX];
                 }else{
-                    PLiteException::throwing("No driver identify been specified '{$identify}' !");
+                    PLiteException::throwing("No driver identify for '{$clsnm}' been specified '{$identify}' !");
                 }
             }
 
@@ -1055,6 +1028,11 @@ namespace PLite {
          * @return mixed
          */
         public static function __callStatic($method, $arguments) {
+            $driver = self::driver();
+            if(!method_exists($driver,$method)){
+                $clsnm = static::class;
+                PLiteException::throwing("Method '{$method}' do not exist in driver '{$clsnm}'!");
+            }
             return call_user_func_array([self::driver(), $method], $arguments);
         }
     }

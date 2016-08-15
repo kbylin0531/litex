@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by linzhv@outlook.com.
- * User: linzh
- * Date: 2016/6/22
- * Time: 11:22
- */
-
 namespace PLite\Library;
+use PLite\PLiteException;
 
 
 /**
@@ -64,7 +58,7 @@ class Hook {
      * @param string $tag 方法名（标签名）
      * @param Mixed $params 方法的参数
      * @return mixed
-     * @throws Exception
+     * @throws PLiteException
      */
     private static function exec($callableorclass, $tag = '', &$params = null) {
         if ($callableorclass instanceof \Closure) {
@@ -76,7 +70,7 @@ class Hook {
                 $obj->$tag($params) : /*如果目标对象中存在这个$tag，则是callable的*/
                 call_user_func([$obj,'run'],$params)/*$obj->run($params)*/;
         }else{
-            Exception::throwing('Wrong tag:'.var_export($callableorclass,true));return false;
+            PLiteException::throwing('Wrong tag:'.var_export($callableorclass,true));return false;
         }
     }
 }

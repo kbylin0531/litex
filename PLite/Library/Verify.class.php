@@ -1,15 +1,12 @@
 <?php
-/**
- * Created by linzhv@outlook.com.
- * User: linzh
- * Date: 2016/6/23
- * Time: 21:56
- */
 namespace PLite\Library;
-use PLite\Lite;
+use PLite\AutoConfig;
+use PLite\PLiteException;
 
-class Verify extends Lite{
-    const CONF_NAME = 'think/verify';
+class Verify {
+    use AutoConfig;
+
+    const CONF_NAME = 'verify';
     const CONF_CONVENTION = [
         'seKey'     =>  'ThinkPHP.CN',   // 验证码加密密钥
         'codeSet'   =>  '2345678abcdefhijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXY',             // 验证码字符集合
@@ -27,7 +24,7 @@ class Verify extends Lite{
         'bg'        =>  array(243, 251, 254),  // 背景颜色
         'reset'     =>  true,           // 验证成功后是否重置
     ];
-    protected static $config =	[];
+    private static $config =	[];
 
     private static $_image   = NULL;     // 验证码图片实例
     private static $_color   = NULL;     // 验证码字体颜色
@@ -48,15 +45,14 @@ class Verify extends Lite{
         }
         // session 过期
         if($_SERVER['REQUEST_TIME'] - $secode['verify_time'] > self::$config['expire']) {
-            Session::getset($key, null);
+            Session::set($key, null);
             return false;
         }
 
         if($this->authcode(strtoupper($code)) == $secode['verify_code']) {
-            self::$config['reset'] && Session::getset($key, null);
+            self::$config['reset'] && Session::set($key, null);
             return true;
         }
-
         return false;
     }
 
@@ -113,7 +109,7 @@ class Verify extends Lite{
         $code = array(); // 验证码
         $codeNX = 0; // 验证码第N个字符的左边距
         if(!function_exists('imagettftext')){
-            Exception::throwing('未安装GD库或者freetype库！');
+            PLiteException::throwing('未安装GD库或者freetype库！');
         }
         if(self::$config['useZh']){ // 中文验证码
             for ($i = 0; $i<self::$config['length']; $i++) {
@@ -142,7 +138,7 @@ class Verify extends Lite{
         $secode     =   array();
         $secode['verify_code'] = $code; // 把校验码保存到session
         $secode['verify_time'] = $_SERVER['REQUEST_TIME'];  // 验证码创建时间
-        Session::getInstance()->set($key.$id, $secode);
+        Session::set($key.$id, $secode);
 
         header('Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate');
         header('Cache-Control: post-check=0, pre-check=0', false);

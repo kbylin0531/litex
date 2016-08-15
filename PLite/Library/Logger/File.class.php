@@ -8,6 +8,7 @@
  */
 namespace PLite\Library\Logger;
 use PLite\Core\Storage;
+use PLite\Library\LoggerInterface;
 use PLite\PLiteException;
 use PLite\Util\Helper\ClientAgent;
 

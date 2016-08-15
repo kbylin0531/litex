@@ -1,12 +1,11 @@
 <?php
-/**
- * Created by linzhv@outlook.com.
- * User: linzh
- * Date: 2016/6/21
- * Time: 20:14
- */
 namespace PLite\Core\Dao;
+use PLite\Core\DaoDriver;
 
+/**
+ * Class MySQL
+ * @package PLite\Core\Dao
+ */
 class MySQL extends DaoDriver {
 
     public function escape($field){
@@ -110,18 +109,18 @@ class MySQL extends DaoDriver {
      * @return string
      */
     public function compile(array $components,$actiontype){
-        $_components = array(
-            'distinct'  => '',
-            'fields'    => ' * ', //查询的表域情况
-            'table'     => null,
-            'join'      => null,     //join部分，需要带上join关键字
-            'where'     => null, //where部分
-            'group'     => null, //分组 需要带上group by
-            'having'    => null,//having子句，依赖$group存在，需要带上having部分
-            'order'     => null,//排序，不需要带上order by
-            'limit'     => 2,
-            'offset'    => 5,
-        );
+//        $_components = array(
+//            'distinct'  => '',
+//            'fields'    => ' * ', //查询的表域情况
+//            'table'     => null,
+//            'join'      => null,     //join部分，需要带上join关键字
+//            'where'     => null, //where部分
+//            'group'     => null, //分组 需要带上group by
+//            'having'    => null,//having子句，依赖$group存在，需要带上having部分
+//            'order'     => null,//排序，不需要带上order by
+//            'limit'     => 2,
+//            'offset'    => 5,
+//        );
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 namespace PLite\Library;
-use PLite\core\URL;
+use PLite\Core\Router;
 use PLite\Debugger;
 use PLite\PLiteException;
 use PLite\Response;
@@ -12,11 +12,6 @@ use PLite\Utils;
  * @package PLite\Library
  */
 class Controller {
-
-    /**
-     * Controller constructor.
-     */
-    public function __construct(){}
 
     /**
      * 分配给模板的变量集合
@@ -125,9 +120,8 @@ class Controller {
      * @return void
      */
     public function redirect($compo,array $params=[],$time=0,$message=''){
-        $url = URL::url($compo,$params);
-//        \PLite\dumpout($url);
-        URL::redirect($url,$time,$message);
+        $url = Router::url($compo,$params);
+        Router::redirect($url,$time,$message);
     }
 
     /**

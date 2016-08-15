@@ -6,7 +6,7 @@
  * Time: 21:42
  */
 namespace PLite\Library;
-use PLite\Lite;
+use PLite\AutoConfig;
 use PLite\PLiteException;
 
 /**
@@ -16,7 +16,8 @@ use PLite\PLiteException;
  *
  * @package PLite\Library
  */
-class Cookie extends Lite{
+class Cookie {
+    use AutoConfig;
     const CONF_NAME = 'cookie';
     const CONF_CONVENTION = [
         // cookie 名称前缀
@@ -35,12 +36,9 @@ class Cookie extends Lite{
         'setcookie' => true,
     ];
 
-    public static function initializationize($clsnm = null, $conf = null){
-        parent::initializationize($clsnm);
-        self::getConfig('httponly') and ini_set('session.cookie_httponly', 1);
+    public static function __init(){
+        self::getConfig('httponly',false) and ini_set('session.cookie_httponly', 1);
     }
-
-
 
     /**
      * 判断Cookie数据

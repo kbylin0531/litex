@@ -762,7 +762,7 @@ class Email {
      * @param	string	$disposition = 'attachment'
      * @param	string	$newname = NULL
      * @param	string	$mime = ''
-     * @return	Email
+     * @return	Email|false
      */
     public function attach($file, $disposition = '', $newname = NULL, $mime = '')
     {
@@ -2338,7 +2338,6 @@ class Email {
      */
     protected function _set_error_message($msg, $val = '')
     {
-        //TODO:error reformat
         $this->_debug_msg[] = $msg.$val.'<br />';
     }
 
