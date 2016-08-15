@@ -120,7 +120,7 @@ class Think implements ViewInterface{
 
     /**
      * 保存控制器分配的变量
-     * @param string $name
+     * @param string|array $name
      * @param null $value
      * @param bool $nocache
      * @return $this
@@ -161,13 +161,14 @@ class Think implements ViewInterface{
 
     /**
      * 显示模板
-     * @param string $template 全部模板引擎通用的
+     * @param string $context
      * @param null $cache_id
      * @param null $compile_id
      * @param null $parent
      * @return void
      */
-    public function display($template = null, $cache_id = null, $compile_id = null, $parent = null) {
+    public function display($context = null, $cache_id = null, $compile_id = null, $parent = null) {
+        $template = SEK::parseTemplatePath($context);
         //模板常量
         defined('__ROOT__') or define('__ROOT__',URL::getBasicUrl());
         defined('__MODULE__') or define('__MODULE__',__PUBLIC__.'/'.REQUEST_MODULE);

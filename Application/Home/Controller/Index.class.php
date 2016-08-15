@@ -6,16 +6,81 @@
  */
 namespace Application\Home\Controller;
 
+use PLite\Core\Configger;
 use PLite\Extension\Sphinx\SphinxClient;
 use PLite\Library\Session;
-use PLite\Response;
 
 class Index {
 
+    public function config(){
+        \PLite\dumpout(Configger::write('as.dc',[
+            '111'   => 'dasdsada',
+            '32323'=> [
+                '111'   => '快速生成API文档',
+            ]
+        ]),
+        Configger::read('as.dc'));
+    }
 
     public function index(){
         $href = __PUBLIC__.'/index.php/Admin/Index/index';
-        echo "<a href='{$href}'>Click to background</a>";
+        $content = '';
+        $i = 1;
+        while($i-- > 0 ){
+            $content .= "<a href='{$href}'>Click to background</a>";
+        }
+        echo $content;
+        return 0;
+    }
+
+    /**
+     * i made a simple test which is faster: adding some text in the normal way or by the ob stack:
+     */
+    public function testObPerfomance(){
+        $start = microtime(true);
+        $var = '';
+        for($i=0 ; $i <= 10000000 ; $i++) {
+            $var .= ' ';
+        }
+        $middle = microtime(true);
+
+        //use more time
+        ob_start();
+        for($i=0 ; $i <= 10000000 ; $i++) {
+            echo ' ';
+        }
+        ob_get_contents();
+        ob_end_clean();
+
+        $end = microtime(true);
+
+        echo $middle - $start;
+        echo '<br />';
+        echo $end - $middle;
+    }
+
+
+    public function testObWorked(){
+        //this is an example of how the stack works:
+        //Level 0
+        ob_start();
+        echo "Hello ";
+
+        //Level 1
+        ob_start();
+        echo "Hello World";
+        $out2 = ob_get_contents();
+        ob_end_clean();
+
+        //Back to level 0
+        echo "Galaxy";
+        $out1 = ob_get_contents();
+        ob_end_clean();
+
+        //Just output
+        var_dump($out1, $out2);
+        //string(12) "Hello Galaxy" string(11) "Hello World"
+        exit;
     }
 
     public function test(){

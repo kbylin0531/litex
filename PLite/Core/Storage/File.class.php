@@ -1,14 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lnzhv
- * Date: 7/13/16
- * Time: 9:57 PM
- */
-
 namespace PLite\Core\Storage;
 use PLite\Core\Storage;
-use PLite\Util\SEK;
+use PLite\Core\StorageInterface;
+use PLite\PLiteException;
+use PLite\Utils;
 
 /**
  * Class File 文件系统驱动类基类
@@ -16,49 +11,10 @@ use PLite\Util\SEK;
  */
 class File implements StorageInterface {
 
-    /**
-     * 惯例配置
-     * @var array
-     */
-    private $convention = [
-        'READ_LIMIT_ON'     => true,
-        'WRITE_LIMIT_ON'    => true,
-        'READABLE_SCOPE'    => PATH_BASE,
-        'WRITABLE_SCOPE'    => PATH_RUNTIME,
+    protected $config = [];
 
-        'READOUT_MAX_SIZE'  => 2097152,//2M限制,对于文本文件已经足够
-        'OS_ECNODE'         => 'GB2312', // 文件系统编码格式,如果是英文环境下可能是UTF-8,GBK,GB2312以外的编码格式
-        'READOUT_ENCODE'    => 'UTF-8', // 读出时转化的成的编码格式
-        'WRITEIN_ENCODE'    => 'UTF-8', // 写入时转化的编码格式
-    ];
-
-    /**
-     * File constructor.
-     * @param array $config
-     */
-    public function __construct(array $config){
-        $this->convention = array_merge($this->convention,$config);
-    }
-
-    /**
-     * 转换成php处理文件系统时所用的编码
-     * 即UTF-8转GB2312
-     * @param string $str 待转化的字符串
-     * @param string $strencode 该字符串的编码格式
-     * @return string|false 转化失败返回false
-     */
-    public function toSystemEncode($str,$strencode='UTF-8'){
-        return iconv($strencode,$this->convention['OS_ECNODE'].'//IGNORE',$str);
-    }
-
-    /**
-     * 转换成程序使用的编码
-     * 即GB2312转UTF-8
-     * @param string $str 待转换的字符串
-     * @return string|false 转化失败返回false
-     */
-    public function toProgramEncode($str){
-        return iconv($this->convention['OS_ECNODE'],'UTF-8//IGNORE',$str);
+    public function __construct(array $config=null){
+        $config and $this->config = array_merge($this->config,$config);
     }
 
     /**
@@ -75,17 +31,14 @@ class File implements StorageInterface {
     private function checkAccessableWithRevise(&$path,$limiton,$scopes){
         if(!$limiton or !$scopes) return true;
         $temp = dirname($path);//修改的目录
-        $path = $this->toSystemEncode($path);
-        if(is_string($scopes)){
-            $scopes = [$scopes];
-        }
+        $path = Utils::toSystemEncode($path);
+        is_string($scopes) and $scopes = [$scopes];
 
         foreach ($scopes as $scope){
-            if(SEK::checkPathContainedInScope($temp,$scope)){
+            if(Utils::checkInScope($temp,$scope)){
                 return true;
             }
         }
-//        \PLite\dumpout($scopes,$temp);
         return false;
     }
 
@@ -95,7 +48,7 @@ class File implements StorageInterface {
      * @return bool
      */
     private function checkReadableWithRevise(&$path){
-        return $this->checkAccessableWithRevise($path,$this->convention['READ_LIMIT_ON'],$this->convention['READABLE_SCOPE']);
+        return $this->checkAccessableWithRevise($path,$this->config['READ_LIMIT_ON'],$this->config['READABLE_SCOPE']);
     }
 
     /**
@@ -104,56 +57,12 @@ class File implements StorageInterface {
      * @return bool
      */
     private function checkWritableWithRevise(&$path){
-        return $this->checkAccessableWithRevise($path,$this->convention['WRITE_LIMIT_ON'],$this->convention['WRITABLE_SCOPE']);
+        return $this->checkAccessableWithRevise($path,$this->config['WRITE_LIMIT_ON'],$this->config['WRITABLE_SCOPE']);
     }
 
 //----------------------------------------------------------------------------------------------------------------------
 //------------------------------------ 读取 -----------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * 获取文件内容
-     * 注意：
-     *  页面是utf-8，file_get_contents的页面是gb2312，输出时中文乱码
-     * @param string $filepath 文件路径,php源码中格式是UTF-8，需要转成GB2312才能使用
-     * @param string|array $file_encoding 文件内容实际编码,可以是数组集合或者是编码以逗号分开的字符串
-     * @param bool $recursion 如果读取到的文件是目录,是否进行递归读取,默认为false
-     * @return string|array|false|null 返回文件时间内容;返回null表示在访问的范围之外
-     */
-    public function read($filepath, $file_encoding=null,$recursion=false){//,$output_encode='UTF-8'
-        if(!$this->checkReadableWithRevise($filepath)) return null;
-
-        if(is_file($filepath)){
-            return $this->_readFile($filepath, $file_encoding);
-        }elseif(is_dir($filepath)){
-            return $this->_readDir($filepath,$recursion);
-        }else{
-            //文件不存在
-            return false;
-        }
-    }
-
-    /**
-     * 读取文件,参数参考read方法
-     * @param string $filepath
-     * @param string $file_encoding
-     * @return false|string 读取失败返回false
-     */
-    private function _readFile($filepath, $file_encoding){
-        $content = file_get_contents($filepath,null,null,null,$this->convention['READOUT_MAX_SIZE']);//限制大小为2M
-        if(false === $content) return false;
-
-        if(null === $file_encoding){
-            return $content;
-        }else{
-            if($file_encoding === $this->convention['READOUT_ENCODE']) return $content;
-            $readoutEncode = $this->convention['READOUT_ENCODE'].'//IGNORE';
-            if(is_string($file_encoding) && false === strpos($file_encoding,',')){
-                return iconv($file_encoding,$readoutEncode,$content);
-            }
-            return mb_convert_encoding($content,$readoutEncode,$file_encoding);
-        }
-    }
 
     /**
      * 读取文件夹内容，并返回一个数组(不包含'.'和'..')
@@ -166,9 +75,10 @@ class File implements StorageInterface {
      * @param bool $_isouter 辅助参数,用于判断是外部调用还是内部的
      * @return array
      */
-    private function _readDir($dirpath, $recursion=false, $_isouter=true){
+    public function readDir($dirpath, $recursion=false, $_isouter=true){
         static $_file = [];
         static $_dirpath_toread = null;
+        if(!$this->checkReadableWithRevise($filepath)) return null;
 
         if(true === $_isouter){
             //外部调用,初始化
@@ -184,16 +94,39 @@ class File implements StorageInterface {
 
             if(file_exists($fullpath)) {
                 $index = strpos($fullpath,$_dirpath_toread);
-                $_file[$this->toProgramEncode(substr($fullpath,$index+strlen($_dirpath_toread)))] = str_replace('\\','/',$this->toProgramEncode($fullpath));
+                $_file[Utils::toProgramEncode(substr($fullpath,$index+strlen($_dirpath_toread)))] =
+                    str_replace('\\','/',Utils::toProgramEncode($fullpath));
             }
 
             if($recursion and is_dir($fullpath)) {
                 $_isouter = "{$_isouter}/{$filename}";
-                $this->_readDir($fullpath,$recursion,false);//递归,不清空
+                $this->readDir($fullpath,$recursion,false);//递归,不清空
             }
         }
         closedir($handler);//关闭目录指针
         return $_file;
+    }
+    /**
+     * 读取文件,参数参考read方法
+     * @param string $filepath
+     * @param string $file_encoding
+     * @param string $readout_encoding
+     * @param int|null $maxlen Maximum length of data read. The default of php is to read until end of file is reached. But I limit to 4 MB
+     * @return false|string 读取失败返回false
+     */
+    public function read($filepath, $file_encoding='UTF-8',$readout_encoding='UTF-8',$maxlen=4094304){
+        if(!$this->checkReadableWithRevise($filepath)) return null;
+        $content = file_get_contents($filepath,null,null,null,$maxlen);//限制大小为2M
+        if(false === $content) return false;//false on failure
+        if(null === $file_encoding or $file_encoding === $readout_encoding){
+            return $content;//return the raw content or what the read is what the need
+        }else{
+            $readoutEncode = "{$readout_encoding}//IGNORE";
+            if(is_string($file_encoding) and false === strpos($file_encoding,',')){
+                return iconv($file_encoding,$readoutEncode,$content);
+            }
+            return mb_convert_encoding($content,$readoutEncode,$file_encoding);
+        }
     }
 
     /**
@@ -213,7 +146,7 @@ class File implements StorageInterface {
      * 返回文件内容上次的修改时间
      * @param string $filepath 文件路径
      * @param int $mtime 修改时间
-     * @return int|bool|null 如果是修改时间的操作返回的bool;如果是获取修改时间,则返回Unix时间戳;返回null表示在访问的范围之外
+     * @return int|bool|null 如果是修改时间的操作返回的bool;如果是获取修改时间,则返回Unix时间戳;
      */
     public function mtime($filepath,$mtime=null){
         if(!$this->checkReadableWithRevise($filepath)) return null;
@@ -223,7 +156,7 @@ class File implements StorageInterface {
     /**
      * 获取文件按大小
      * @param string $filepath 文件路径
-     * @return int|false|null 按照字节计算的单位;返回null表示在访问的范围之外
+     * @return int|false|null 按照字节计算的单位;
      */
     public function size($filepath){
         if(!$this->checkReadableWithRevise($filepath)) return null;
@@ -235,13 +168,24 @@ class File implements StorageInterface {
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * 创建文件夹
-     * @param string $dirpath 文件夹路径
+     * @param string $dir 文件夹路径
      * @param int $auth 文件夹权限
-     * @return bool|null 返回null表示在访问的范围之外
+     * @return bool 文件夹已经存在的时候返回false,成功创建返回true
      */
-    public function mkdir($dirpath,$auth = 0755){
-        if(!$this->checkWritableWithRevise($dirpath)) return false;
-        return $this->_makeDir($dirpath,$auth);
+    public function mkdir($dir, $auth = 0766){
+        if(!$this->checkWritableWithRevise($dir)) return false;
+        return is_dir($dir)?chmod($dir,$auth):mkdir($dir,$auth,true);
+    }
+
+    /**
+     * 修改文件权限
+     * @param string $path 文件路径
+     * @param int $auth 文件权限
+     * @return bool 是否成功修改了该文件|返回null表示在访问的范围之外
+     */
+    public function chmod($path, $auth = 0766){
+        if(!$this->checkWritableWithRevise($path)) return null;
+        return file_exists($path)?chmod($path,$auth):false;
     }
 
     /**
@@ -255,112 +199,39 @@ class File implements StorageInterface {
      */
     public function touch($filepath, $mtime = null, $atime = null){
         if(!$this->checkWritableWithRevise($filepath)) return null;
-        if(!file_exists($filepath)){
-            $this->_makeDir(dirname($filepath));
-        }
+        $this->checkAndMakeSubdir($filepath) or PLiteException::throwing("Check path '$filepath' failed");
         return touch($filepath, $mtime,$atime);
     }
 
     /**
-     * 修改文件权限
-     * @param string $filepath 文件路径
-     * @param int $auth 文件权限
-     * @return bool 是否成功修改了该文件|返回null表示在访问的范围之外
-     */
-    public function chmod($filepath,$auth = 0755){
-        if(!$this->checkWritableWithRevise($dirpath)) return false;
-        return file_exists($filepath)?chmod($filepath,$auth):false;
-    }
-
-    /**
-     * 创建文件夹
-     * @param string $dirpath 文件夹路径
-     * @param int $auth 文件夹权限
-     * @return bool 文件夹已经存在的时候返回false,成功创建返回true
-     */
-    private function _makeDir($dirpath,$auth = 0755){
-//        \PLite\dumpout(is_dir($dirpath),$dirpath,mkdir($dirpath,$auth,true));
-        return is_dir($dirpath)?chmod($dirpath,$auth):mkdir($dirpath,$auth,true);
-    }
-
-    /**
      * 删除文件
-     * 删除目录时必须保证该目录为空
+     * 删除目录时必须保证该目录为空,or set parameter 2 as true
      * @param string $filepath 文件或者目录的路径
      * @param bool $recursion 删除的目标是目录时,若目录下存在文件,是否进行递归删除,默认为false
-     * @return bool 是否成功删除|返回null表示在访问的范围之外
+     * @return bool
      */
     public function unlink($filepath,$recursion=false){
         if(!$this->checkWritableWithRevise($filepath)) return null;
         if(is_file($filepath)){
             return unlink($filepath);
         }elseif(is_dir($filepath)){
-            return $this->_removeDir($filepath,$recursion);
-        }else{
-            return false;
+            return $this->rmdir($filepath,$recursion);
         }
+        return false; //file do not exist
     }
-
     /**
-     * 删除文件夹
-     * 注意:@rmdir($dirpath); 也无法阻止报错
-     * @param string $dirpath 文件夹名路径
-     * @param bool $recursion 是否递归删除
-     * @return bool 目录不存在返回false
-     */
-    private function _removeDir($dirpath,$recursion=false){
-        if(!is_dir($dirpath)) return false;
-        //扫描目录
-
-        $dh = opendir($dirpath);
-        while ($file = readdir($dh)) {
-            if($file === '.' or $file === '..') continue;
-
-            if(!$recursion) {//存在其他文件或者目录,非true时循环删除
-                closedir($dh);
-                return false;
-            }
-
-            $path = str_replace('\\','/',"{$dirpath}/{$file}");
-            if(is_dir($path) and !$this->_removeDir($path,$recursion)) return false;
-            if(is_file($path) and !unlink($path)) return false;
-        }
-        closedir($dh);
-        return rmdir($dirpath);
-    }
-
-
-
-    /**
-     * 将指定内容写入到文件中
-     * @param string $filepath 文件路径
-     * @param string $content 要写入的文件内容
-     * @param string $write_encode 写入文件时的编码
-     * @param string $text_encode 文本本身的编码格式,默认使用UTF-8的编码格式
-     * @return bool 是否成功写入|返回null表示在访问的范围之外
-     */
-    public function write($filepath,$content,$write_encode=null,$text_encode='UTF-8'){
-//        \PLite\dump($this->convention,$filepath,$this->checkWritableWithRevise($filepath));
-        if(!$this->checkWritableWithRevise($filepath)) return null;
-        return $this->_write($filepath,$content,$write_encode,$text_encode);
-    }
-
-    /**
-     * @param $filepath
-     * @param $content
-     * @param null $write_encode
-     * @param string $text_encode
+     * @param string $filepath
+     * @param string $content
+     * @param string $write_encode Encode of the text to write
+     * @param string $text_encode encode of content,it will be 'UTF-8' while scruipt file is encode with 'UTF-8',but sometime it's not expect
      * @return bool
      */
-    private function _write($filepath,$content,$write_encode=null,$text_encode='UTF-8'){
-        //文件父目录检测
-        $dir = dirname($filepath);
-        if(!is_dir($dir)) $this->_makeDir($dir);
-
+    public function write($filepath,$content,$write_encode='UTF-8',$text_encode='UTF-8'){
+        if(!$this->checkWritableWithRevise($filepath)) return null;
+        $this->checkAndMakeSubdir($filepath) or PLiteException::throwing("Check path '$filepath' failed");
         //文本编码检测
-        null === $write_encode and $write_encode = $this->convention['WRITEIN_ENCODE'];
         if($write_encode !== $text_encode){//写入的编码并非是文本的编码时进行转化
-            $content = iconv($text_encode,$write_encode.'//IGNORE',$content);
+            $content = iconv($text_encode,"{$write_encode}//IGNORE",$content);
         }
 
         //文件写入
@@ -373,27 +244,62 @@ class File implements StorageInterface {
      * @param string $content 要写入的文件内容
      * @param string $write_encode 写入文件时的编码
      * @param string $text_encode 文本本身的编码格式,默认使用UTF-8的编码格式
-     * @return bool|null 是否成功写入,返回null表示无法访问该范围的文件
+     * @return bool
      */
-    public function append($filepath,$content,$write_encode=null,$text_encode='UTF-8'){
+    public function append($filepath,$content,$write_encode='UTF-8',$text_encode='UTF-8'){
         if(!$this->checkWritableWithRevise($filepath)) return null;
-
         //文件不存在时
-        if(!is_file($filepath)) return $this->_write($filepath,$content,$write_encode);
+        if(!is_file($filepath)) return $this->write($filepath,$content,$write_encode,$text_encode);
 
         //打开文件
         $handler = fopen($filepath,'a+');//追加方式，如果文件不存在则无法创建
-        if(false === $handler) return false;
+        if(false === $handler) return false;//open failed
 
         //编码处理
-        null === $write_encode and $write_encode = $this->convention['WRITEIN_ENCODE'];
-        $write_encode !== $text_encode and $content = iconv($text_encode,$write_encode,$content);
+        $write_encode !== $text_encode and $content = iconv($text_encode,"{$write_encode}//IGNORE",$content);
 
         //关闭文件
         $rst = fwrite($handler,$content); //出现错误时返回false
-        if(false === fclose($handler)) return false;
+        if(false === fclose($handler)) return false;//close failed
 
         return $rst > 0;
     }
 
+    /**
+     * 文件父目录检测
+     * @param string $path the path must be encode with file system
+     * @param int $auth
+     * @return bool
+     */
+    private function checkAndMakeSubdir($path, $auth = 0766){
+        $path = dirname($path);
+        if(!is_dir($path)) return $this->mkdir($path,$auth);
+        if(!is_writeable($path)) return $this->chmod($path,$auth);
+        return true;
+    }
+
+    /**
+     * 删除文件夹
+     * 注意:@rmdir($dirpath); 也无法阻止报错
+     * @param string $dir 文件夹名路径
+     * @param bool $recursion 是否递归删除
+     * @return bool
+     */
+    private function rmdir($dir, $recursion=false){
+        if(!is_dir($dir)) return false;
+        //扫描目录
+        $dh = opendir($dir);
+        while ($file = readdir($dh)) {
+            if($file === '.' or $file === '..') continue;
+
+            if(!$recursion) {//存在其他文件或者目录,非true时循环删除
+                closedir($dh);
+                return false;
+            }
+            $dir = IS_WINDOWS?str_replace('\\','/',"{$dir}/{$file}"):"{$dir}/{$file}";
+            if(!$this->unlink($dir,$recursion)) return false;
+        }
+        closedir($dh);
+        return rmdir($dir);
+    }
 }

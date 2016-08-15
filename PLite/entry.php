@@ -1,21 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lnzhv
- * Date: 7/13/16
- * Time: 6:06 PM
- */
+
 namespace {
     use PLite\AutoLoader;
-    use PLite\Configger;
+    use PLite\Core\Cache;
+    use PLite\Core\Configger;
     use PLite\Debugger;
-    use PLite\Dispatcher;
-    use PLite\Response;
     use PLite\PLiteException;
-    use PLite\Router;
+    use PLite\Response;
     use PLite\Utils;
+    use PLite\Core\Dispatcher;
+    use PLite\Core\Router;
 
-    const LITE_VERSION = 0.85;
+    const LITE_VERSION = 0.728;
 //---------------------------------- mode constant -------------------------------------//
     defined('DEBUG_MODE_ON') or define('DEBUG_MODE_ON', true);
     defined('PAGE_TRACE_ON') or define('PAGE_TRACE_ON', true);//在处理微信签名检查时会发生以外的错误
@@ -36,7 +32,7 @@ namespace {
     define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
 
     //record status at the beginning
-    DEBUG_MODE_ON and $GLOBALS['_status_begin'] = [
+    $GLOBALS['_status_begin'] = [
         REQUEST_MICROTIME,
         memory_get_usage(),
     ];
@@ -50,7 +46,7 @@ namespace {
         HTTP_PREFIX.$_SERVER['SERVER_NAME']:
         HTTP_PREFIX.$_SERVER['SERVER_NAME'].':80'.dirname($_SERVER['SCRIPT_NAME']),'/'));//define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
 
-//---------------------------------- variable type constant ------------------------------//
+//---------------------------------- general constant ------------------------------//
     const TYPE_BOOL     = 'boolean';
     const TYPE_INT      = 'integer';
     const TYPE_FLOAT    = 'double';//double ,  float
@@ -61,6 +57,14 @@ namespace {
     const TYPE_NULL     = 'NULL';
     const TYPE_UNKNOWN  = 'unknown type';
 
+    const PRIOR_INDEX           = 'PRIOR_INDEX';
+    const DRIVER_CLASS_LIST     = 'DRIVER_CLASS_LIST';
+    const DRIVER_CONFIG_LIST    = 'DRIVER_CONFIG_LIST';
+
+    const AJAX_JSON     = 0;
+    const AJAX_XML      = 1;
+    const AJAX_STRING   = 2;
+
 //---------------------------------- path constant -------------------------------------//
     define('PATH_BASE', IS_WINDOWS?str_replace('\\','/',dirname(__DIR__)):dirname(__DIR__));
     defined('APP_DIR')  or define('APP_DIR','Application');//dir name opposide to base path
@@ -69,6 +73,7 @@ namespace {
     const PATH_CONFIG   = PATH_BASE.'/Config';
     const PATH_RUNTIME  = PATH_BASE.'/Runtime';
     const PATH_PUBLIC   = PATH_BASE.'/Public';
+
 
     /**
      * Class PLite
@@ -113,8 +118,8 @@ namespace {
          * @return void
          */
         public static function init(array $config=null){
-            DEBUG_MODE_ON and Debugger::import('app_begin',$GLOBALS['_status_begin']);
-            DEBUG_MODE_ON and Debugger::status('app_init_begin');
+            Debugger::import('app_begin',$GLOBALS['_status_begin']);
+            Debugger::status('app_init_begin');
             $config and self::$_config = Utils::merge(self::$_config,$config);
 
             //environment
@@ -129,12 +134,11 @@ namespace {
             spl_autoload_register([AutoLoader::class,'load']) or die('Faile to register class autoloader!');
             self::registerErrorHandler(self::$_config['ERROR_HANDLER']);
             self::registerExceptionHandler(self::$_config['EXCEPTION_HANDLER']);
+
             register_shutdown_function(function (){/* called when script shut down */
                 PAGE_TRACE_ON and !IS_REQUEST_AJAX and Debugger::trace();//show the trace info
-                Response::flushOutput();
-
 //                $gap = microtime(true) - $GLOBALS['_status_begin'][0];//begin to end
-                DEBUG_MODE_ON and Debugger::status('script_shutdown');
+                Debugger::status('script_shutdown');
             });
 
             //function pack
@@ -150,7 +154,7 @@ namespace {
                 }
             }
 
-            DEBUG_MODE_ON and Debugger::status('app_init_done');
+            Debugger::status('app_init_done');
             self::$_app_need_inited = false;
         }
 
@@ -162,29 +166,45 @@ namespace {
          */
         public static function start(array $config=null){
             self::$_app_need_inited and self::init($config);
-            DEBUG_MODE_ON and Debugger::status('app_start');
+            Debugger::status('app_start');
+            $identify = md5($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 
-            Configger::init(self::$_config['CONFIGGER']);
-            Router::init(self::$_config['ROUTER']);
+            $content = Cache::get($identify,null);
+            if(null !== $content){
+                Debugger::trace('load from cache');
+                echo $content;
+            }else{
+                //打开输出控制缓冲
+                ob_start();
 
-            //parse uri
-            $result = self::$_config['ROUTE_ON']?Router::parseRoute():null;
-            $result or $result = Router::parseURL();
-            //URL中解析结果合并到$_GET中，$_GET的其他参数不能和之前的一样，否则会被解析结果覆盖,注意到$_GET和$_REQUEST并不同步，当动态添加元素到$_GET中后，$_REQUEST中不会自动添加
-            empty($result['p']) or $_GET = array_merge($_GET,$result['p']);
+                Configger::init(self::$_config['CONFIGGER']);
+                Router::init(self::$_config['ROUTER']);
 
-            DEBUG_MODE_ON and Debugger::status('dispatch_begin');
+                //parse uri
+                $result = self::$_config['ROUTE_ON']?Router::parseRoute():null;
+                $result or $result = Router::parseURL();
+                //URL中解析结果合并到$_GET中，$_GET的其他参数不能和之前的一样，否则会被解析结果覆盖,注意到$_GET和$_REQUEST并不同步，当动态添加元素到$_GET中后，$_REQUEST中不会自动添加
+                empty($result['p']) or $_GET = array_merge($_GET,$result['p']);
 
-            Dispatcher::init(self::$_config['DISPATCHER']);
-            //dispatch
-            $ckres = Dispatcher::checkDefault($result['m'],$result['c'],$result['a']);
+                Debugger::status('dispatch_begin');
 
-            //在执行方法之前定义常量,为了能在控制器的构造函数中使用这三个常量
-            define('REQUEST_MODULE',$ckres['m']);//请求的模块
-            define('REQUEST_CONTROLLER',$ckres['c']);//请求的控制器
-            define('REQUEST_ACTION',$ckres['a']);//请求的操作
+                Dispatcher::init(self::$_config['DISPATCHER']);
+                //dispatch
+                $ckres = Dispatcher::checkDefault($result['m'],$result['c'],$result['a']);
 
-            Dispatcher::exec();
+                //在执行方法之前定义常量,为了能在控制器的构造函数中使用这三个常量
+                define('REQUEST_MODULE',$ckres['m']);//请求的模块
+                define('REQUEST_CONTROLLER',$ckres['c']);//请求的控制器
+                define('REQUEST_ACTION',$ckres['a']);//请求的操作
+
+                $result = Dispatcher::exec();
+                echo $content = Response::getOutput();
+
+                //exec的结果将用于判断输出缓存，如果为int，表示缓存时间，0表示无限缓存,将来将创造更多的扩展，目前仅限于int
+                if(isset($result)){
+                    Cache::set($identify,$content,$result)?Debugger::trace('build cache success!'):Debugger::trace('failed to build cache!');
+                }
+            }
         }
 
         /**
@@ -219,8 +239,9 @@ namespace {
 }
 namespace PLite {
 
+    use PLite\Core\Configger;
     use PLite\Util\Helper\XMLHelper;
-    use PLite\Library\ExtDebugger;
+    use PLite\Util\SEK;
 
 //-----------------------------------------------------------------------------------------
 //---------------------------- RUNCTION OF FRAMEWOEK BEGIN --------------------------------
@@ -298,7 +319,7 @@ namespace PLite {
          * @return void
          */
         public static function status($tag){
-            DEBUG_MODE_ON and self::$_status[$tag] = [
+            self::$_status[$tag] = [
                 microtime(true),
                 memory_get_usage(),
             ];
@@ -320,8 +341,9 @@ namespace PLite {
          * @return string|bool
          */
         public static function trace($message=null){
-            if(null === $message){
-                return ExtDebugger::showTrace(self::$_status,self::$_traces);
+            if(!DEBUG_MODE_ON) return false;
+            if(null === $message and self::$_allowTrace){
+                return SEK::showTrace(self::$_status,self::$_traces);
             }else{
                 $location = debug_backtrace();
                 $location = "{$location[0]['file']}:{$location[0]['line']}";
@@ -398,8 +420,28 @@ namespace PLite {
          * @param \Exception $e ParseError(newer in php7) or Exception
          * @return void
          */
-        final public static function handleException($e) {
-            ExtDebugger::handleException($e);
+        public static function handleException($e) {
+            if(IS_REQUEST_AJAX){
+                exit($e->getMessage());
+            }
+            EXCEPTION_CLEAN and ob_get_level() > 0 and ob_end_clean();
+            $trace = $e->getTrace();
+            if(!empty($trace[0])){
+                empty($trace[0]['file']) and $trace[0]['file'] = 'Unkown file';
+                empty($trace[0]['line']) and $trace[0]['line'] = 'Unkown line';
+
+                $vars = [
+                    'message'   => get_class($e).' : '.$e->getMessage(),
+                    'position'  => 'File:'.$trace[0]['file'].'   Line:'.$trace[0]['line'],
+                    'trace'     => $trace,
+                ];
+                if(DEBUG_MODE_ON){
+                    Utils::loadTemplate('exception',$vars);
+                }
+            }else{
+                Utils::loadTemplate('user_error');
+            }
+            exit;
         }
 
         /**
@@ -410,498 +452,22 @@ namespace PLite {
          * @param int $errline error occurring file line number
          * @return void
          */
-        final public static function handleError($errno,$errstr,$errfile,$errline){
-//            dumpout(debug_backtrace());
-            ExtDebugger::handleError($errno,$errstr,$errfile,$errline);
-        }
-    }
-
-    class Configger {
-        /**
-         * 配置类型
-         * 值使用字符串而不是效率更高的数字是处于可以直接匹配后缀名的考虑
-         */
-        const TYPE_PHP     = 'php';
-        const TYPE_INI     = 'ini';
-        const TYPE_YAML    = 'yaml';
-        const TYPE_XML     = 'xml';
-        const TYPE_JSON    = 'json';
-
-        /**
-         * @var string config file-build path
-         */
-        private static $configs_path = PATH_RUNTIME.'/configs.php';
-        /**
-         * @var array map of class fullname of its config name
-         */
-        private static $_map = [];
-
-        /**
-         * @var array config of this class
-         */
-        private static $_config = [
-            'AUTO_BUILD'        => true,
-            'AUTO_CLASS_LIST'   => [
-                'PLite\\Core\\Dao',
-                'PLite\\Library\\View',
-            ],
-            'USER_CONFIG_PATH'  => PATH_RUNTIME.'/DynamicConfig/',
-        ];
-        /**
-         * @var array
-         */
-        private static $_cache = null;
-
-        /**
-         * Init the config cache
-         * @param array $config
-         * @return void
-         */
-        public static function init(array $config=null){
-            $config and self::$_config = array_merge(self::$_config,$config);
-            if(self::$configs_path and is_readable(self::$configs_path)){
-                self::$_cache = include self::$configs_path;
-            }elseif(self::$_config['AUTO_BUILD'] and !empty(self::$_config['AUTO_CLASS_LIST'])){
-                foreach (self::$_config['AUTO_CLASS_LIST'] as $clsnm){
-                    self::getOuterConfig($clsnm);
-                }
-                //Closure is not suggest in config file due to var_export could not do well with closure
-                // it will be translated to 'method Closure::__set_state()'
-                Storage::write(self::$configs_path,'<?php return '.var_export(self::$_cache,true).';');
-            }
-            is_array(self::$_cache) or self::$_cache = [];
-        }
-
-        /**
-         * get class config
-         * @param string $clsnm class name
-         * @param bool $refresh is rerfresh the config
-         * @return array
-         * @throws PLiteException
-         */
-        public static function load($clsnm,$refresh=false){
-            if($refresh or null === self::$_cache) self::init();
-            return isset(self::$_cache[$clsnm])?self::$_cache[$clsnm]:self::getOuterConfig($clsnm);
-        }
-
-        /**
-         * read the outer class config (instead of modifying the class self)
-         * @param string $clsnm class name
-         * @return array
-         */
-        private static function getOuterConfig($clsnm){
-            $cname = Utils::constant($clsnm,'CONF_NAME',null);//outer constant name
-            self::$_map[$cname] = $clsnm;
-            strpos('.', $cname) and $cname = str_replace('.', '/' ,$cname);
-            $path = PATH_CONFIG."/{$cname}.php";
-            return self::$_cache[$clsnm] = is_readable($path)?include $path:[];
-        }
-
-        /**
-         * parse config file into php array
-         * @param string $path 配置文件的路径
-         * @param string|null $type 配置文件的类型,参数为null时根据文件名称后缀自动获取
-         * @param callable $parser 配置解析方法 有些格式需要用户自己解析
-         * @return array
-         */
-        public static function parse($path,$type=null,callable $parser=null){
-            isset($type) or $type = pathinfo($path, PATHINFO_EXTENSION);
-            switch ($type) {
-                case self::TYPE_PHP:
-                    return include $path;
-                case self::TYPE_INI:
-                    return parse_ini_file($path);
-                case self::TYPE_YAML:
-                    return yaml_parse_file($path);
-                case self::TYPE_XML:
-                    return (array)simplexml_load_file($path);
-                case self::TYPE_JSON:
-                    return json_decode(file_get_contents($path), true);
-                default:
-                    return $parser?$parser($path):PLiteException::throwing('无法解析配置文件');
-            }
-        }
-
-        /**
-         * read static config in path PATH_CONFIG
-         * which config name like 'a.b'(no suffix)
-         * @param string|array $name config item name,mapping to filename(not include suffix,and be careful with '.',it will replace with '/')
-         * @return array it will return the config in file and will return empty array if not exit config file
-         */
-        public static function readStatic($name) {
-            $result = [];
-            if(is_array($name)){ //for multiple config,behinder will cover aheader
-                foreach($name as $item){
-                    $temp = self::load($item);
-                    $temp and $result = Utils::merge($result,$temp);
-                }
-            }elseif(is_string($name)){
-                false === strpos('.', $name) and $name = str_replace('.', '/' ,$name);//it will worked nice if position is 0
-                $path = PATH_CONFIG."/{$name}.php";
-                Storage::exits($path) and $result = self::parse($path);
+        public static function handleError($errno,$errstr,$errfile,$errline){
+            IS_REQUEST_AJAX and exit($errstr);
+            EXCEPTION_CLEAN and ob_get_level() > 0 and ob_end_clean();
+            if(!is_string($errstr)) $errstr = serialize($errstr);
+            $trace = debug_backtrace();
+            $vars = [
+                'message'   => "C:{$errno}   S:{$errstr}",
+                'position'  => "File:{$errfile}   Line:{$errline}",
+                'trace'     => $trace, //be careful
+            ];
+            if(DEBUG_MODE_ON){
+                Utils::loadTemplate('error',$vars);
             }else{
-                PLiteException::throwing('Invalid param ,expect string or array',$name);
+                Utils::loadTemplate('user_error');
             }
-            return $result;
-        }
-
-        /**
-         * read the user-defined config in PATH_RUNTIME
-         * @param string $identify config identify
-         * @return array
-         */
-        public static function readDynamic($identify){
-            static $_cache = [];
-            if(!isset($_cache[$identify])) {
-                $path = self::id2path($identify,true);
-                if(null === $path) return [];//文件不存在，返回null
-                $content = file_get_contents($path);//get false in failure
-                if(false === $content) return [];
-                $config = @unserialize($content);//无法反序列化的内容会抛出错误E_NOTICE，使用@进行忽略，但是不要忽略返回值
-                $_cache[$identify] = false === $config ? [] : $config;
-            }
-            return $_cache[$identify];
-        }
-
-        /**
-         * write user-config to file
-         * @param string $identify
-         * @param array $config
-         */
-        public static function writeDynamic($identify,array $config){
-            $path = self::id2path($identify,false);
-            Storage::write($path,serialize($config));
-        }
-
-        /**
-         * 将配置项转换成配置文件路径
-         * @param string $item 配置项
-         * @param mixed $check 检查文件是否存在
-         * @return false|string 返回配置文件路径，参数二位true并且文件不存在时返回null
-         */
-        private static function id2path($item,$check=true){
-            $dir = self::$_config['USER_CONFIG_PATH'];
-            if(is_readable($dir) and is_writable($dir)){
-                $path = "{$dir}/{$item}.php";
-                return $check || is_file($path)?$path:false;
-            }
-            return false;
-        }
-    }
-
-    /**
-     * Class Filer
-     * file operator
-     * @package PLite
-     */
-    class Storage {
-
-        /**
-         * 目录存在与否
-         */
-        const IS_DIR    = -1;
-        const IS_FILE   = 1;
-        const IS_EMPTY  = 0;
-
-        private static $_config = [
-            'READ_LIMIT_ON'     => true,
-            'WRITE_LIMIT_ON'    => true,
-            'READABLE_SCOPE'    => PATH_BASE,
-            'WRITABLE_SCOPE'    => PATH_RUNTIME,
-        ];
-
-        /**
-         * @param array|null $config the config to apply
-         */
-        public static function init(array $config=null){
-            $config and self::$_config = array_merge(self::$_config,$config);
-        }
-
-        /**
-         * 检查目标目录是否可读取 并且对目标字符串进行修正处理
-         *
-         * $accesspath代表的是可以访问的目录
-         * $path 表示正在访问的文件或者目录
-         *
-         * @param string $path 路径
-         * @param bool $limiton 是否限制了访问范围
-         * @param string|[] $scopes 范围
-         * @return bool 表示是否可以访问
-         */
-        private static function checkAccessableWithRevise(&$path,$limiton,$scopes){
-            if(!$limiton or !$scopes) return true;
-            $temp = dirname($path);//修改的目录
-            $path = Utils::toSystemEncode($path);
-            if(is_string($scopes)){
-                $scopes = [$scopes];
-            }
-
-            foreach ($scopes as $scope){
-                if(Utils::checkInScope($temp,$scope)){
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /**
-         * 检查是否有读取权限
-         * @param string $path 路径
-         * @return bool
-         */
-        private static function checkReadableWithRevise(&$path){
-            return self::checkAccessableWithRevise($path,self::$_config['READ_LIMIT_ON'],self::$_config['READABLE_SCOPE']);
-        }
-
-        /**
-         * 检查是否有写入权限
-         * @param string $path 路径
-         * @return bool
-         */
-        private static function checkWritableWithRevise(&$path){
-            return self::checkAccessableWithRevise($path,self::$_config['WRITE_LIMIT_ON'],self::$_config['WRITABLE_SCOPE']);
-        }
-//----------------------------------------------------------------------------------------------------------------------
-//------------------------------------ 读取 -----------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------------
-
-        /**
-         * 读取文件夹内容，并返回一个数组(不包含'.'和'..')
-         * array(
-         *      //文件名称(相对于带读取的目录而言) => 文件内容
-         *      'filename' => 'file full path',
-         * );
-         * @param $dirpath
-         * @param bool $recursion 是否进行递归读取
-         * @param bool $_isouter 辅助参数,用于判断是外部调用还是内部的
-         * @return array
-         */
-        public static function readDir($dirpath, $recursion=false, $_isouter=true){
-            static $_file = [];
-            static $_dirpath_toread = null;
-            if(!self::checkReadableWithRevise($filepath)) return null;
-
-            if(true === $_isouter){
-                //外部调用,初始化
-                $_file = [];
-                $_dirpath_toread = $dirpath;
-            }
-
-            $handler = opendir($dirpath);
-            while (($filename = readdir( $handler )) !== false) {//未读到最后一个文件时候返回false
-                if ($filename === '.' or $filename === '..' ) continue;
-
-                $fullpath = "{$dirpath}/{$filename}";//子文件的完整路径
-
-                if(file_exists($fullpath)) {
-                    $index = strpos($fullpath,$_dirpath_toread);
-                    $_file[Utils::toProgramEncode(substr($fullpath,$index+strlen($_dirpath_toread)))] =
-                        str_replace('\\','/',Utils::toProgramEncode($fullpath));
-                }
-
-                if($recursion and is_dir($fullpath)) {
-                    $_isouter = "{$_isouter}/{$filename}";
-                    self::readDir($fullpath,$recursion,false);//递归,不清空
-                }
-            }
-            closedir($handler);//关闭目录指针
-            return $_file;
-        }
-        /**
-         * 读取文件,参数参考read方法
-         * @param string $filepath
-         * @param string $file_encoding
-         * @param string $readout_encoding
-         * @param int|null $maxlen Maximum length of data read. The default of php is to read until end of file is reached. But I limit to 4 MB
-         * @return false|string 读取失败返回false
-         */
-        public static function readFile($filepath, $file_encoding='UTF-8',$readout_encoding='UTF-8',$maxlen=4094304){
-            if(!self::checkReadableWithRevise($filepath)) return null;
-            $content = file_get_contents($filepath,null,null,null,$maxlen);//限制大小为2M
-            if(false === $content) return false;//false on failure
-            if(null === $file_encoding or $file_encoding === $readout_encoding){
-                return $content;//return the raw content or what the read is what the need
-            }else{
-                $readoutEncode = "{$readout_encoding}//IGNORE";
-                if(is_string($file_encoding) and false === strpos($file_encoding,',')){
-                    return iconv($file_encoding,$readoutEncode,$content);
-                }
-                return mb_convert_encoding($content,$readoutEncode,$file_encoding);
-            }
-        }
-
-        /**
-         * 确定文件或者目录是否存在
-         * 相当于 is_file() or is_dir()
-         * @param string $filepath 文件路径
-         * @return int 0表示目录不存在,<0表示是目录 >0表示是文件,可以用Storage的三个常量判断
-         */
-        public static function exits($filepath){
-            if(!self::checkReadableWithRevise($filepath)) return null;
-            if(is_dir($filepath)) return Storage::IS_DIR;
-            if(is_file($filepath)) return Storage::IS_FILE;
-            return Storage::IS_EMPTY;
-        }
-
-        /**
-         * 返回文件内容上次的修改时间
-         * @param string $filepath 文件路径
-         * @param int $mtime 修改时间
-         * @return int|bool|null 如果是修改时间的操作返回的bool;如果是获取修改时间,则返回Unix时间戳;
-         */
-        public static function mtime($filepath,$mtime=null){
-            if(!self::checkReadableWithRevise($filepath)) return null;
-            return file_exists($filepath)?null === $mtime?filemtime($filepath):touch($filepath,$mtime):false;
-        }
-
-        /**
-         * 获取文件按大小
-         * @param string $filepath 文件路径
-         * @return int|false|null 按照字节计算的单位;
-         */
-        public static function size($filepath){
-            if(!self::checkReadableWithRevise($filepath)) return null;
-            return file_exists($filepath)?filesize($filepath):false;//即便是加了@filesize也无法防止系统的报错
-        }
-
-//----------------------------------------------------------------------------------------------------------------------
-//------------------------------------ 写入 -----------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------------
-        /**
-         * 创建文件夹
-         * @param string $dir 文件夹路径
-         * @param int $auth 文件夹权限
-         * @return bool 文件夹已经存在的时候返回false,成功创建返回true
-         */
-        public static function mkdir($dir, $auth = 0766){
-            if(!self::checkWritableWithRevise($dir)) return false;
-            return is_dir($dir)?chmod($dir,$auth):mkdir($dir,$auth,true);
-        }
-
-        /**
-         * 修改文件权限
-         * @param string $path 文件路径
-         * @param int $auth 文件权限
-         * @return bool 是否成功修改了该文件|返回null表示在访问的范围之外
-         */
-        public static function chmod($path, $auth = 0766){
-            if(!self::checkWritableWithRevise($path)) return null;
-            return file_exists($path)?chmod($path,$auth):false;
-        }
-
-        /**
-         * 设定文件的访问和修改时间
-         * 注意的是:内置函数touch在文件不存在的情况下会创建新的文件,此时创建时间可能大于修改时间和访问时间
-         *         但是如果是在上层目录不存在的情况下
-         * @param string $filepath 文件路径
-         * @param int $mtime 文件修改时间
-         * @param int $atime 文件访问时间，如果未设置，则值设置为mtime相同的值
-         * @return bool 是否成功|返回null表示在访问的范围之外
-         */
-        public static function touch($filepath, $mtime = null, $atime = null){
-            if(!self::checkWritableWithRevise($filepath)) return null;
-            self::checkAndMakeSubdir($filepath) or PLiteException::throwing("Check path '$filepath' failed");
-            return touch($filepath, $mtime,$atime);
-        }
-
-        /**
-         * 删除文件
-         * 删除目录时必须保证该目录为空,or set parameter 2 as true
-         * @param string $filepath 文件或者目录的路径
-         * @param bool $recursion 删除的目标是目录时,若目录下存在文件,是否进行递归删除,默认为false
-         * @return bool
-         */
-        public static function unlink($filepath,$recursion=false){
-            if(!self::checkWritableWithRevise($filepath)) return null;
-            if(is_file($filepath)){
-                return unlink($filepath);
-            }elseif(is_dir($filepath)){
-                return self::rmdir($filepath,$recursion);
-            }
-            return false; //file do not exist
-        }
-        /**
-         * @param string $filepath
-         * @param string $content
-         * @param string $write_encode Encode of the text to write
-         * @param string $text_encode encode of content,it will be 'UTF-8' while scruipt file is encode with 'UTF-8',but sometime it's not expect
-         * @return bool
-         */
-        public static function write($filepath,$content,$write_encode='UTF-8',$text_encode='UTF-8'){
-            if(!self::checkWritableWithRevise($filepath)) return null;
-            self::checkAndMakeSubdir($filepath) or PLiteException::throwing("Check path '$filepath' failed");
-            //文本编码检测
-            if($write_encode !== $text_encode){//写入的编码并非是文本的编码时进行转化
-                $content = iconv($text_encode,"{$write_encode}//IGNORE",$content);
-            }
-
-            //文件写入
-            return file_put_contents($filepath,$content) > 0;
-        }
-
-        /**
-         * 将指定内容追加到文件中
-         * @param string $filepath 文件路径
-         * @param string $content 要写入的文件内容
-         * @param string $write_encode 写入文件时的编码
-         * @param string $text_encode 文本本身的编码格式,默认使用UTF-8的编码格式
-         * @return bool
-         */
-        public static function append($filepath,$content,$write_encode='UTF-8',$text_encode='UTF-8'){
-            if(!self::checkWritableWithRevise($filepath)) return null;
-            //文件不存在时
-            if(!is_file($filepath)) return self::write($filepath,$content,$write_encode,$text_encode);
-
-            //打开文件
-            $handler = fopen($filepath,'a+');//追加方式，如果文件不存在则无法创建
-            if(false === $handler) return false;//open failed
-
-            //编码处理
-            $write_encode !== $text_encode and $content = iconv($text_encode,"{$write_encode}//IGNORE",$content);
-
-            //关闭文件
-            $rst = fwrite($handler,$content); //出现错误时返回false
-            if(false === fclose($handler)) return false;//close failed
-
-            return $rst > 0;
-        }
-
-        /**
-         * 文件父目录检测
-         * @param string $path the path must be encode with file system
-         * @param int $auth
-         * @return bool
-         */
-        public static function checkAndMakeSubdir($path, $auth = 0766){
-            $path = dirname($path);
-            if(!is_dir($path)) return self::mkdir($path,$auth);
-            if(!is_writeable($path)) return self::chmod($path,$auth);
-            return true;
-        }
-
-        /**
-         * 删除文件夹
-         * 注意:@rmdir($dirpath); 也无法阻止报错
-         * @param string $dir 文件夹名路径
-         * @param bool $recursion 是否递归删除
-         * @return bool
-         */
-        public static function rmdir($dir, $recursion=false){
-            if(!is_dir($dir)) return false;
-            //扫描目录
-            $dh = opendir($dir);
-            while ($file = readdir($dh)) {
-                if($file === '.' or $file === '..') continue;
-
-                if(!$recursion) {//存在其他文件或者目录,非true时循环删除
-                    closedir($dh);
-                    return false;
-                }
-                $dir = IS_WINDOWS?str_replace('\\','/',"{$dir}/{$file}"):"{$dir}/{$file}";
-                if(!self::unlink($dir,$recursion)) return false;
-            }
-            closedir($dh);
-            return rmdir($dir);
+            exit;
         }
     }
 
@@ -1117,171 +683,10 @@ namespace PLite {
     }
 
     /**
-     * Class Dispatcher
-     * 将URI解析结果调度到指定的控制器下的方法下
-     * @package PLite\Core
-     */
-    class Dispatcher {
-
-        private static $_module = null;
-        private static $_controller = null;
-        private static $_action = null;
-        /**
-         * @var array
-         */
-        private static $_config = [
-            //空缺时默认补上,Done!
-            'INDEX_MODULE'      => 'Home',
-            'INDEX_CONTROLLER'  => 'Index',
-            'INDEX_ACTION'      => 'index',
-        ];
-
-        /**
-         * @param array|null $config
-         */
-        public static function init(array $config=null){
-            $config and self::$_config = array_merge(self::$_config,$config);
-        }
-
-        /**
-         * 匹配空缺补上默认
-         * @param string|array $modules
-         * @param string $ctrler
-         * @param string $action
-         * @return array
-         */
-        public static function checkDefault($modules,$ctrler,$action){
-            self::$_module      = $modules?$modules:self::$_config['INDEX_MODULE'];
-            self::$_controller  = $ctrler?$ctrler:self::$_config['INDEX_CONTROLLER'];
-            self::$_action      = $action?$action:self::$_config['INDEX_ACTION'];
-
-            self::$_module and is_array(self::$_module) and self::$_module = implode('/',self::$_module);
-
-            return [
-                'm' => self::$_module,
-                'c' => self::$_controller,
-                'a' => self::$_action,
-            ];
-        }
-
-        public static function checkCache($modules=null,$ctrler=null,$action=null){
-
-        }
-
-        /**
-         * 制定对应的方法
-         * @param string $modules
-         * @param string $ctrler
-         * @param string $action
-         * @return mixed
-         * @throws PLiteException
-         */
-        public static function exec($modules=null,$ctrler=null,$action=null){
-            null === $modules   and $modules = self::$_module;
-            null === $ctrler    and $ctrler = self::$_controller;
-            null === $action    and $action = self::$_action;
-
-            DEBUG_MODE_ON and Debugger::trace($modules,$ctrler,$action);
-
-            $modulepath = PATH_BASE."/Application/{$modules}";//linux 不识别 \\
-
-            strpos($modules,'/') and $modules = str_replace('/','\\',$modules);
-
-            //模块检测
-            is_dir($modulepath) or PLiteException::throwing("Module '{$modules}' not found!");
-
-            //控制器名称及存实性检测
-            $className = "Application\\{$modules}\\Controller\\{$ctrler}";
-            class_exists($className) or PLiteException::throwing($modules,$className);
-            $classInstance =  new $className();
-            //方法检测
-            method_exists($classInstance,$action) or PLiteException::throwing($modules,$className,$action);
-            $method = new \ReflectionMethod($classInstance, $action);
-
-            $result = null;
-            if ($method->isPublic() and !$method->isStatic()) {//仅允许非静态的公开方法
-                //方法的参数检测
-                if ($method->getNumberOfParameters()) {//有参数
-                    $args = self::fetchMethodArgs($method);
-                    //执行方法
-                    $result = $method->invokeArgs($classInstance, $args);
-                } else {//无参数的方法调用
-                    $result = $method->invoke($classInstance);
-                }
-            } else {
-                PLiteException::throwing($className, $action);
-            }
-
-            DEBUG_MODE_ON and Debugger::status('execute_end');
-            return $result;
-        }
-
-
-
-        /**
-         * 获取传递给盖饭昂奋的参数
-         * @param \ReflectionMethod $targetMethod
-         * @return array
-         * @throws PLiteException
-         */
-        private static function fetchMethodArgs(\ReflectionMethod $targetMethod){
-            //获取输入参数
-            $vars = $args = [];
-            switch(strtoupper($_SERVER['REQUEST_METHOD'])){
-                case 'POST':$vars    =  array_merge($_GET,$_POST);  break;
-                case 'PUT':parse_str(file_get_contents('php://input'), $vars);  break;
-                default:$vars  =  $_GET;
-            }
-            //获取方法的固定参数
-            $methodParams = $targetMethod->getParameters();
-            //遍历方法的参数
-            foreach ($methodParams as $param) {
-                $paramName = $param->getName();
-
-                if(isset($vars[$paramName])){
-                    $args[] =   $vars[$paramName];
-                }elseif($param->isDefaultValueAvailable()){
-                    $args[] =   $param->getDefaultValue();
-                }else{
-                    return PLiteException::throwing("目标缺少参数'{$param}'!");
-                }
-            }
-            return $args;
-        }
-
-        /**
-         * 加载当前访问的模块的指定配置
-         * 配置目录在模块目录下的'Common/Conf'
-         * @param string $name 配置名称,多个名称以'/'分隔
-         * @param string $type 配置类型,默认为php
-         * @return array
-         */
-        public static function load($name,$type=Configger::TYPE_PHP){
-            if(!defined('REQUEST_MODULE')) return PLiteException::throwing('\'load\'必须在\'exec\'方法之后调用!');//前提是正确制定过exec方法
-            $path = PATH_BASE.'/Application/'.REQUEST_MODULE.'/Common/Config/';
-
-            if(Storage::exits($path) === Storage::IS_DIR){
-                $file = "{$path}/{$name}.".$type;
-                return Configger::load($file);
-            }
-            return [];
-        }
-
-    }
-
-
-    /**
      * Class Response 输出控制类
      * @package PLite\library
      */
     class Response {
-
-        /**
-         * 数据返回形式
-         */
-        const AJAX_JSON     = 0;
-        const AJAX_XML      = 1;
-        const AJAX_STRING   = 2;
 
         /**
          * 返回的消息类型
@@ -1306,6 +711,100 @@ namespace PLite {
         }
 
         /**
+         * @param bool $clean
+         * @return string
+         */
+        public static function getOutput($clean=true){
+            if(ob_get_level()){
+                $content = ob_get_contents();
+                $clean and ob_end_clean();
+                return $content;
+            }else{
+                return '';
+            }
+        }
+
+        /**
+         * HTTP Protocol defined status codes
+         * @param int $code
+         * @param string $message
+         */
+        public static function sendHttpStatus($code,$message='') {
+            static $_status = null;
+            if(!$message){
+                $_status or $_status = array(
+                    // Informational 1xx
+                    100 => 'Continue',
+                    101 => 'Switching Protocols',
+
+                    // Success 2xx
+                    200 => 'OK',
+                    201 => 'Created',
+                    202 => 'Accepted',
+                    203 => 'Non-Authoritative Information',
+                    204 => 'No Content',
+                    205 => 'Reset Content',
+                    206 => 'Partial Content',
+
+                    // Redirection 3xx
+                    300 => 'Multiple Choices',
+                    301 => 'Moved Permanently',
+                    302 => 'Found',  // 1.1
+                    303 => 'See Other',
+                    304 => 'Not Modified',
+                    305 => 'Use Proxy',
+                    // 306 is deprecated but reserved
+                    307 => 'Temporary Redirect',
+
+                    // Client Error 4xx
+                    400 => 'Bad Request',
+                    401 => 'Unauthorized',
+                    402 => 'Payment Required',
+                    403 => 'Forbidden',
+                    404 => 'Not Found',
+                    405 => 'Method Not Allowed',
+                    406 => 'Not Acceptable',
+                    407 => 'Proxy Authentication Required',
+                    408 => 'Request Timeout',
+                    409 => 'Conflict',
+                    410 => 'Gone',
+                    411 => 'Length Required',
+                    412 => 'Precondition Failed',
+                    413 => 'Request Entity Too Large',
+                    414 => 'Request-URI Too Long',
+                    415 => 'Unsupported Media Type',
+                    416 => 'Requested Range Not Satisfiable',
+                    417 => 'Expectation Failed',
+
+                    // Server Error 5xx
+                    500 => 'Internal Server Error',
+                    501 => 'Not Implemented',
+                    502 => 'Bad Gateway',
+                    503 => 'Service Unavailable',
+                    504 => 'Gateway Timeout',
+                    505 => 'HTTP Version Not Supported',
+                    509 => 'Bandwidth Limit Exceeded'
+                );
+                $message = isset($_status[$code])?$_status[$code]:'';
+            }
+            ob_get_level() > 0 and ob_end_clean();
+            header("HTTP/1.1 {$code} {$message}");
+        }
+
+        /**
+         * 向浏览器客户端发送不缓存命令
+         * @param bool $clean clean the output before,important and default to true
+         * @return void
+         */
+        public static function sendNocache($clean=true){
+            $clean and ob_get_level() > 0 and ob_end_clean();
+            header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+            header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+            header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+            header( 'Cache-Control: post-check=0, pre-check=0', false );
+            header( 'Pragma: no-cache' );
+        }
+        /**
          * return the request in ajax way
          * and call this method will exit the script
          * @access protected
@@ -1315,17 +814,17 @@ namespace PLite {
          * @return void
          * @throws \Exception
          */
-        public static function ajaxBack($data, $type = self::AJAX_JSON, $options = 0){
-            self::cleanOutput();
+        public static function ajaxBack($data, $type = AJAX_JSON, $options = 0){
+            ob_get_level() > 0 and ob_end_clean();
             Debugger::closeTrace();
             switch (strtoupper($type)) {
-                case self::AJAX_JSON :// 返回JSON数据格式到客户端 包含状态信息
+                case AJAX_JSON :// 返回JSON数据格式到客户端 包含状态信息
                     header('Content-Type:application/json; charset=utf-8');
                     exit(json_encode($data, $options));
-                case self::AJAX_XML :// 返回xml格式数据
+                case AJAX_XML :// 返回xml格式数据
                     header('Content-Type:text/xml; charset=utf-8');
                     exit(XMLHelper::encode($data));
-                case self::AJAX_STRING:
+                case AJAX_STRING:
                     header('Content-Type:text/plain; charset=utf-8');
                     exit($data);
                 default:
@@ -1335,373 +834,11 @@ namespace PLite {
     }
 
     /**
-     * Class Router
-     * @package PLite\Core
-     */
-    class Router {
-
-        private static $_config = [
-            //------------------------
-            //For URL route
-            //------------------------
-            'URI_ROUTE_ON'          => true,//总开关,是否对URI地址进行路由
-            'STATIC_ROUTE_ON'       => true,
-            //静态路由规则
-            'STATIC_ROUTE_RULES'    => [],
-            'WILDCARD_ROUTE_ON'     => false,
-            //通配符路由规则,具体参考CodeIgniter
-            'WILDCARD_ROUTE_RULES'  => [],
-            'REGULAR_ROUTE_ON'      => true,
-            //正则表达式 规则
-            'REGULAR_ROUTE_RULES'   => [],
-
-            //------------------------
-            //For URL parser
-            //------------------------
-            //API模式，直接使用$_GET
-            'API_MODE_ON'   => false,
-            //API模式 对应的$_GET变量名称
-            'API_MODULES_VARIABLE'   => '_m',//该模式下使用到多层模块时涉及'MM_BRIDGE'的配置
-            'API_CONTROLLER_VARIABLE'   => '_c',
-            'API_ACTION_VARIABLE'   => '_a',
-
-            //普通模式
-            'MASQUERADE_TAIL'   => '.html',
-            //重写模式下 消除的部分，对应.htaccess文件下
-            'REWRITE_HIDDEN'      => '/index.php',
-            'MM_BRIDGE'     => '/',//模块与模块之间的连接
-            'MC_BRIDGE'     => '/',
-            'CA_BRIDGE'     => '/',
-            //*** 必须保证操作与控制器之间的符号将是$_SERVER['PATH_INFO']字符串中第一个出现的,为了更好地显示URL，参数一般通过POST传递
-            //特别注意的是若使用了问号，则后面的字符串将被认为是请求参数
-            'AP_BRIDGE'     => '-',
-            'PP_BRIDGE'     => '-',//参数与参数之间的连接桥
-            'PKV_BRIDGE'    => '-',//参数的键值对之前的连接桥
-
-            //是否开启域名部署（包括子域名部署）
-            'DOMAIN_DEPLOY_ON'  => true,
-            //子域名部署模式下 的 完整域名
-            'DOMAIN_NAME'       =>'linzhv.com',
-            //是否将子域名段和模块进行映射
-            'SUBDOMAIN_AUTO_MAPPING_ON' => false,
-            //子域名部署规则
-            //注意参与array_flip()函数,键值互换
-            'SUBDOMAIN_MAPPINIG' => [],
-
-            //使用的协议名称
-            'SERVER_PROTOCOL' => 'http',
-            //使用的端口号，默认为80时会显示为隐藏
-            'SERVER_PORT'   => 80,
-        ];
-
-
-        /**
-         * 返回解析结果
-         * @var array
-         */
-        private static $result = [
-            'm' => null,
-            'c' => null,
-            'a' => null,
-            'p' => null,
-        ];
-
-
-        /**
-         * @param array|null $config
-         */
-        public static function init(array $config=null){
-            $config and self::$_config = array_merge(self::$_config,$config);
-        }
-
-        /**
-         * 解析路由规则
-         * @param string|null $url 请求路径
-         * @return array|null|string
-         */
-        public static function parseRoute($url=null){
-            $url or $url = $_SERVER['REQUEST_URI'];
-
-            if(strpos($url,'//') !== false){
-                //it may exist much more '/' in uri,remove it
-                $url = str_replace('//','/',$url);
-            }
-
-            //静态路由
-            if(self::$_config['STATIC_ROUTE_ON'] and self::$_config['STATIC_ROUTE_RULES']){
-                if(isset(self::$_config['STATIC_ROUTE_RULES'][$url])){
-                    return self::$_config['STATIC_ROUTE_RULES'][$url];
-                }
-            }
-            //规则路由
-            if(self::$_config['WILDCARD_ROUTE_ON'] and self::$_config['WILDCARD_ROUTE_RULES']){
-                foreach(self::$_config['WILDCARD_ROUTE_RULES'] as $pattern => $rule){
-                    // Convert wildcards to RegEx（from CI）
-                    //any对应非/的任何字符 num对应数字
-                    $pattern = str_replace(array('[any]', '[num]'), array('([^/]+)', '([0-9]+)'), $pattern);
-//                $pattern = preg_replace('/\[.+?\]/','([^/\[\]]+)',$pattern);//非贪婪匹配
-                    $rst = self::_matchRegular($pattern,$rule, $url);
-                    if(null !== $rst) return $rst;
-                }
-            }
-            //正则路由
-            if(self::$_config['REGULAR_ROUTE_ON'] and self::$_config['REGULAR_ROUTE_RULES']){
-                foreach(self::$_config['REGULAR_ROUTE_RULES'] as $pattern => $rule){
-                    $rst = self::_matchRegular($pattern,$rule, $url);
-                    if(null !== $rst) return $rst;
-                }
-            }
-            return null;
-        }
-
-
-
-        /**
-         * 使用正则表达式匹配uri
-         * @param string $pattern 路由规则
-         * @param array|string|callable $rule 路由导向结果
-         * @param string $uri 传递进来的URL字符串
-         * @return array|string|null
-         */
-        private static function _matchRegular($pattern, $rule, $uri){
-            $result = null;
-            // do the RegEx match? use '#' to ignore '/'
-            if (preg_match('#^'.$pattern.'$#', $uri, $matches)) {
-                if(is_array($rule)){
-                    $len = count($matches);
-                    for($i = 1; $i < $len; $i++){
-                        $key = '$'.$i;
-                        if(isset($rule['$'.$i])){
-                            $v = (string)$rule[$key];
-                            if(strpos($v,'.')){
-                                $a = explode('.',$v);
-                                empty($rule[$a[0]]) and $rule[$a[0]] = [];
-                                $rule[$a[0]][$a[1]] = $matches[$i];
-                            }else{
-                                $rule[$v] = $matches[$i];
-                            }
-                        }else{
-                            empty($rule['o']) and $rule['o'] = [];
-                            $rule['o'][] = $matches[$i];
-                        }
-                        unset($rule[$key]);
-                    }
-                    $result = $rule;
-                }elseif(is_string($rule)){
-                    $result = preg_replace('#^'.$pattern.'$#', $rule, $uri);//参数一代表的正则表达式从参数三的字符串中寻找匹配并替换到参数二代表的字符串中
-                }elseif(is_callable($rule)){
-                    array_shift($matches);
-                    // Execute the callback using the values in matches as its parameters.
-                    $result = call_user_func_array($rule, $matches);//参数二是完整的匹配
-                    if($result === true){
-                        //返回true表示直接完成
-                        exit();
-                    }elseif(!is_string($result) and !is_array($result)){
-                        //要求结果必须返回string或者数组
-                        return null;
-                    }
-                }
-            }
-            return $result;
-        }
-
-        /**
-         * 解析URI
-         * @param string $uri 请求的URI
-         * @param string $hostname
-         * @return array
-         */
-        public static function parseURL($uri=null,$hostname=null){
-            //API模式下
-            if(self::$_config['API_MODE_ON']){
-                self::parseInAPI();
-            }else{
-                $uri or $uri = Utils::pathInfo(true);
-                //解析域名部署
-                if(self::$_config['DOMAIN_DEPLOY_ON']){
-                    $hostname or $hostname = $_SERVER['SERVER_NAME'];
-                    self::parseHostname($hostname);//如果绑定了模块，之后的解析将无法指定模块
-                }
-                //检查、寻找和解析URI路由 'URI_ROUTE_ON'
-                //普通模式下解析URI地址
-                self::parseInCommon($uri);
-            }
-            return self::$result;
-        }
-
-        /**
-         * 按照API模式进行解析(都组最快)
-         * 保持原样
-         * @return void
-         */
-        private static function parseInAPI(){
-            DEBUG_MODE_ON and Debugger::status('fetchurl_in_topspeed_begin');
-            $vars = [
-                self::$_config['API_MODULES_VARIABLE'],
-                self::$_config['API_CONTROLLER_VARIABLE'],
-                self::$_config['API_ACTION_VARIABLE'],
-            ];
-            //获取模块名称
-            isset($_GET[$vars[0]]) and self::$result['m'] = $_GET[$vars[0]];
-            //获取控制器名称
-            isset($_GET[$vars[1]]) and self::$result['c'] = $_GET[$vars[1]];
-            //获取操作名称，类方法不区分大小写
-            isset($_GET[$vars[2]]) and self::$result['a'] = $_GET[$vars[2]];
-            //参数为剩余的变量
-            unset($_GET[$vars[0]],$_GET[$vars[1]],$_GET[$vars[2]]);
-            self::$result['p'] = $_GET;
-
-            DEBUG_MODE_ON and Debugger::status('fetchurl_in_topspeed_end');
-        }
-
-        /**
-         * 按照普通模式进行URI解析
-         * @param string $uri 待解析的URI
-         * @return void
-         */
-        private static function parseInCommon($uri){
-            DEBUG_MODE_ON and Debugger::status('parseurl_in_common_begin');
-            $bridges = [
-                'mm'  => self::$_config['MM_BRIDGE'],
-                'mc'  => self::$_config['MC_BRIDGE'],
-                'ca'  => self::$_config['CA_BRIDGE'],
-                'ap'  => self::$_config['AP_BRIDGE'],
-                'pp'  => self::$_config['PP_BRIDGE'],
-                'pkv'  => self::$_config['PKV_BRIDGE'],
-            ];
-            self::stripMasqueradeTail($uri);
-
-            //-- 解析PATHINFO --//
-            //截取参数段param与定位段local
-            $papos          = strpos($uri,$bridges['ap']);
-            $mcapart = null;
-            $pparts = '';
-            if(false === $papos){
-                $mcapart  = trim($uri,'/');//不存在参数则认定PATH_INFO全部是MCA的部分，否则得到结果substr($uri,0,0)即空字符串
-            }else{
-                $mcapart  = trim(substr($uri,0,$papos),'/');
-                $pparts   = substr($uri,$papos + strlen($bridges['ap']));
-            }
-
-            //-- 解析MCA部分 --//
-            //逆向检查CA是否存在衔接
-            $mcaparsed = self::parseMCA($mcapart,$bridges);
-            self::$result = array_merge(self::$result,$mcaparsed);
-
-            //-- 解析参数部分 --//
-
-
-            self::$result['p'] = Utils::fetchKeyValuePair($pparts,$bridges['pp'],$bridges['pkv']);
-            DEBUG_MODE_ON and Debugger::status('parseurl_in_common_end');
-        }
-
-        /**
-         * 解析主机名
-         * 如果找到了对应的主机名称，则绑定到对应的模块
-         * @param string $hostname 访问的主机名
-         * @return bool 返回是否绑定了模块
-         */
-        private static function parseHostname($hostname){
-            $subdomain = strstr($hostname,self::$_config['DOMAIN_NAME'],true);
-            if($subdomain !== false){
-                $subdomain = rtrim($subdomain,'.');
-                if(isset(self::$_config['SUBDOMAIN_MAPPINIG'][$subdomain])){
-                    self::$result['m'] = self::$_config['SUBDOMAIN_MAPPINIG'][$subdomain];
-                }elseif(self::$_config['SUBDOMAIN_AUTO_MAPPING_ON']){
-                    if(false !== strpos($subdomain,'.')){
-                        self::$result['m'] = array_map(function ($val) {
-                            return Utils::styleStr($val,1);
-                        }, explode('.',$subdomain));
-                    }else{
-                        self::$result['m'] = ucfirst($subdomain);
-                    }
-                }
-            }
-            return false;
-        }
-
-        /**
-         * 解析"模块、控制器、操作"
-         * @param $mcapart
-         * @param $bridges
-         * @return array
-         */
-        private static function parseMCA($mcapart,$bridges){
-            $parsed = ['m'=>null,'c'=>null,'a'=>null];
-            $capos = strrpos($mcapart,$bridges['ca']);
-            if(false === $capos){
-                //找不到控制器与操作之间分隔符（一定不存在控制器）
-                //先判断位置部分是否为空字符串来决定是否有操作名称
-                if(strlen($mcapart)){
-                    //位置字段全部是字符串的部分
-                    $parsed['a'] = $mcapart;
-                }else{
-                    //没有操作部分，MCA全部使用默认的
-                }
-            }else{
-                //apos+CA_BRIDGE 后面的部分全部算作action
-                $parsed['a'] = substr($mcapart,$capos+strlen($bridges['ca']));
-
-                //CA存在衔接符 则说明一定存在控制器
-                $mcalen = strlen($mcapart);
-                $mcpart = substr($mcapart,0,$capos-$mcalen);//去除了action的部分
-
-                if(strlen($mcapart)){
-                    $mcpos = strrpos($mcpart,$bridges['mc']);
-                    if(false === $mcpos){
-                        //不存在模块
-                        if(strlen($mcpart)){
-                            //全部是控制器的部分
-                            $parsed['c'] = $mcpart;
-                        }else{
-                            //没有控制器部分，则使用默认的
-                        }
-                    }else{
-                        //截取控制器的部分
-                        $parsed['c']   = substr($mcpart,$mcpos+strlen($bridges['mc']));
-
-                        //既然存在MC衔接符 说明一定存在模块
-                        $mpart = substr($mcpart,0,$mcpos-strlen($mcpart));//以下的全是模块部分的字符串
-                        if(strlen($mpart)){
-                            if(false === strpos($mpart,$bridges['mm'])){
-                                $parsed['m'] = $mpart;
-                            }else{
-                                $parsed['m'] = explode($bridges['mm'],$mpart);
-                            }
-                        }else{
-                            //一般存在衔接符的情况下不为空,但也考虑下特殊情况
-                        }
-                    }
-                }else{
-                    //一般存在衔接符的情况下不为空,但也考虑下特殊情况
-                }
-            }
-            return $parsed;
-        }
-        /**
-         * 删除伪装的url后缀
-         * @param string|array $uri 需要去除尾巴的字符串或者字符串数组（当数组中存在其他元素时忽略）
-         * @return void
-         */
-        private static function stripMasqueradeTail(&$uri){
-            $uri = trim($uri);
-            $position = stripos($uri,self::$_config['MASQUERADE_TAIL']);
-            //$position === false 表示 不存在伪装的后缀或者相关带嫌疑的url部分
-
-            if(false !== $position and strlen($uri) === ($position + strlen(self::$_config['MASQUERADE_TAIL'])) ){
-                //伪装的后缀存在且只出现在最后的位置时
-                $uri = substr($uri,0,$position);
-            }
-        }
-    }
-
-
-    /**
      * Class D
      * Making library driver based
      * @package PLite
      */
-    trait D{
+    trait AutoDrive{
         /**
          * @var array drivers
          */
@@ -1757,7 +894,7 @@ namespace PLite {
          * @param null|string $clsnm class-name
          * @return void
          */
-        final public static function __initializationize($clsnm=null){
+        public static function __initializationize($clsnm=null){
             $clsnm or $clsnm = static::class;
             if(!isset(self::$_cs[$clsnm])){
                 //get convention
@@ -1831,7 +968,7 @@ namespace PLite {
      * Make single instance or identify-based instance possible
      * @package PLite
      */
-    trait I {
+    trait AutoInstance {
 
         protected static $_is = [];
 
@@ -1862,7 +999,7 @@ namespace PLite {
      * @package PLite
      */
     abstract class Lite {
-        use AutoConfig , I ;
+        use AutoConfig , AutoDrive;
 
         /**
          * 类实例的驱动
@@ -1877,7 +1014,7 @@ namespace PLite {
         /**
          * it maybe a waste of performance
          * @param string|int|null $identify it will get the default index if set to null
-         * @return null|object
+         * @return object
          */
         protected static function driver($identify=null){
             $clsnm = static::class;
@@ -1887,28 +1024,38 @@ namespace PLite {
             //get default identify
             if(null === $identify) {
                 $config = static::getConfig();
-                if(isset($config['PRIOR_INDEX'])){
-                    $identify = $config['PRIOR_INDEX'];
+                if(isset($config[PRIOR_INDEX])){
+                    $identify = $config[PRIOR_INDEX];
                 }else{
-                    PLiteException::throwing('No driver identify been specified !');
+                    PLiteException::throwing("No driver identify been specified '{$identify}' !");
                 }
             }
 
             //instance a driver for this identify
             if(!isset(self::$_drivers[$clsnm][$identify])){
                 $config or $config = static::getConfig();
-                if(isset($config['DRIVER_CLASS_LIST'][$identify])){
+                if(isset($config[DRIVER_CLASS_LIST][$identify])){
                     //获取驱动类名称
-                    $driver = $config['DRIVER_CLASS_LIST'][$identify];
-                    $param  = empty($config['DRIVER_CONFIG_LIST'][$identify])?null:$config['DRIVER_CONFIG_LIST'][$identify];
+                    $driver = $config[DRIVER_CLASS_LIST][$identify];
+                    $param  = empty($config[DRIVER_CONFIG_LIST][$identify])?null:$config[DRIVER_CONFIG_LIST][$identify];
                     //设置实例驱动
-                    self::$_drivers[$clsnm][$identify] = $param? new $driver($param): new $driver($param);
+                    self::$_drivers[$clsnm][$identify] = $param? new $driver($param): new $driver();
                 }else{
                     PLiteException::throwing("No driver for identify '$identify'!");
                 }
             }
 
             return self::$_drivers[$clsnm][$identify];
+        }
+
+        /**
+         * Use driver method as its static method
+         * @param string $method method name
+         * @param array $arguments method arguments
+         * @return mixed
+         */
+        public static function __callStatic($method, $arguments) {
+            return call_user_func_array([self::driver(), $method], $arguments);
         }
     }
 }

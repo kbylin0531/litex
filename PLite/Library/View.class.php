@@ -1,21 +1,20 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lnzhv
- * Date: 7/13/16
- * Time: 10:15 PM
- */
 
 namespace PLite\Library;
 use PLite\Lite;
-use PLite\Library\View\ViewInterface;
-use PLite\Util\SEK;
 
+/**
+ * Class View
+ * @method void assign(string|array $tpl_var,mixed $value=null,bool $nocache=false) 保存控制器分配的变量
+ * @method void registerParsingString(string $str,string|int $replacement) 设置模板替换字符串
+ * @method void display(array $context,int  $cache_id = null,int $compile_id = null,int $parent = null) 显示模板
+ * @package PLite\Library
+ */
 class View extends Lite {
 
     const CONF_NAME = 'view';
     const CONF_CONVENTION = [
-        'PRIOR_INDEX' => 0,
+        'PRIOR_INDEX' => 1,
         'DRIVER_CLASS_LIST' => [
             'PLite\\Library\\View\\Smarty',
             'PLite\\Library\\View\\Think',
@@ -53,65 +52,8 @@ class View extends Lite {
             ],
         ],
 
-        //模板文件后缀名
-//        'TEMPLATE_SUFFIX'   => 'html',
         //模板文件提示错误信息模板
         'TEMPLATE_EMPTY_PATH'   => 'notpl',
     ];
-
-    /**
-     * 调用本类display的方法的上下文环境
-     * @var array
-     */
-    protected static $_context = null;
-
-    /**
-     * 类实例的驱动
-     * @var ViewInterface
-     */
-    protected static $_driver = null;
-
-    /**
-     * 保存控制器分配的变量
-     * @param string $tpl_var
-     * @param null $value
-     * @param bool $nocache
-     * @return void
-     */
-    public static function assign($tpl_var,$value=null,$nocache=false){
-        self::$_driver or self::$_driver = self::driver();
-        self::$_driver->assign($tpl_var,$value,$nocache);
-    }
-
-
-    /**
-     * 设置模板替换字符串
-     * @param string|array $str
-     * @param string $replacement
-     * @return void
-     */
-    public static function registerParsingString($str,$replacement){
-        self::$_driver or self::$_driver = self::driver();
-        if(is_array($str)){
-            foreach ($str as $key=>$val){
-                self::$_driver->registerParsingString($key,$val);
-            }
-        }else{
-            self::$_driver->registerParsingString($str,$replacement);
-        }
-    }
-    /**
-     * 显示模板
-     * @param array $context 模板调用上下文环境，包括模块、控制器、方法和模板主题
-     * @param null $cache_id
-     * @param null $compile_id
-     * @param null $parent
-     * @return void
-     */
-    public static function display(array $context, $cache_id = null, $compile_id = null,$parent = null){
-        self::$_driver or self::$_driver = self::driver();
-        $template = SEK::parseTemplatePath($context);
-        self::$_driver->setContext($context)->display($template,$cache_id,$compile_id,$parent);
-    }
 
 }

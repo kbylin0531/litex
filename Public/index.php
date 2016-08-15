@@ -1,5 +1,4 @@
 <?php
-
 const DEBUG_MODE_ON = true;
 const PAGE_TRACE_ON = true;
 const LITE_ON = false;

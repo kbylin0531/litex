@@ -45,12 +45,12 @@ interface ViewInterface {
     public function registerParsingString($str,$replacement);
     /**
      * 显示模板
-     * @param string $template 全部模板引擎通用的
+     * @param string $context 全部模板引擎通用的
      * @param null $cache_id
      * @param null $compile_id
      * @param null $parent
      * @return void
      */
-    public function display($template = null, $cache_id = null, $compile_id = null, $parent = null);
+    public function display($context = null, $cache_id = null, $compile_id = null, $parent = null);
 
 }

@@ -80,20 +80,20 @@ class Smarty implements ViewInterface {
 
     /**
      * 显示模板
-     * @param string $template 模板文件位置
+     * @param string $context 模板文件位置
      * @param null $cache_id
      * @param null $compile_id
      * @param null $parent
      * @return void
      * @throws Exception
      */
-    public function display($template = null, $cache_id = null, $compile_id = null, $parent = null){
+    public function display($context = null, $cache_id = null, $compile_id = null, $parent = null){
         \PLite::recordStatus('display_begin');
 
         //拟上下文转化成数组
         $context = &$this->_context;
         //判断模板文件是否存在（改为由模板引擎判断）
-        if(!is_file($template)) Exception::throwing('Could not find the template file of this action',$context['a']);
+        if(!is_file($context)) Exception::throwing('Could not find the template file of this action',$context['a']);
 
         //编译缓存目录
         $cachedir = $this->convention['TEMPLATE_CACHE_DIR']."{$context['m']}/{$context['c']}/";
@@ -106,7 +106,7 @@ class Smarty implements ViewInterface {
         \PLite::recordStatus('view_display_begin');
 
         //显示模板文件
-        $this->smarty->display($template,$cache_id,$compile_id,$parent);
+        $this->smarty->display($context,$cache_id,$compile_id,$parent);
         \PLite::recordStatus('view_display_end');
     }
 

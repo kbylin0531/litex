@@ -7,6 +7,7 @@
  */
 
 namespace PLite\Core\Cache;
+use PLite\Core\CacheInterface;
 use PLite\PLiteException as Exception;
 
 /**
@@ -102,12 +103,13 @@ class Memcache implements CacheInterface{
      *
      * @access public
      * @param string $name 缓存变量名
+     * @param mixed $replacement
      * @return string|array |null 返回false时候表示出现了错误
      */
-    public function get($name)
+    public function get($name,$replacement=null)
     {
         $val = $this->handler->get($this->options['prefix'] . $name);
-        return false === $this->handler->get($this->options['prefix'] . $name)?null:$val;
+        return false === $val?$replacement:$val;
     }
 
     /**

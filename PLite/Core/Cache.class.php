@@ -1,25 +1,66 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: lnzhv
- * Date: 7/13/16
- * Time: 7:03 PM
- */
 namespace PLite\Core;
-use PLite\Core\Cache\CacheInterface;
 use PLite\Lite;
 
+/**
+ * Interface CacheInterface 缓存驱动接口
+ * @package Kbylin\System\Library\Cache
+ */
+interface CacheInterface {
+    /**
+     * 读取缓存
+     * @access public
+     * @param string $name 缓存变量名
+     * @param mixed $replacement
+     * @return mixed
+     */
+    public function get($name,$replacement=null);
+
+    /**
+     * 写入缓存
+     * @access public
+     * @param string $name 缓存变量名
+     * @param mixed $value  存储数据
+     * @param int $expire  有效时间，0为永久（以秒计时）
+     * @return boolean
+     */
+    public function set($name, $value, $expire = 0);
+
+    /**
+     * 删除缓存
+     * @access public
+     * @param string $name 缓存变量名
+     * @return boolean
+     */
+    public function delete($name);
+
+    /**
+     * 清除缓存
+     * @access public
+     * @return boolean
+     */
+    public function clean();
+}
+
+/**
+ * Class Cache
+ *
+ * @method int get(string $name,$replace=null) static 读取缓存
+ * @method boolean set(string $name,mixed $value,int $expire) static 写入缓存
+ * @method int delete(string $name) static 删除缓存
+ * @method int clean() static empty the cache
+ * @package PLite\Core
+ */
 class Cache extends Lite{
 
     const CONF_NAME = 'cache';
     const CONF_CONVENTION = [
-        'PRIOR_INDEX' => 0,
-        'DRIVER_CLASS_LIST' => [
-            'PLite\\Core\\Cacher\\File',
-            'PLite\\Core\\Cacher\\Memcache',
+        PRIOR_INDEX => 0,
+        DRIVER_CLASS_LIST => [
+            'PLite\\Core\\Cache\\File',
+            'PLite\\Core\\Cache\\Memcache',
         ],
-        'DRIVER_CONFIG_LIST' => [
+        DRIVER_CONFIG_LIST => [
             [
                 //from thinkphp ,match case
                 'expire'        => 0,
@@ -27,7 +68,7 @@ class Cache extends Lite{
                 'path_level'    => 1,
                 'prefix'        => '',
                 'length'        => 0,
-                'path'          => PATH_RUNTIME.'Cache/File/',
+                'path'          => PATH_RUNTIME.'/file_cache/',
                 'data_compress' => false,
             ],
             [
@@ -41,85 +82,5 @@ class Cache extends Lite{
             ],
         ],
     ];
-
-
-    /**
-     * 读取次数
-     * @var int
-     */
-    private static $readTimes   = 0;
-    /**
-     * 写入次数
-     * @var int
-     */
-    private static $writeTimes  = 0;
-    /**
-     * to declare the driver type
-     * @var CacheInterface
-     */
-    protected $driver = null;
-
-    /**
-     * 获取读取缓存次数
-     * @return int
-     */
-    public function getReadTimes(){
-        return self::$readTimes;
-    }
-
-    /**
-     * 获取写入缓存的速度
-     * @return int
-     */
-    public function getWriteTimes(){
-        return self::$writeTimes;
-    }
-
-    /**
-     * 读取缓存
-     * @access public
-     * @param string $name 缓存变量名
-     * @param mixed $replace 值不存在时的替代
-     * @return mixed
-     */
-    public function get($name,$replace=null){
-        ++ self::$readTimes;
-        $result = $this->driver->get($name);
-        return $result === null ? $replace : $result;
-    }
-
-    /**
-     * 写入缓存
-     * @access public
-     * @param string $name 缓存变量名
-     * @param mixed $value  存储数据
-     * @param int $expire  有效时间 0为永久
-     * @return bool
-     */
-    public function set($name, $value, $expire = null){
-        ++ self::$writeTimes;
-        return $this->driver->set($name, $value, $expire);
-    }
-
-    /**
-     * 删除缓存
-     * @access public
-     * @param string $name 缓存变量名
-     * @return boolean
-     */
-    public function delete($name){
-        ++ self::$writeTimes;
-        return $this->driver->delete($name);
-    }
-
-    /**
-     * 清除全部缓存
-     * @access public
-     * @return boolean
-     */
-    public function clean(){
-        ++ self::$writeTimes;
-        return $this->driver->clean();
-    }
 
 }

@@ -1,6 +1,8 @@
 <?php
 namespace PLite\Core\Cache;
-use PLite\Storage;
+use PLite\Core\CacheInterface;
+use PLite\Core\Storage;
+use PLite\PLiteException;
 
 /**
  * 文件类型缓存类
@@ -10,7 +12,7 @@ class File implements CacheInterface {
 
     protected $options = [
         'expire'        => 0,
-        'cache_subdir'  => false,
+        'cache_subdir'  => true,
         'path_level'    => 1,
         'prefix'        => '',
         'length'        => 0,
@@ -71,7 +73,8 @@ class File implements CacheInterface {
             $name = $this->options['prefix'] . DIRECTORY_SEPARATOR . $name;
         }
         $filename = $this->options['path'] . $name . '.php';
-        Storage::checkAndMakeSubdir($filename);
+        $dir = dirname($filename);
+        Storage::mkdir($dir) or PLiteException::throwing("Failed to mkdir '{$dir}'");
         return $filename;
     }
 
@@ -127,9 +130,7 @@ class File implements CacheInterface {
      * @param int $expire  有效时间 0为永久
      * @return boolean
      */
-    public function set($name, $value, $expire = null)
-    {
-
+    public function set($name, $value, $expire = null) {
         if (!isset($expire)) {
             $expire = $this->options['expire'];
         }
