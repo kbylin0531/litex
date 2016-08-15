@@ -8,9 +8,9 @@
 
 namespace PLite\Library\View;
 use PLite\Core\Dao;
-use PLite\Core\URL;
+use PLite\Core\Router;
 use PLite\PLiteException;
-use PLite\Storage;
+use PLite\Core\Storage;
 use PLite\Util\SEK;
 use PLite\Utils;
 
@@ -170,7 +170,7 @@ class Think implements ViewInterface{
     public function display($context = null, $cache_id = null, $compile_id = null, $parent = null) {
         $template = SEK::parseTemplatePath($context);
         //模板常量
-        defined('__ROOT__') or define('__ROOT__',URL::getBasicUrl());
+        defined('__ROOT__') or define('__ROOT__',Router::getBasicUrl());
         defined('__MODULE__') or define('__MODULE__',__PUBLIC__.'/'.REQUEST_MODULE);
         defined('__CONTROLLER__') or define('__CONTROLLER__',__MODULE__.'/'.REQUEST_CONTROLLER);
         defined('__ACTION__') or define('__ACTION__',__CONTROLLER__.'/'.REQUEST_ACTION);
@@ -273,7 +273,7 @@ class Think implements ViewInterface{
         if(is_file($templateFile)) {
             $this->templateFile    =  $templateFile;
             // 读取模板文件内容
-            $tmplContent =  Storage::readFile($templateFile);//file_get_contents($templateFile);
+            $tmplContent =  Storage::read($templateFile);//file_get_contents($templateFile);
         }else{
             $tmplContent =  $templateFile;
         }

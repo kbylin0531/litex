@@ -106,7 +106,10 @@ class Cookie {
      * @return mixed
      */
     public static function get($name, $prefix = null) {
-        $prefix = isset($prefix) ? $prefix : self::getConfig('prefix');
+        if(!isset($prefix)){
+            $config = self::getConfig();
+            $prefix = isset($config['prefix'])?$config['prefix']:'';
+        }
         $name   = $prefix . $name;
         if (isset($_COOKIE[$name])) {
             $value = $_COOKIE[$name];

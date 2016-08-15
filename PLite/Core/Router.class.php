@@ -10,6 +10,7 @@ use PLite\Utils;
  * @package PLite\Core
  */
 class Router {
+
     use AutoConfig;
 
     const CONF_NAME = 'route';

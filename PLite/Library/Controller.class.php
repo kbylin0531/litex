@@ -100,13 +100,12 @@ class Controller {
             $context['a'] or empty(self::$_context['a']) or $context['a'] = self::$_context['a'];
         }
 //        \PLite\dumpout($context);
-        $view = View::getInstance();
         //模板变量导入
-        $view->assign($this->_tVars);
+        View::assign($this->_tVars);
         //格式化模板变量
         Debugger::status('display_begin');
 //        \PLite\dumpout($context);
-        $view->display($context,$cache_id,$compile_id,$parent);
+        View::display($context,$cache_id,$compile_id,$parent);
         Debugger::status('display_end');
     }
 

@@ -171,6 +171,8 @@ namespace {
                 //打开输出控制缓冲
                 ob_start();
 
+
+                Router::__initializationize();
                 //parse uri
                 $result = self::$_config['ROUTE_ON']?Router::parseRoute():null;
                 $result or $result = Router::parseURL();
@@ -231,7 +233,6 @@ namespace PLite {
     use PLite\Core\Configger;
     use PLite\Util\Helper\XMLHelper;
     use PLite\Util\SEK;
-
 //-----------------------------------------------------------------------------------------
 //---------------------------- RUNCTION OF FRAMEWOEK BEGIN --------------------------------
 //-----------------------------------------------------------------------------------------
@@ -536,14 +537,13 @@ namespace PLite {
         /**
          * @param string $clsnm class name
          * @param string $method method name
-         * @param null|array $args
          * @return mixed|null
          */
-        public static function callStatic($clsnm,$method,$args=null){
+        public static function callStatic($clsnm,$method){
             $callable = "{$clsnm}::{$method}()";
             if(is_callable($callable)){
                 try{
-                    return $args?call_user_func_array($callable,$args):$clsnm::$method();
+                    return $clsnm::$method();
                 }catch (\Exception $e){
                     Debugger::trace($e->getMessage());
                 }
@@ -874,64 +874,22 @@ namespace PLite {
                 //load the outer config
                 $conf = Configger::load($clsnm);
                 $conf and is_array($conf) and self::$_cs[$clsnm] = Utils::merge(self::$_cs[$clsnm],$conf,true);
+
+                Debugger::trace("Class '{$clsnm}' __initializationized!");
             }
             //auto init
             Utils::callStatic($clsnm,'__init');
         }
 
         /**
-         * @param string $names
-         * @param mixed $replacement 如果参数一指定的配置项不存在时默认代替的配置项
-         * @return mixed|null
-         */
-        private static function &_search_position($names,$replacement=null){
-            $static_config = &self::$_cs[static::class];
-            if(strpos($names,'.')) {//exist and the position great than  0
-                $names = explode('.', $names);
-                $len = count($names);
-                for ($i = 0; $i < $len; $i++) {
-                    $name = $names[$i];
-                    if (isset($static_config[$name])) {
-                        //it will return if is the last one
-                        if ($i === $len - 1) {
-                            $names = $name;
-                            break;
-                        }
-                    } else {
-                        return $replacement;
-                    }
-                    $static_config = &$static_config[$name];
-                }
-            }
-            return isset($static_config[$names])?$static_config[$names]:$replacement;
-        }
-
-        /**
          * 获取该类的配置（经过用户自定义后）
-         * @param string|null $names 配置项名称
-         * @param mixed $replacement 如果参数一指定的配置项不存在时默认代替的配置项
          * @return array
          */
-        final protected static function &getConfig($names=null, $replacement=null){
+        final protected static function &getConfig(){
             $clsnm = static::class;
             isset(self::$_cs[$clsnm]) or self::$_cs[$clsnm] = [];
-            if(null !== $names){
-                return self::_search_position($names,$replacement);
-            }
+            $replacement = null;
             return self::$_cs[$clsnm];
-        }
-
-        /**
-         * set template
-         * @param string $names
-         * @param mixed $value
-         * @return bool|mixed return the value what is set
-         */
-        final protected static function setConfig($names, $value){
-            $clsnm = static::class;
-            isset(self::$_cs[$clsnm]) or self::$_cs[$clsnm] = [];
-            $place = &self::_search_position($names);
-            return $place !== null?($place = $value):false;
         }
 
     }

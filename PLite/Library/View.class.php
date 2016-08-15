@@ -6,9 +6,9 @@ use PLite\Lite;
 
 /**
  * Class View
- * @method void assign(string|array $tpl_var,mixed $value=null,bool $nocache=false) 保存控制器分配的变量
- * @method void registerParsingString(string $str,string|int $replacement) 设置模板替换字符串
- * @method void display(array $context,int  $cache_id = null,int $compile_id = null,int $parent = null) 显示模板
+ * @method void assign(string|array $tpl_var,mixed $value=null,bool $nocache=false) static 保存控制器分配的变量
+ * @method void registerParsingString(string $str,string|int $replacement) static 设置模板替换字符串
+ * @method void display(array $context,int  $cache_id = null,int $compile_id = null,int $parent = null) static 显示模板
  * @package PLite\Library
  */
 class View extends Lite {
