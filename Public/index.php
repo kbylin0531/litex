@@ -23,6 +23,8 @@ function wechat($id){
 }
 
 PLite::start([
+    'CACHE_URL_ON'      => false,
+    'CACHE_PATH_ON'     => true,
     'CONFIGGER' => [],
     'ROUTER'    => [
         'STATIC_ROUTE_ON'   => false,

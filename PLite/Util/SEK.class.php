@@ -54,18 +54,19 @@ final class SEK {
                 'Request'   => date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME']).' '.$_SERVER['SERVER_PROTOCOL'].' '.$_SERVER['REQUEST_METHOD'],
                 'Time'      => "{$stat[0]}ms",
                 'QPS'       => $reqs,//吞吐率
-                'SessionID' => session_id(),
-                'Cookie'    => var_export($_COOKIE,true),
+                'Session ID' => session_id(),
                 'Obcache-Size'  => number_format((ob_get_length()/1024),2).' KB (Unexpect Trace Page!)',//不包括trace
             ],
             'Trace'         => $trace,
             'Files'         => array_merge(['Total'=>count($info)],$info),
             'Status'        => $cmprst,
-            'Get'           => $_GET,
-            'Post'          => $_POST,
-            'Server'        => $_SERVER,
+            'GET'           => $_GET,
+            'POST'          => $_POST,
+            'REQUEST'       => $_REQUEST,
+            'SERVER'        => $_SERVER,
             'ENV'           => $_ENV,
-            'Session'       => isset($_SESSION)?$_SESSION:['SESSION state disabled'],//session_start()之后$_SESSION数组才会被创建
+            'COOKIE'        => empty($_COOKIE)?[]:$_COOKIE,
+            'SESSION'       => isset($_SESSION)?$_SESSION:['SESSION state disabled'],//session_start()之后$_SESSION数组才会被创建
             'IP'            => [
                 '$_SERVER["HTTP_X_FORWARDED_FOR"]'  =>  isset($_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['HTTP_X_FORWARDED_FOR']:'NULL',
                 '$_SERVER["HTTP_CLIENT_IP"]'  =>  isset($_SERVER['HTTP_CLIENT_IP'])?$_SERVER['HTTP_CLIENT_IP']:'NULL',
@@ -82,7 +83,6 @@ final class SEK {
         foreach($vars as $key => $value){
             $nav .= "<span style=\"color:#000;padding-right:12px;height:30px;line-height: 30px;display:inline-block;margin-right:3px;cursor: pointer;font-weight:700\">$key</span>";
             $win .= '<div style="display:none;"><ol style="padding: 0; margin:0">';
-
             if(is_array($value)){
                 foreach ($value as $k=>$val){
                     if(!is_string($val)) $val = var_export($val,true);
@@ -98,7 +98,7 @@ final class SEK {
 
         echo <<< endline
     <div style="border-left:thin double #ccc;position: fixed;bottom:0;right:0;font-size:14px;width:1280px;z-index: 999999;color: #000;text-align:left;font-family:'Times New Roman';cursor:default;">
-        <div id="page_trace_tab" style="display: none;background:white;margin:0;height: 512px;">
+        <div id="ptt" style="display: none;background:white;margin:0;height: 512px;">
             <!-- 导航条 -->
             <div id="pttt" style="height:32px;padding: 6px 12px 0;border-bottom:1px solid #ececec;border-top:1px solid #ececec;font-size:16px">
                 {$nav}
@@ -124,20 +124,20 @@ final class SEK {
         var tab_cont = document.getElementById('pttc').getElementsByTagName('div');
         var open     = document.getElementById('pto');
         var close    = document.getElementById('ptc');
-        var trace    = document.getElementById('page_trace_tab');
-        var cookie   = document.cookie.match(/show_page_trace=(\d\|\d)/);
+        var trace    = document.getElementById('ptt');
+        var cookie   = document.cookie.match(/_spt=(\d\|\d)/);
         var history  = (cookie && typeof cookie[1] != 'undefined' && cookie[1].split('|')) || [0,0];
         open.onclick = function(){
             trace.style.display = '';
             close.style.display = '';
             history[0] = 1;
-            document.cookie = 'show_page_trace='+history.join('|');
+            document.cookie = '_spt='+history.join('|');
         };
         close.onclick = function(){
             trace.style.display = 'none';
             open.style.display = 'block';
             history[0] = 0;
-            document.cookie = 'show_page_trace='+history.join('|');
+            document.cookie = '_spt='+history.join('|');
         };
         for(var i = 0; i < tab_tit.length; i++){
             tab_tit[i].onclick = (function(i){
@@ -149,7 +149,7 @@ final class SEK {
                     tab_cont[i].style.display = 'block';
                     tab_tit[i].style.color = '#000';
                     history[1] = i;
-                    document.cookie = 'show_page_trace='+history.join('|')
+                    document.cookie = '_spt='+history.join('|')
                 }
             })(i);
         }
@@ -188,7 +188,6 @@ endline;
         $stmtError = $statement->errorInfo();
         return 0 !== intval($stmtError[0])?"Error Code:[{$stmtError[0]}]::[{$stmtError[1]}]:[{$stmtError[2]}]":null;//代号为0时表示错误未发生
     }
-
 
     /**
      * decompose the params from request
@@ -370,7 +369,6 @@ endline;
      */
     public static function backtrace($elements=self::ELEMENT_ALL, $place=self::PLACE_SELF) {
         $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
-//        \PLite\dump($trace);
         $result = [];
         if($elements){
             $elements & self::ELEMENT_ARGS     and $result[self::ELEMENT_ARGS]    = isset($trace[$place]['args'])?$trace[$place]['args']:null;
@@ -389,18 +387,25 @@ endline;
     /**
      * 解析模板位置
      * 测试代码：
-    $this->parseTemplateLocation('ModuleA/ModuleB@ControllerName/ActionName:themeName'),
-    $this->parseTemplateLocation('ModuleA/ModuleB@ControllerName/ActionName'),
-    $this->parseTemplateLocation('ControllerName/ActionName:themeName'),
-    $this->parseTemplateLocation('ControllerName/ActionName'),
-    $this->parseTemplateLocation('ActionName'),
-    $this->parseTemplateLocation('ActionName:themeName')
+        [
+            SEK::parseLocation('ModuleA/ModuleB@ControllerName/ActionName:themeName'),
+            SEK::parseLocation('ModuleA/ModuleB@ControllerName/ActionName'),
+            SEK::parseLocation('ControllerName/ActionName:themeName'),
+            SEK::parseLocation('ControllerName/ActionName'),
+            SEK::parseLocation('ActionName'),
+            SEK::parseLocation('ActionName:themeName'),
+        ]
      * @param string $location 模板位置
      * @return array
      */
     public static function parseLocation($location){
         //资源解析结果：元素一表示解析结果
-        $result = [];
+        $result = [
+            't' => null,
+            'm' => null,
+            'c' => null,
+            'a' => null,
+        ];
 
         //-- 解析字符串成数组 --//
         $tpos = strpos($location,':');
@@ -425,11 +430,6 @@ endline;
             $result['a'] = $location;
         }
 
-        isset($result['t']) or $result['t'] = null;
-        isset($result['m']) or $result['m'] = null;
-        isset($result['c']) or $result['c'] = null;
-        isset($result['a']) or $result['a'] = null;
-
         return $result;
     }
 
@@ -443,7 +443,7 @@ endline;
         //分析php源码
         $tokens     = token_get_all($content);
         $last_space = false;
-        for ($i = 0, $j = count($tokens); $i < $j; $i++) {
+        for ($i = 0, $len = count($tokens); $i < $len; $i++) {
             if (is_string($tokens[$i])) {
                 $last_space = false;
                 $stripStr  .= $tokens[$i];
@@ -465,7 +465,7 @@ endline;
                         break;
                     case T_END_HEREDOC:
                         $stripStr .= "PLite;\n";
-                        for($k = $i+1; $k < $j; $k++) {
+                        for($k = $i+1; $k < $len; $k++) {
                             if(is_string($tokens[$k]) && $tokens[$k] == ';') {
                                 $i = $k;
                                 break;
@@ -531,13 +531,8 @@ endline;
      * @author 麦当苗儿 <zuojiazi@vip.qq.com>
      */
     public static function dataSign($data) {
-        //数据类型检测
-        if(!is_array($data)){
-            $data = (array)$data;
-        }
-        ksort($data); //排序
-        $code = http_build_query($data); //url编码并生成query字符串
-        $sign = sha1($code); //生成签名
-        return $sign;
+        is_array($data) or $data = [$data];
+        ksort($data);
+        return sha1(http_build_query($data));
     }
 }

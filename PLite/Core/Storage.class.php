@@ -110,10 +110,10 @@ interface StorageInterface {
  * @method int has(string $filepath) static 确定文件或者目录是否存在
  * @method int|bool mtime(string $filepath, int $mtime = null) static 返回文件内容上次的修改时间
  * @method int|false size(string $filepath) static 获取文件按大小
- * @method bool mkdir(string $dirpath,int $auth = 0755) static 创建文件夹
+ * @method bool mkdir(string $dirpath,int $auth = 0766) static 创建文件夹
  * @method bool touch(string $filepath,int  $mtime = null,int  $atime = null) static 设定文件的访问和修改时间
  * @method bool chmod(string $filepath,int  $auth = 0755) static 修改文件权限
- * @method bool unlink(string $filepath,bool $recursion = false) 删除文件,目录时必须保证该目录为空
+ * @method bool unlink(string $filepath,bool $recursion = false) static 删除文件,目录时必须保证该目录为空
  * @method bool write(string $filepath,string $content,string $write_encode = null,string $text_encode = 'UTF-8') static 将指定内容写入到文件中
  * @method bool append(string $filepath,string  $content,string $write_encode = null,string $text_encode = 'UTF-8') static 将指定内容追加到文件中
  * @package PLite

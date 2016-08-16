@@ -42,7 +42,7 @@ class File implements CacheInterface {
      * @return bool
      */
     public function available(){
-        is_dir($this->options['path']) or mkdir($this->options['path'],0777,true);
+        Storage::mkdir($this->options['path'],0766);
         return is_writeable($this->options['path']);
     }
 
@@ -64,7 +64,7 @@ class File implements CacheInterface {
      */
     private function filename($name)
     {
-        $name = md5($name);
+//        $name = md5($name);
         if ($this->options['cache_subdir']) {
             // 使用子目录
             $name = substr($name, 0, 2) . DIRECTORY_SEPARATOR . substr($name, 2);
@@ -211,7 +211,7 @@ class File implements CacheInterface {
      */
     public function delete($name){
         $name = $this->filename($name);
-        return is_file($name)? unlink($name) : true;
+        return Storage::unlink($name);
     }
     /**
      * 清除缓存

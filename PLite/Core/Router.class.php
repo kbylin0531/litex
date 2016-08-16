@@ -35,9 +35,9 @@ class Router {
         //API模式，直接使用$_GET
         'API_MODE_ON'   => false,
         //API模式 对应的$_GET变量名称
-        'API_MODULES_VARIABLE'   => '_m',//该模式下使用到多层模块时涉及'MM_BRIDGE'的配置
+        'API_MODULES_VARIABLE'      => '_m',//该模式下使用到多层模块时涉及'MM_BRIDGE'的配置
         'API_CONTROLLER_VARIABLE'   => '_c',
-        'API_ACTION_VARIABLE'   => '_a',
+        'API_ACTION_VARIABLE'       => '_a',
 
         //普通模式
         'MASQUERADE_TAIL'   => '.html',

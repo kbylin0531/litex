@@ -10,7 +10,7 @@ namespace {
     use PLite\Core\Dispatcher;
     use PLite\Core\Router;
 
-    const LITE_VERSION = 0.728;
+    const LITE_VERSION = 1.0;
 //---------------------------------- mode constant -------------------------------------//
     defined('DEBUG_MODE_ON') or define('DEBUG_MODE_ON', true);
     defined('PAGE_TRACE_ON') or define('PAGE_TRACE_ON', true);//在处理微信签名检查时会发生以外的错误
@@ -22,7 +22,7 @@ namespace {
     const EXCEPTION_CLEAN = false;//it will clean the output before if error or exception occur
     const DRIVER_KEY_WITH_PARAM = false;//for trait 'PLite\D' ,if set to true,it will serialize the parameters of contructor which may use a lot of resource
 
-
+    if(DEBUG_MODE_ON) include __DIR__.'/Common/debug_suit.php';
 //---------------------------------- environment constant -------------------------------------//
     //It is different to thinkphp that the beginning time is the time of request comming
     //and ThinkPHP is just using the time of calling 'microtime(true)' which ignore the loading and parsing of "ThinkPHP.php" and its include files.
@@ -31,7 +31,7 @@ namespace {
     define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
 
     //record status at the beginning
-    $GLOBALS['_status_begin'] = [
+    $GLOBALS['litex_begin'] = [
         REQUEST_MICROTIME,
         memory_get_usage(),
     ];
@@ -41,9 +41,14 @@ namespace {
     define('IS_METHOD_POST',$_SERVER['REQUEST_METHOD'] === 'POST');//“GET”, “HEAD”，“POST”，“PUT”
 
     define('HTTP_PREFIX', (isset ($_SERVER ['HTTPS']) and $_SERVER ['HTTPS'] === 'on') ? 'https://' : 'http://' );
-    define('__PUBLIC__',rtrim(empty($_SERVER['SERVER_PORT']) || 80 === $_SERVER['SERVER_PORT']?
-        HTTP_PREFIX.$_SERVER['SERVER_NAME']:
-        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':80'.dirname($_SERVER['SCRIPT_NAME']),'/'));//define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
+
+//    \PLite\dumpout((empty($_SERVER['SERVER_PORT']) or (80 == $_SERVER['SERVER_PORT'])),
+//        HTTP_PREFIX,$_SERVER['SERVER_NAME'],dirname($_SERVER['SCRIPT_NAME']),$_SERVER['SERVER_PORT'],
+//        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].dirname($_SERVER['SCRIPT_NAME'])
+//        );
+    define('__PUBLIC__',rtrim((empty($_SERVER['SERVER_PORT']) or (80 == $_SERVER['SERVER_PORT']))?
+        HTTP_PREFIX.$_SERVER['SERVER_NAME'].dirname($_SERVER['SCRIPT_NAME']):
+        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].dirname($_SERVER['SCRIPT_NAME']),'/'));//define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
 
 //---------------------------------- general constant ------------------------------//
     const TYPE_BOOL     = 'boolean';
@@ -63,6 +68,10 @@ namespace {
     const AJAX_JSON     = 0;
     const AJAX_XML      = 1;
     const AJAX_STRING   = 2;
+
+    const ONE_DAY   = 86400;
+    const ONE_WEEK  = 604800;
+    const ONE_MONTH = 2592000;
 
 //---------------------------------- path constant -------------------------------------//
     define('PATH_BASE', IS_WINDOWS?str_replace('\\','/',dirname(__DIR__)):dirname(__DIR__));
@@ -102,7 +111,11 @@ namespace {
             'ROUTE_ON'          => true,
 
             //string
-            'FUNCTION_PACK' => null,
+            'FUNCTION_PACK'     => null,
+
+            //cache
+            'CACHE_URL_ON'      => true,
+            'CACHE_PATH_ON'     => true,
 
         ];
 
@@ -112,7 +125,7 @@ namespace {
          * @return void
          */
         public static function init(array $config=null){
-            Debugger::import('app_begin',$GLOBALS['_status_begin']);
+            Debugger::import('app_begin',$GLOBALS['litex_begin']);
             Debugger::status('app_init_begin');
             $config and self::$_config = Utils::merge(self::$_config,$config);
 
@@ -131,7 +144,6 @@ namespace {
 
             register_shutdown_function(function (){/* called when script shut down */
                 PAGE_TRACE_ON and !IS_REQUEST_AJAX and Debugger::trace();//show the trace info
-//                $gap = microtime(true) - $GLOBALS['_status_begin'][0];//begin to end
                 Debugger::status('script_shutdown');
             });
 
@@ -161,16 +173,17 @@ namespace {
         public static function start(array $config=null){
             self::$_app_need_inited and self::init($config);
             Debugger::status('app_start');
-            $identify = md5($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+//            $identify = md5($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+            $identify = self::$_config['CACHE_URL_ON']?str_replace('/','_',"{$_SERVER['HTTP_HOST']}-{$_SERVER['REQUEST_URI']}"):null;
+            $content = $identify ? Cache::get($identify,null):null;
 
-            $content = Cache::get($identify,null);
+            //'CACHE_PATH_ON'     => true,
             if(null !== $content){
-                Debugger::trace('load from cache');
+                Debugger::trace('load from url cache');
                 echo $content;
             }else{
                 //打开输出控制缓冲
                 ob_start();
-
 
                 Router::__initializationize();
                 //parse uri
@@ -183,17 +196,32 @@ namespace {
                 //dispatch
                 $ckres = Dispatcher::checkDefault($result['m'],$result['c'],$result['a']);
 
-                //在执行方法之前定义常量,为了能在控制器的构造函数中使用这三个常量
-                define('REQUEST_MODULE',$ckres['m']);//请求的模块
-                define('REQUEST_CONTROLLER',$ckres['c']);//请求的控制器
-                define('REQUEST_ACTION',$ckres['a']);//请求的操作
+                $pidentify = self::$_config['CACHE_PATH_ON']?str_replace('/','_',"{$ckres['m']}_{$ckres['c']}_{$ckres['a']}"):null;
 
-                $result = Dispatcher::exec();
-                echo $content = Response::getOutput();
+                $content = $pidentify?Cache::get($pidentify,null):null;
+                if(null !== $content){
+                    Debugger::trace('load from path cache');
+                    echo $content;
+                }else{
+                    //在执行方法之前定义常量,为了能在控制器的构造函数中使用这三个常量
+                    define('REQUEST_MODULE',$ckres['m']);//请求的模块
+                    define('REQUEST_CONTROLLER',$ckres['c']);//请求的控制器
+                    define('REQUEST_ACTION',$ckres['a']);//请求的操作
 
-                //exec的结果将用于判断输出缓存，如果为int，表示缓存时间，0表示无限缓存,将来将创造更多的扩展，目前仅限于int
-                if(isset($result)){
-                    Cache::set($identify,$content,$result)?Debugger::trace('build cache success!'):Debugger::trace('failed to build cache!');
+                    $result = Dispatcher::exec();
+                    echo $content = Response::getOutput();
+
+                    //exec的结果将用于判断输出缓存，如果为int，表示缓存时间，0表示无限缓存,将来将创造更多的扩展，目前仅限于int
+
+                    if(isset($result)){
+                        //it will not dispear if time not expire, remove it by hand in runtime directory!
+                        if(self::$_config['CACHE_URL_ON']){
+                            Cache::set($identify,$content,$result)?Debugger::trace('build url cache success!'):Debugger::trace('failed to build cache!');
+                        }
+                        if(self::$_config['CACHE_PATH_ON']){
+                            Cache::set($pidentify,$content,$result)?Debugger::trace('build path cache success!'):Debugger::trace('failed to build cache!');
+                        }
+                    }
                 }
             }
         }
@@ -218,14 +246,6 @@ namespace {
             set_exception_handler(self::$_exceptionhandler);
         }
 
-        /**
-         * 注销错误和异常处理回调函数
-         * @return void
-         */
-        public static function unregisterAll(){
-            restore_exception_handler();
-            restore_error_handler();
-        }
     }
 }
 namespace PLite {
@@ -233,39 +253,6 @@ namespace PLite {
     use PLite\Core\Configger;
     use PLite\Util\Helper\XMLHelper;
     use PLite\Util\SEK;
-//-----------------------------------------------------------------------------------------
-//---------------------------- RUNCTION OF FRAMEWOEK BEGIN --------------------------------
-//-----------------------------------------------------------------------------------------
-    function _var_dump($params, $traces, $withhead=true){
-        $color='#';$str='9ABCDEF';//随机浅色背景
-        for($i=0;$i<6;$i++) $color=$color.$str[rand(0,strlen($str)-1)];
-        $str = "<pre style='background: {$color};width: 100%;padding: 10px'>";
-        if($withhead) $str .= "<h3 style='color: midnightblue'><b>F:</b>{$traces[0]['file']} << <b>L:</b>{$traces[0]['line']} >> </h3>";
-        foreach ($params as $key=>$val) $str .= '<b>P '.$key.':</b><br />'.var_export($val, true).'<br />';
-        return $str.'</pre>';
-    }
-    /**
-     * @param ...
-     * @return void
-     */
-    function dumpout(){
-        echo _var_dump(func_get_args(),debug_backtrace());
-        exit();
-    }
-    function _export(){
-        echo _var_dump(func_get_args(),debug_backtrace(),false);
-    }
-    /**
-     * @param ...
-     * @return void
-     */
-    function dump(){
-        echo _var_dump(func_get_args(),debug_backtrace());
-    }
-
-//-----------------------------------------------------------------------------------------
-//---------------------------- RUNCTION OF FRAMEWOEK END ----------------------------------
-//-----------------------------------------------------------------------------------------
 
     /**
      * Class Debugger
@@ -309,7 +296,7 @@ namespace PLite {
          * @return void
          */
         public static function status($tag){
-            self::$_status[$tag] = [
+            DEBUG_MODE_ON and self::$_status[$tag] = [
                 microtime(true),
                 memory_get_usage(),
             ];
@@ -991,7 +978,7 @@ namespace PLite {
                 $clsnm = static::class;
                 PLiteException::throwing("Method '{$method}' do not exist in driver '{$clsnm}'!");
             }
-            return call_user_func_array([self::driver(), $method], $arguments);
+            return call_user_func_array([$driver, $method], $arguments);
         }
     }
 }

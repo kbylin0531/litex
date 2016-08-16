@@ -9,8 +9,14 @@ namespace Application\Home\Controller;
 use PLite\Core\Configger;
 use PLite\Extension\Sphinx\SphinxClient;
 use PLite\Library\Session;
+use PLite\Response;
+use PLite\Util\SEK;
 
 class Index {
+
+    public function ajax(){
+        Response::ajaxBack($_GET);
+    }
 
     public function config(){
         \PLite\dumpout(Configger::write('as.dc',[
@@ -22,6 +28,19 @@ class Index {
         Configger::read('as.dc'));
     }
 
+    public function location(){
+        \PLite\dumpout(
+            [
+                SEK::parseLocation('ModuleA/ModuleB@ControllerName/ActionName:themeName'),
+                SEK::parseLocation('ModuleA/ModuleB@ControllerName/ActionName'),
+                SEK::parseLocation('ControllerName/ActionName:themeName'),
+                SEK::parseLocation('ControllerName/ActionName'),
+                SEK::parseLocation('ActionName'),
+                SEK::parseLocation('ActionName:themeName'),
+            ]
+        );
+    }
+
     public function index(){
         $href = __PUBLIC__.'/index.php/Admin/Index/index';
         $content = '';
@@ -30,7 +49,20 @@ class Index {
             $content .= "<a href='{$href}'>Click to background</a>";
         }
         echo $content;
-        return 0;
+        return ONE_DAY;
+    }
+
+    public function index2(){
+        $href = __PUBLIC__.'/index.php/Admin/Index/index';
+        $content = '';
+        $i = 1;
+        while($i-- > 0 ){
+            $content .= "<a href='{$href}'>Click to background</a>";
+        }
+        echo $content;
+        return [
+            'expire'    => 10,
+        ];
     }
 
     /**
