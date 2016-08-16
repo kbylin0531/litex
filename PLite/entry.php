@@ -17,17 +17,25 @@ namespace {
 //    defined('LITE_ON')       or define('LITE_ON', true);
     defined('INSPECT_ON')    or define('INSPECT_ON',false);
 
-    defined('FS_ENCODING')  or define('FS_ENCODING','GB2312');//file system encoding
-
+    defined('OS_ENCODING')  or define('OS_ENCODING','UTF-8');//file system encoding,GB2312 for windows,and utf8 for most linux
     const EXCEPTION_CLEAN = false;//it will clean the output before if error or exception occur
     const DRIVER_KEY_WITH_PARAM = false;//for trait 'PLite\D' ,if set to true,it will serialize the parameters of contructor which may use a lot of resource
+
+//---------------------------------- path constant -------------------------------------//
+    define('PATH_BASE', IS_WINDOWS?str_replace('\\','/',dirname(__DIR__)):dirname(__DIR__));
+    defined('APP_DIR')  or define('APP_DIR','Application');//dir name opposide to base path
+    defined('APP_PATH') or define('PATH_APP',PATH_BASE.'/'.APP_DIR);
+    const PATH_PLITE    = PATH_BASE.'/PLite';
+    const PATH_CONFIG   = PATH_BASE.'/Config';
+    const PATH_RUNTIME  = PATH_BASE.'/Runtime';
+    const PATH_PUBLIC   = PATH_BASE.'/Public';
 
     if(DEBUG_MODE_ON) include __DIR__.'/Common/debug_suit.php';
 //---------------------------------- environment constant -------------------------------------//
     //It is different to thinkphp that the beginning time is the time of request comming
     //and ThinkPHP is just using the time of calling 'microtime(true)' which ignore the loading and parsing of "ThinkPHP.php" and its include files.
     //It could always keeped in 10ms from request beginning to script shutdown.
-    define('REQUEST_MICROTIME', isset($_SERVER['REQUEST_TIME_FLOAT'])? $_SERVER['REQUEST_TIME_FLOAT']:microtime(true));//(int)($_SERVER['REQUEST_TIME_FLOAT']*1000)
+    define('REQUEST_MICROTIME', $_SERVER['REQUEST_TIME_FLOAT']);//(int)($_SERVER['REQUEST_TIME_FLOAT']*1000)//isset($_SERVER['REQUEST_TIME_FLOAT'])? $_SERVER['REQUEST_TIME_FLOAT']:microtime(true)
     define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
 
     //record status at the beginning
@@ -73,14 +81,6 @@ namespace {
     const ONE_WEEK  = 604800;
     const ONE_MONTH = 2592000;
 
-//---------------------------------- path constant -------------------------------------//
-    define('PATH_BASE', IS_WINDOWS?str_replace('\\','/',dirname(__DIR__)):dirname(__DIR__));
-    defined('APP_DIR')  or define('APP_DIR','Application');//dir name opposide to base path
-    defined('APP_PATH') or define('PATH_APP',PATH_BASE.'/'.APP_DIR);
-    const PATH_PLITE    = PATH_BASE.'/PLite';
-    const PATH_CONFIG   = PATH_BASE.'/Config';
-    const PATH_RUNTIME  = PATH_BASE.'/Runtime';
-    const PATH_PUBLIC   = PATH_BASE.'/Public';
 
     /**
      * Class PLite
@@ -211,9 +211,10 @@ namespace {
                     $result = Dispatcher::exec();
                     echo $content = Response::getOutput();
 
-                    //exec的结果将用于判断输出缓存，如果为int，表示缓存时间，0表示无限缓存,将来将创造更多的扩展，目前仅限于int
+                    //exec的结果将用于判断输出缓存，如果为int，表示缓存时间，0表示无限缓存XXX,将来将创造更多的扩展，目前仅限于int
 
                     if(isset($result)){
+                        if (0 == $result) $result = ONE_DAY;//'无限缓存' will cause some problem
                         //it will not dispear if time not expire, remove it by hand in runtime directory!
                         if(self::$_config['CACHE_URL_ON']){
                             Cache::set($identify,$content,$result)?Debugger::trace('build url cache success!'):Debugger::trace('failed to build cache!');
@@ -546,7 +547,7 @@ namespace PLite {
          * @return string|false 转化失败返回false
          */
         public static function toSystemEncode($str,$strencode='UTF-8'){
-            return iconv($strencode,FS_ENCODING.'//IGNORE',$str);
+            return iconv($strencode,OS_ENCODING.'//IGNORE',$str);
         }
 
         /**
@@ -557,7 +558,7 @@ namespace PLite {
          * @return string|false 转化失败返回false
          */
         public static function toProgramEncode($str, $program_encoding='UTF-8'){
-            return iconv(FS_ENCODING,"{$program_encoding}//IGNORE",$str);
+            return iconv(OS_ENCODING,"{$program_encoding}//IGNORE",$str);
         }
 
         /**

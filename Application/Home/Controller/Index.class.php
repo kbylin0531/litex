@@ -1,9 +1,4 @@
 <?php
-
-/**
- * User: linzh<784855684@qq.com>
- * Datetime: 8/4/16 8:58 AM
- */
 namespace Application\Home\Controller;
 
 use PLite\Core\Configger;
@@ -23,7 +18,7 @@ class Index {
             '111'   => 'dasdsada',
             '32323'=> [
                 '111'   => '快速生成API文档',
-            ]
+            ],
         ]),
         Configger::read('as.dc'));
     }
