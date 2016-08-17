@@ -3,7 +3,6 @@ namespace PLite\Core;
 
 use PDO;
 use PDOStatement;
-use PLite\AutoInstance;
 use PLite\Lite;
 use PLite\PLiteException as Exception;
 use PLite\Util\SEK;
@@ -116,8 +115,6 @@ abstract class DaoDriver extends PDO {
  */
 class Dao extends Lite {
 
-    use AutoInstance;
-
     const CONF_NAME = 'dao';
     const CONF_CONVENTION = [
         'PRIOR_INDEX' => 0,
@@ -192,7 +189,7 @@ class Dao extends Lite {
      * Dao constructor.
      * @param string|int $index
      */
-    private function __construct($index){
+    public function __construct($index){
         $this->pdo = self::driver($index);
     }
 

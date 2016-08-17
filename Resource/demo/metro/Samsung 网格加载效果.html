@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html class=" js cssanimations" lang="zh-cn">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Samsung 网格加载效果 | Demo 3</title>
+    <meta name="description" content="Grid Loading and Hover Effect: Recreating Samsung's grid loading effect">
+    <meta name="keywords" content="grid loading, swipe, effect, slide, masonry, web design, tutorial">
+    <link rel="stylesheet" type="text/css" href="assets/normalize.css">
+    <link rel="stylesheet" type="text/css" href="assets/demo.css">
+    <link rel="stylesheet" type="text/css" href="assets/component.css">
+    <style>
+        body {
+            background: #444;
+        }
+
+        .codrops-demos a.current-demo {
+            color: #999;
+        }
+
+        .codrops-header h1 {
+            margin-top: 50px;
+            font-family: 'Microsoft Yahei';
+            color: #fff;
+        }
+    </style>
+    <script src="assets/modernizr.js"></script>
+    <style type="text/css"> #fi #fic {
+        margin-right: 100px !important
+    }
+
+    #fi #rh {
+        margin-left: -115px !important;
+        width: 95px !important
+    }
+
+    #fi .rh {
+        display: none !important
+    }
+
+    body:not(.xE) div[role='main'] .Bu:not(:first-child) {
+        display: none !important
+    } </style>
+</head>
+<body>
+<div class="container">
+    <header class="codrops-header">
+        <h1>Samsung 网格加载效果</h1>
+        <nav class="codrops-demos">
+            <a href="http://www.jq22.com/demo/samsung20150724/index.html">效果一</a>
+            <a href="http://www.jq22.com/demo/samsung20150724/index2.html">效果二</a>
+            <a class="current-demo" href="http://www.jq22.com/demo/samsung20150724/index3.html">效果三</a>
+        </nav>
+    </header>
+    <section class="grid-wrap">
+        <ul style="position: relative; width: 1256px; height: 2623px;" class="grid swipe-rotate loaded" id="grid">
+            <li class="shown" style="position: absolute; left: 0; top: 0;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 314px; top: 0;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 628px; top: 0;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 942px; top: 0;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 628px; top: 238px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 0; top: 399px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 942px; top: 434px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 314px; top: 435px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 628px; top: 609px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 0; top: 656px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 942px; top: 727px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 314px; top: 869px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 628px; top: 994px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 0; top: 1027px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 942px; top: 1125px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 0; top: 1267px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 314px; top: 1306px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 628px; top: 1365px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 942px; top: 1524px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 314px; top: 1544px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 0; top: 1702px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 628px; top: 1799px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 314px; top: 1801px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 942px; top: 1895px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 0; top: 1995px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 314px; top: 2186px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 628px; top: 2233px;"><a href="#"></a></li>
+            <li class="shown" style="position: absolute; left: 942px; top: 2266px;"><a href="#"></a></li>
+        </ul>
+    </section>
+</div><!-- /container -->
+<div class="footer-banner" style="width:728px; margin:160px auto 100px"></div>
+<script src="assets/jquery.js"></script>
+<script src="assets/masonry.js"></script>
+<script src="assets/imagesloaded.js"></script>
+<script src="assets/classie.js"></script>
+<script src="assets/colorfinder-1.js"></script>
+<script src="assets/gridScrollFx.js"></script>
+<script>
+    new GridScrollFx(document.getElementById('grid'), {
+        viewportFactor: 0.4
+    });
+</script>
+
+
+</body>
+</html>

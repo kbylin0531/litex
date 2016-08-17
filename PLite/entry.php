@@ -1,7 +1,7 @@
 <?php
 
 namespace {
-    use PLite\AutoLoader;
+    use PLite\Loader;
     use PLite\Core\Cache;
     use PLite\Debugger;
     use PLite\PLiteException;
@@ -11,54 +11,7 @@ namespace {
     use PLite\Core\Router;
 
     const LITE_VERSION = 1.0;
-//---------------------------------- mode constant -------------------------------------//
-    defined('DEBUG_MODE_ON') or define('DEBUG_MODE_ON', true);
-    defined('PAGE_TRACE_ON') or define('PAGE_TRACE_ON', true);//在处理微信签名检查时会发生以外的错误
-//    defined('LITE_ON')       or define('LITE_ON', true);
-    defined('INSPECT_ON')    or define('INSPECT_ON',false);
-
-    defined('OS_ENCODING')  or define('OS_ENCODING','UTF-8');//file system encoding,GB2312 for windows,and utf8 for most linux
-    const EXCEPTION_CLEAN = false;//it will clean the output before if error or exception occur
-    const DRIVER_KEY_WITH_PARAM = false;//for trait 'PLite\D' ,if set to true,it will serialize the parameters of contructor which may use a lot of resource
-
-//---------------------------------- path constant -------------------------------------//
-    define('PATH_BASE', IS_WINDOWS?str_replace('\\','/',dirname(__DIR__)):dirname(__DIR__));
-    defined('APP_DIR')  or define('APP_DIR','Application');//dir name opposide to base path
-    defined('APP_PATH') or define('PATH_APP',PATH_BASE.'/'.APP_DIR);
-    const PATH_PLITE    = PATH_BASE.'/PLite';
-    const PATH_CONFIG   = PATH_BASE.'/Config';
-    const PATH_RUNTIME  = PATH_BASE.'/Runtime';
-    const PATH_PUBLIC   = PATH_BASE.'/Public';
-
-    if(DEBUG_MODE_ON) include __DIR__.'/Common/debug_suit.php';
-//---------------------------------- environment constant -------------------------------------//
-    //It is different to thinkphp that the beginning time is the time of request comming
-    //and ThinkPHP is just using the time of calling 'microtime(true)' which ignore the loading and parsing of "ThinkPHP.php" and its include files.
-    //It could always keeped in 10ms from request beginning to script shutdown.
-    define('REQUEST_MICROTIME', $_SERVER['REQUEST_TIME_FLOAT']);//(int)($_SERVER['REQUEST_TIME_FLOAT']*1000)//isset($_SERVER['REQUEST_TIME_FLOAT'])? $_SERVER['REQUEST_TIME_FLOAT']:microtime(true)
-    define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
-
-    //record status at the beginning
-    $GLOBALS['litex_begin'] = [
-        REQUEST_MICROTIME,
-        memory_get_usage(),
-    ];
-    const IS_CLIENT = PHP_SAPI === 'cli';
-    define('IS_WINDOWS',false !== stripos(PHP_OS, 'WIN'));//const IS_WINDOWS = PHP_OS === 'WINNT';
-    define('IS_REQUEST_AJAX', ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ));
-    define('IS_METHOD_POST',$_SERVER['REQUEST_METHOD'] === 'POST');//“GET”, “HEAD”，“POST”，“PUT”
-
-    define('HTTP_PREFIX', (isset ($_SERVER ['HTTPS']) and $_SERVER ['HTTPS'] === 'on') ? 'https://' : 'http://' );
-
-//    \PLite\dumpout((empty($_SERVER['SERVER_PORT']) or (80 == $_SERVER['SERVER_PORT'])),
-//        HTTP_PREFIX,$_SERVER['SERVER_NAME'],dirname($_SERVER['SCRIPT_NAME']),$_SERVER['SERVER_PORT'],
-//        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].dirname($_SERVER['SCRIPT_NAME'])
-//        );
-    define('__PUBLIC__',rtrim((empty($_SERVER['SERVER_PORT']) or (80 == $_SERVER['SERVER_PORT']))?
-        HTTP_PREFIX.$_SERVER['SERVER_NAME'].dirname($_SERVER['SCRIPT_NAME']):
-        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].dirname($_SERVER['SCRIPT_NAME']),'/'));//define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
-
-//---------------------------------- general constant ------------------------------//
+    //---------------------------------- general constant ------------------------------//
     const TYPE_BOOL     = 'boolean';
     const TYPE_INT      = 'integer';
     const TYPE_FLOAT    = 'double';//double ,  float
@@ -81,6 +34,51 @@ namespace {
     const ONE_WEEK  = 604800;
     const ONE_MONTH = 2592000;
 
+//---------------------------------- mode constant -------------------------------------//
+    defined('DEBUG_MODE_ON') or define('DEBUG_MODE_ON', true);
+    defined('PAGE_TRACE_ON') or define('PAGE_TRACE_ON', true);//在处理微信签名检查时会发生以外的错误
+//    defined('LITE_ON')       or define('LITE_ON', true);
+    defined('INSPECT_ON')    or define('INSPECT_ON',false);
+
+    defined('OS_ENCODING')  or define('OS_ENCODING','UTF-8');//file system encoding,GB2312 for windows,and utf8 for most linux
+
+    defined('EXCEPTION_CLEAN') or define('EXCEPTION_CLEAN',false);//it will clean the output before if error or exception occur
+    defined('DRIVER_KEY_WITH_PARAM') or define('DRIVER_KEY_WITH_PARAM',false);//for trait 'PLite\D' ,if set to true,it will serialize the parameters of contructor which may use a lot of resource
+
+//---------------------------------- environment constant -------------------------------------//
+    //It is different to thinkphp that the beginning time is the time of request comming
+    //and ThinkPHP is just using the time of calling 'microtime(true)' which ignore the loading and parsing of "ThinkPHP.php" and its include files.
+    //It could always keeped in 10ms from request beginning to script shutdown.
+    define('REQUEST_MICROTIME', $_SERVER['REQUEST_TIME_FLOAT']);//(int)($_SERVER['REQUEST_TIME_FLOAT']*1000)//isset($_SERVER['REQUEST_TIME_FLOAT'])? $_SERVER['REQUEST_TIME_FLOAT']:microtime(true)
+    define('REQUEST_TIME',$_SERVER['REQUEST_TIME']);
+
+    //record status at the beginning
+    $GLOBALS['litex_begin'] = [
+        REQUEST_MICROTIME,
+        memory_get_usage(),
+    ];
+    const IS_CLIENT = PHP_SAPI === 'cli';
+    define('IS_WINDOWS',false !== stripos(PHP_OS, 'WIN'));//const IS_WINDOWS = PHP_OS === 'WINNT';
+    define('IS_REQUEST_AJAX', ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ));
+    define('IS_METHOD_POST',$_SERVER['REQUEST_METHOD'] === 'POST');//“GET”, “HEAD”，“POST”，“PUT”
+
+    define('HTTP_PREFIX', (isset ($_SERVER ['HTTPS']) and $_SERVER ['HTTPS'] === 'on') ? 'https://' : 'http://' );
+
+    $script_dir = rtrim(dirname($_SERVER['SCRIPT_NAME']),'/');
+    define('__PUBLIC__',(empty($_SERVER['SERVER_PORT']) or (80 == $_SERVER['SERVER_PORT']))?
+        HTTP_PREFIX.$_SERVER['SERVER_NAME'].$script_dir:
+        HTTP_PREFIX.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$script_dir);//define('__PUBLIC__',dirname($_SERVER['SCRIPT_NAME']));
+
+//---------------------------------- path constant -------------------------------------//
+    define('PATH_BASE', IS_WINDOWS?str_replace('\\','/',dirname(__DIR__)):dirname(__DIR__));
+    defined('APP_DIR')  or define('APP_DIR','Application');//dir name opposide to base path
+    defined('APP_PATH') or define('PATH_APP',PATH_BASE.'/'.APP_DIR);
+    const PATH_PLITE    = PATH_BASE.'/PLite';
+    const PATH_CONFIG   = PATH_BASE.'/Config';
+    const PATH_RUNTIME  = PATH_BASE.'/Runtime';
+    const PATH_PUBLIC   = PATH_BASE.'/Public';
+
+    if(DEBUG_MODE_ON) include __DIR__.'/Common/debug_suit.php';
 
     /**
      * Class PLite
@@ -138,11 +136,11 @@ namespace {
             ini_set('display_errors',DEBUG_MODE_ON?1:0);
 
             //behavior
-            spl_autoload_register([AutoLoader::class,'load']) or die('Faile to register class autoloader!');
+            spl_autoload_register([Loader::class,'load']) or die('Faile to register class autoloader!');
             self::registerErrorHandler(self::$_config['ERROR_HANDLER']);
             self::registerExceptionHandler(self::$_config['EXCEPTION_HANDLER']);
 
-            register_shutdown_function(function (){/* called when script shut down */
+            register_shutdown_function(function (){/* 脚本结束时将会自动输出，所以不能把输出控制语句放到这里 */
                 PAGE_TRACE_ON and !IS_REQUEST_AJAX and Debugger::trace();//show the trace info
                 Debugger::status('script_shutdown');
             });
@@ -160,8 +158,8 @@ namespace {
                 }
             }
 
-            Debugger::status('app_init_done');
             self::$_app_need_inited = false;
+            Debugger::status('app_init_done');
         }
 
         private static $_app_need_inited = true;
@@ -334,10 +332,10 @@ namespace PLite {
     }
 
     /**
-     * Class AutoLoader
+     * Class Loader
      * @package PLite
      */
-    class AutoLoader {
+    class Loader {
 
         /**
          * 类名和类路径映射表
@@ -384,7 +382,7 @@ namespace PLite {
         /**
          * 直接抛出异常信息
          * @param ...
-         * @return false
+         * @return mixed
          * @throws PLiteException
          */
         public static function throwing(){
@@ -892,19 +890,74 @@ namespace PLite {
         protected static $_is = [];
 
         /**
-         * Get instance by identify
-         * @param string|int $identify
+         * Get instance of this class of special driver by config
+         * @param array|int|float|string|null $config it will convered to identify
+         * @param string $clsnm class name ,it will always be driver name if value set to re-null
+         * @param string|int $identify Instance identify
          * @return object
          */
-        public static function getInstance($identify=0){
-            $clsnm = static::class;
-            isset(self::$_is[$clsnm]) or self::$_is[$clsnm] = [];
+        public static function getInstance($config=null,$clsnm=null,$identify=null){
+            isset($clsnm) or $clsnm = static::class;
+            isset($identify) or $identify = self::_getIdentify();
             if(!isset(self::$_is[$clsnm][$identify])){
-                self::$_is[$clsnm][$identify] = new $clsnm($identify);
+                self::$_is[$clsnm][$identify] = new $clsnm($config);
             }
             return self::$_is[$clsnm][$identify];
         }
 
+        /**
+         * @param null $config
+         * @return int|mixed|string
+         */
+        private static function _getIdentify($config=null){
+            switch (gettype($config)){
+                case TYPE_ARRAY:
+                    $identify = SEK::dataSign($config);
+                    break;
+                case TYPE_FLOAT:
+                case TYPE_INT:
+                case TYPE_STR:
+                    $identify = (string) $config;
+                    break;
+                case TYPE_NULL:
+                    $identify = 0;
+                    break;
+                default:
+                    return PLiteException::throwing('Invalid parameter!',$config);
+            }
+            return $identify;
+        }
+
+        /**
+         * judget if instance exist
+         * @param array|int|float|string|null $config it will convered to identify
+         * @param string $clsnm class name ,it will always be driver name if value set to re-null
+         * @return bool
+         */
+        public static function hasInstance($config=null,$clsnm=null){
+            isset($clsnm) or $clsnm = static::class;
+            if(!isset(self::$_is[$clsnm])){
+                self::$_is[$clsnm] = [];
+                return false;
+            }
+            //get identify
+            switch (gettype($config)){
+                case TYPE_ARRAY:
+                    $identify = SEK::dataSign($config);
+                    break;
+                case TYPE_FLOAT:
+                case TYPE_INT:
+                case TYPE_STR:
+                    $identify = (string) $config;
+                    break;
+                case TYPE_NULL:
+                    $identify = 0;
+                    break;
+                default:
+                    return PLiteException::throwing('Invalid parameter!',$config);
+            }
+            return isset(self::$_is[$clsnm][$identify]);
+        }
     }
 
     /**
@@ -918,7 +971,7 @@ namespace PLite {
      * @package PLite
      */
     abstract class Lite {
-        use AutoConfig , AutoDrive;
+        use AutoConfig , AutoInstance;
 
         /**
          * 类实例的驱动
@@ -935,7 +988,7 @@ namespace PLite {
          * @param string|int|null $identify it will get the default index if set to null
          * @return object
          */
-        protected static function driver($identify=null){
+        public static function driver($identify=null){
             $clsnm = static::class;
             isset(self::$_drivers[$clsnm]) or self::$_drivers[$clsnm] = [];
             $config = null;
@@ -954,11 +1007,11 @@ namespace PLite {
             if(!isset(self::$_drivers[$clsnm][$identify])){
                 $config or $config = static::getConfig();
                 if(isset($config[DRIVER_CLASS_LIST][$identify])){
-                    //获取驱动类名称
-                    $driver = $config[DRIVER_CLASS_LIST][$identify];
-                    $param  = empty($config[DRIVER_CONFIG_LIST][$identify])?null:$config[DRIVER_CONFIG_LIST][$identify];
-                    //设置实例驱动
-                    self::$_drivers[$clsnm][$identify] = $param? new $driver($param): new $driver();
+                    self::$_drivers[$clsnm][$identify] = self::getInstance(
+                        empty($config[DRIVER_CONFIG_LIST][$identify])?null:$config[DRIVER_CONFIG_LIST][$identify],//获取驱动类名称
+                        $config[DRIVER_CLASS_LIST][$identify],//设置实例驱动
+                        $identify //驱动标识符
+                        );
                 }else{
                     PLiteException::throwing("No driver for identify '$identify'!");
                 }

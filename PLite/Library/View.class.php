@@ -1,7 +1,6 @@
 <?php
 
 namespace PLite\Library;
-use PLite\AutoInstance;
 use PLite\Lite;
 
 /**
@@ -13,7 +12,6 @@ use PLite\Lite;
  */
 class View extends Lite {
 
-    use AutoInstance;
 
     const CONF_NAME = 'view';
     const CONF_CONVENTION = [

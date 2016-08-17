@@ -56,14 +56,14 @@ class File
             $current_uri = "cmd:" . implode(' ', $_SERVER['argv']);
         }
 
-        $runtime    = number_format(microtime(true) - THINK_START_TIME, 10);
+        $runtime    = number_format(microtime(true) - REQUEST_TIME, 10);
         $reqs       = number_format(1 / $runtime, 2);
         $time_str   = ' [运行时间：' . number_format($runtime, 6) . 's][吞吐率：' . $reqs . 'req/s]';
-        $memory_use = number_format((memory_get_usage() - THINK_START_MEM) / 1024, 2);
-        $memory_str = ' [内存消耗：' . $memory_use . 'kb]';
+//        $memory_use = number_format((memory_get_usage() - THINK_START_MEM) / 1024, 2);
+//        $memory_str = ' [内存消耗：' . $memory_use . 'kb]';
         $file_load  = ' [文件加载：' . count(get_included_files()) . ']';
 
-        $info = '[ log ] ' . $current_uri . $time_str . $memory_str . $file_load . "\r\n";
+        $info = '[ log ] ' . $current_uri . $time_str /*. $memory_str */. $file_load . "\r\n";
         foreach ($log as $type => $val) {
             foreach ($val as $msg) {
                 if (!is_string($msg)) {
