@@ -1,5 +1,5 @@
 <?php
-const DEBUG_MODE_ON = true;
+const DEBUG_MODE_ON = false;
 const PAGE_TRACE_ON = true;
 const LITE_ON = false;
 const INSPECT_ON = false;

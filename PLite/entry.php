@@ -101,7 +101,7 @@ namespace {
          * 惯例配置
          * @var array
          */
-        private static $_config = [
+        public static $_config = [
             'ZONE'          => 'Asia/Shanghai',
             'PARAMSET_NAME' => '_PARAMS_',
             'ERROR_HANDLER'     => null,
@@ -114,6 +114,12 @@ namespace {
             //cache
             'CACHE_URL_ON'      => true,
             'CACHE_PATH_ON'     => true,
+
+            //配合nginx负载均衡达到'线路容灾'的目的
+            'EXCEPTION_BACK_CODE'   => 403,
+            'EXCEPTION_BACK_MESSAGE'=> 'Resource Exception!',
+            'ERROR_BACK_CODE'       => 403,
+            'ERROR_BACK_MESSAGE'    => 'Resource Error!',
 
         ];
 
@@ -170,6 +176,10 @@ namespace {
          */
         public static function start(array $config=null){
             self::$_app_need_inited and self::init($config);
+
+            include 'aaa.php';
+
+
             Debugger::status('app_start');
 //            $identify = md5($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
             $identify = self::$_config['CACHE_URL_ON']?str_replace('/','_',"{$_SERVER['HTTP_HOST']}-{$_SERVER['REQUEST_URI']}"):null;
@@ -395,11 +405,12 @@ namespace PLite {
          * @param \Exception $e ParseError(newer in php7) or Exception
          * @return void
          */
-        public static function handleException($e) {
+        final public static function handleException($e) {
             if(IS_REQUEST_AJAX){
                 exit($e->getMessage());
             }
             EXCEPTION_CLEAN and ob_get_level() > 0 and ob_end_clean();
+            DEBUG_MODE_ON or Response::sendHttpStatus(\PLite::$_config['EXCEPTION_BACK_CODE'],\PLite::$_config['EXCEPTION_BACK_MESSAGE']);
             $trace = $e->getTrace();
             if(!empty($trace[0])){
                 empty($trace[0]['file']) and $trace[0]['file'] = 'Unkown file';
@@ -412,6 +423,8 @@ namespace PLite {
                 ];
                 if(DEBUG_MODE_ON){
                     Utils::loadTemplate('exception',$vars);
+                }else{
+                    Utils::loadTemplate('user_error');
                 }
             }else{
                 Utils::loadTemplate('user_error');
@@ -427,7 +440,7 @@ namespace PLite {
          * @param int $errline error occurring file line number
          * @return void
          */
-        public static function handleError($errno,$errstr,$errfile,$errline){
+        final public static function handleError($errno,$errstr,$errfile,$errline){
             IS_REQUEST_AJAX and exit($errstr);
             EXCEPTION_CLEAN and ob_get_level() > 0 and ob_end_clean();
             if(!is_string($errstr)) $errstr = serialize($errstr);
@@ -437,6 +450,7 @@ namespace PLite {
                 'position'  => "File:{$errfile}   Line:{$errline}",
                 'trace'     => $trace, //be careful
             ];
+            DEBUG_MODE_ON or Response::sendHttpStatus(\PLite::$_config['ERROR_BACK_CODE'],\PLite::$_config['ERROR_BACK_MESSAGE']);
             if(DEBUG_MODE_ON){
                 Utils::loadTemplate('error',$vars);
             }else{

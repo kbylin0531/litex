@@ -42,7 +42,7 @@
                     <h3>回溯：</h3>
                 </div>
                 <div class="text">
-                    <p><?php \PLite\_export($trace); ?></p>
+                    <p><?php \PLite\dump($trace); ?></p>
                 </div>
             </div>
         <?php }?>
